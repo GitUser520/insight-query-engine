@@ -1,0 +1,20 @@
+{
+  "title": "a simple valid query no result",
+  "input":
+  {
+    "WHERE": {
+      "GT": {
+        "courses_avg": 100
+      }
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept",
+        "courses_avg"
+      ],
+      "ORDER": "courses_avg"
+    }
+  },
+  "errorExpected": false,
+  "expected": []
+}

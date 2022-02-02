@@ -1,0 +1,20 @@
+{
+  "title": "an invalid query with invalid filter key",
+  "input":
+  {
+    "WHERE": {
+      "E": {
+        "courses_avg": 90
+      }
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept",
+        "courses_title"
+      ],
+      "ORDER": "courses_title"
+    }
+  },
+  "errorExpected": true,
+  "expected": "InvalidFilterError"
+}

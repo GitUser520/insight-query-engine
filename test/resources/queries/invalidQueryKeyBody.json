@@ -1,0 +1,20 @@
+{
+  "title": "an invalid query with invalid query key in body",
+  "input":
+  {
+    "WHERE": {
+      "EQ": {
+        "courses_av": 90
+      }
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept",
+        "courses_title"
+      ],
+      "ORDER": "courses_avg"
+    }
+  },
+  "errorExpected": true,
+  "expected": "InvalidQueryKeyError"
+}
