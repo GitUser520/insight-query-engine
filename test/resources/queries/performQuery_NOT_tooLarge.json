@@ -1,0 +1,18 @@
+{
+  "title": "query NOT too large",
+  "input":
+  {
+    "WHERE": {
+      "NOT":{
+        "IS": {"courses_dept": "adhe"}
+      }
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept"
+      ]
+    }
+  }	,
+  "errorExpected": true,
+  "expected": "ResultTooLargeError"
+}
