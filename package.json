@@ -5,6 +5,9 @@
 	"repository": "https://github.students.cs.ubc.ca/CPSC310-2021W-T2/project_team617.git",
 	"author": "none",
 	"license": "none",
+	"engines": {
+		"node": ">= 16 < 17"
+	},
 	"dependencies": {
 		"decimal.js": "10.3.1",
 		"express": "4.17.2",

@@ -1,0 +1,18 @@
+{
+  "title": "query LT courses_dept invalid LT type",
+  "input":
+  {
+    "WHERE": {
+      "LT":{
+        "courses_dept": "string"
+      }
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept"
+      ]
+    }
+  },
+  "errorExpected": true,
+  "expected": "InsightError"
+}

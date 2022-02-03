@@ -1,0 +1,18 @@
+{
+  "title": "query reference column-where mismatch fail",
+  "input":
+  {
+    "WHERE": {
+      "GT": {
+        "courses_avg": 95
+      }
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept"
+      ]
+    }
+  }	,
+  "errorExpected": true,
+  "expected": "InsightError"
+}
