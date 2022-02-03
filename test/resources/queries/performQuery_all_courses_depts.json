@@ -1,0 +1,14 @@
+{
+  "title": "query all courses_dept",
+  "input":
+  {
+    "WHERE": {},
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept"
+      ]
+    }
+  },
+  "errorExpected": true,
+  "expected": "ResultTooLargeError"
+}

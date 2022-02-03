@@ -1,0 +1,20 @@
+
+{
+  "title": "query invalid GT too large",
+  "input":
+  {
+    "WHERE": {
+      "GT": {
+        "courses_avg": 53
+      }
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_avg"
+      ]
+    }
+  },
+  "errorExpected": true,
+  "expected": "ResultTooLargeError"
+}
+

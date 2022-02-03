@@ -1,0 +1,18 @@
+{
+  "title": "query EQ courses_dept bad format not object",
+  "input":
+  {
+    "WHERE": {
+      "EQ":[
+        {"courses_dept": "A"}
+      ]
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept"
+      ]
+    }
+  },
+  "errorExpected": true,
+  "expected": "InsightError"
+}

@@ -1,0 +1,18 @@
+{
+  "title": "query valid LT",
+  "input":
+  {
+    "WHERE": {
+      "LT": {
+        "courses_avg": 10
+      }
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_avg"
+      ]
+    }
+  },
+  "errorExpected": false,
+  "expected": {"result":[{"courses_avg":4},{"courses_avg":4},{"courses_avg":4.5},{"courses_avg":0},{"courses_avg":0},{"courses_avg":0},{"courses_avg":1}]}
+}
