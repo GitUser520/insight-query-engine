@@ -12,6 +12,7 @@ import * as fs from "fs-extra";
 import {folderTest} from "@ubccpsc310/folder-test";
 import {expect} from "chai";
 
+
 describe("InsightFacade", function () {
 	let insightFacade: InsightFacade;
 
