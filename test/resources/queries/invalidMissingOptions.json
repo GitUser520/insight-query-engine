@@ -1,0 +1,12 @@
+{
+  "title": "a simple invalid query",
+  "input": {
+    "WHERE": {
+      "GT": {
+        "courses_avg": 98
+      }
+    }
+  },
+  "errorExpected": true,
+  "expected": "MissingOptionsError"
+}

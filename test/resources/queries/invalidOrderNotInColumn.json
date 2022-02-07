@@ -1,0 +1,20 @@
+{
+  "title": "an invalid query ORDER not in COLUMN",
+  "input":
+  {
+    "WHERE": {
+      "EQ": {
+        "courses_avg": 95
+      }
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept",
+        "courses_title"
+      ],
+      "ORDER": "courses_avg"
+    }
+  },
+  "errorExpected": true,
+  "expected": "OrderNotInColumnError"
+}

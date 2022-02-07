@@ -13,6 +13,7 @@
 		"express": "4.17.2",
 		"fs-extra": "10.0.0",
 		"jszip": "3.7.1",
+		"nvm": "^0.0.4",
 		"parse5": "6.0.1"
 	},
 	"devDependencies": {

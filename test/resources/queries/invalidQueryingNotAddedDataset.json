@@ -1,0 +1,20 @@
+{
+  "title": "an invalid query calling not added dataset",
+  "input":
+  {
+    "WHERE": {
+      "EQ": {
+        "another_avg": 90
+      }
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "another_dept",
+        "another_avg"
+      ],
+      "ORDER": "another_avg"
+    }
+  },
+  "errorExpected": true,
+  "expected": "QueryingUnknownDatasetsError"
+}
