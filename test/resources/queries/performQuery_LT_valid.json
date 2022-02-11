@@ -14,5 +14,8 @@
     }
   },
   "errorExpected": false,
-  "expected": {"result":[{"courses_avg":4},{"courses_avg":4},{"courses_avg":4.5},{"courses_avg":0},{"courses_avg":0},{"courses_avg":0},{"courses_avg":1}]}
+  "expected":
+  [
+    {"courses_avg":4},{"courses_avg":4},{"courses_avg":4.5},{"courses_avg":0},{"courses_avg":0},{"courses_avg":0},{"courses_avg":1}
+  ]
 }

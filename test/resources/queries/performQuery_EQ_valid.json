@@ -15,5 +15,8 @@
     }
   },
   "errorExpected": false,
-  "expected": {"result":[{"courses_avg":97},{"courses_avg":97},{"courses_avg":97}]}
+  "expected":
+  [
+    {"courses_avg":97},{"courses_avg":97},{"courses_avg":97}
+  ]
 }
