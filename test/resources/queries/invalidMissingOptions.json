@@ -8,5 +8,5 @@
     }
   },
   "errorExpected": true,
-  "expected": "MissingOptionsError"
+  "expected": "InsightError"
 }
