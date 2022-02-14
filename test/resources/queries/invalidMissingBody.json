@@ -11,5 +11,5 @@
   }
   },
   "errorExpected": true,
-  "expected": "MissingBodyError"
+  "expected": "InsightError"
 }
