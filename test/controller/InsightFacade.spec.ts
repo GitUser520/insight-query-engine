@@ -65,12 +65,14 @@ describe("InsightFacade", function () {
 			const content: string = datasetContents.get("courses") ?? "";
 			const expected: string[] = [id];
 			return insightFacade.addDataset(id, content, InsightDatasetKind.Courses).then((result: string[]) => {
+				console.info(`Result: ${result}`);
 				expect(result).to.deep.equal(expected);
 			});
 		});
 
 		it("should not add one dataset given invalid dataset", async function () {
-			const contentInvalid = getContentFromArchives("invalid.txt");
+			// const contentInvalid = getContentFromArchives("invalid.txt");
+			const contentInvalid = getContentFromArchives("malformed.zip");
 			try {
 				await insightFacade.addDataset("courses", contentInvalid, InsightDatasetKind.Courses);
 				expect.fail("should have thrown an error");
