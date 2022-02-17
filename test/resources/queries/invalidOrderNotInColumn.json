@@ -16,5 +16,5 @@
     }
   },
   "errorExpected": true,
-  "expected": "OrderNotInColumnError"
+  "expected": "InsightError"
 }

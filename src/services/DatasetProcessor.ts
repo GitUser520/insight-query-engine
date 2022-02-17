@@ -17,24 +17,36 @@ export const keyMapping: any = {
 	Year: "year"
 };
 
+export const typeMapping: any = {
+	Subject: "string",
+	Course: "string",
+	Avg: "number",
+	Professor: "string",
+	Title: "string",
+	Pass: "number",
+	Fail: "number",
+	Audit: "number",
+	id: "string",
+	Year: "string"
+};
+
 const filename: string = "/data/datasets.json";
 
-export async function parseCourse(json: any): Promise<Section[]> {
+export function parseCourse(json: any): Section[] {
 	const result = json["result"];
 	let allSections: Section[] = [];
-	return new Promise((resolve, reject) => {
-		let parsedSection: Section;
-		if (result === null) {
-			return reject(new InsightError("no 'result' in course data"));
+
+	let parsedSection: Section;
+	if (result === null) {
+		return allSections;
+	}
+	for (const sectionData of result) {
+		if (isValidSection(sectionData)) {
+			parsedSection = parseSection(sectionData);
+			allSections.push(parsedSection);
 		}
-		for (const sectionData of result) {
-			if (isValidSection(sectionData)) {
-				parsedSection = parseSection(sectionData);
-				allSections.push(parsedSection);
-			}
-		}
-		return resolve(allSections);
-	});
+	}
+	return allSections;
 }
 
 // parse a single section
@@ -56,13 +68,11 @@ export function isValidSection(json: any): boolean {
 	const keys: string[] = Object.keys(json);
 	const requiredKeys: string[] = Object.keys(keyMapping);
 	// check if containing all keys required
-	for (const key of requiredKeys) {
-		if (!keys.includes(key)) {
+	for (const requiredKey of requiredKeys) {
+		if (!keys.includes(requiredKey)) {
 			return false;
 		}
 	}
-    // todo: more validation?
-
 	return true;
 }
 
@@ -75,20 +85,24 @@ export function loadFromDisk(): Dataset[] {
 			result = JSON.parse(fs.readFileSync(filename, "utf8"));
 		});
 	} catch(err) {
-		console.error(err);
+		// console.error(err);
 	}
 	return result;
 }
 
-export function persistToDisk(datasets: Dataset[]): void {
+export async function persistToDisk(datasets: Dataset[]): Promise<void> {
 	const fs = require("fs");
 	let getDirName = require("path").dirname;
-	try {
-		mkdirp(getDirName(filename), function () {
-			fs.writeFileSync(filename, JSON.stringify(datasets));
-		});
-	} catch(err) {
-		console.error(err);
-	}
+	return new Promise((resolve, reject) => {
+		try {
+			mkdirp(getDirName(filename), function () {
+				fs.writeFileSync(filename, JSON.stringify(datasets));
+			});
+		} catch(err) {
+			// console.error(err);
+			return reject(new InsightError("error"));
+		}
+		return resolve();
+	});
 }
 
