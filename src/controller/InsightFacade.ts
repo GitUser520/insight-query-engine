@@ -48,7 +48,7 @@ export default class InsightFacade implements IInsightFacade {
 					zip.folder("courses")?.forEach(((relativePath, file) => {
 						promises.push(file.async("string"));
 					}));
-					Promise.all(promises).then((promise: string[]) => {
+					Promise.all(promises).then( async (promise: string[]) => {
 						dataset = new Dataset(id, kind);
 						let allSections: Section[] = [];
 						for (const courseData of promise) {
@@ -62,12 +62,8 @@ export default class InsightFacade implements IInsightFacade {
 						dataset.data = allSections;
 						dataset.size = allSections.length;
 						this.addedDatasets.push(dataset);
-						persistToDisk(this.addedDatasets)
-							.then(() => {
-								return this.getAddedDatasetIds();
-							}).then((ids) => {
-								return resolve(ids);
-							});
+						await persistToDisk(this.addedDatasets);
+						return resolve(this.getAddedDatasetIds());
 					});
 				})
 				.catch(() => {
