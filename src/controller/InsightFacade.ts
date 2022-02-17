@@ -53,22 +53,20 @@ export default class InsightFacade implements IInsightFacade {
 						let allSections: Section[] = [];
 						for (const courseData of promise) {
 							const json = JSON.parse(courseData);
-							parseCourse(json).then((result: Section[]) => {
-								allSections = [...allSections, ...result];
-							}).catch((e) => {
-								console.log(e);
-								return reject(new InsightError("error in parsing the dataset"));
-							});
+							const result = parseCourse(json);
+							allSections = [...allSections, ...result];
+						}
+						if (allSections.length === 0) {
+							return reject(new InsightError("no valid section in this dataset"));
 						}
 						dataset.data = allSections;
 						dataset.size = allSections.length;
 						this.addedDatasets.push(dataset);
-						persistToDisk(this.addedDatasets);
-						return resolve(this.getAddedDatasetIds());
+						persistToDisk(this.addedDatasets).then(() => resolve(this.getAddedDatasetIds()));
 					});
 				})
-				.catch((err) => {
-					console.log(err);
+				.catch(() => {
+					// console.log(err);
 					return reject(new InsightError("error in loading zip file"));
 				});
 		});
@@ -86,5 +84,6 @@ export default class InsightFacade implements IInsightFacade {
 	public listDatasets(): Promise<InsightDataset[]> {
 		return Promise.reject("Not implemented.");
 	}
+
 }
 
