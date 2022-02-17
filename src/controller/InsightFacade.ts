@@ -62,7 +62,10 @@ export default class InsightFacade implements IInsightFacade {
 						dataset.data = allSections;
 						dataset.size = allSections.length;
 						this.addedDatasets.push(dataset);
-						persistToDisk(this.addedDatasets).then(() => resolve(this.getAddedDatasetIds()));
+						persistToDisk(this.addedDatasets).then(() => {
+							const ids: string[] = this.getAddedDatasetIds();
+							return resolve(ids);
+						});
 					});
 				})
 				.catch(() => {
