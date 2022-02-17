@@ -1,0 +1,22 @@
+{
+  "title": "query valid EQ",
+  "input":
+  {
+    "WHERE": {
+      "EQ":{
+        "courses_avg": 97
+      }
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_avg"
+      ]
+    }
+  },
+  "errorExpected": false,
+  "expected":
+  [
+    {"courses_avg":97},{"courses_avg":97},{"courses_avg":97}
+  ]
+}
+
