@@ -86,7 +86,7 @@ export function loadFromDisk(): Dataset[] {
 			result = JSON.parse(fs.readFileSync(filename, "utf8"));
 		});
 	} catch(err) {
-		console.error(err);
+		// console.error(err);
 	}
 	return result;
 }
@@ -100,7 +100,7 @@ export async function persistToDisk(datasets: Dataset[]): Promise<void> {
 				fs.writeFileSync(filename, JSON.stringify(datasets));
 			});
 		} catch(err) {
-			console.error(err);
+			// console.error(err);
 			return reject(new InsightError("error"));
 		}
 		return resolve();
