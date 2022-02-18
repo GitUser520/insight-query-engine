@@ -1,4 +1,3 @@
-
 {
   "title": "query valid EQ",
   "input":
@@ -20,3 +19,4 @@
     {"courses_avg":97},{"courses_avg":97},{"courses_avg":97}
   ]
 }
+

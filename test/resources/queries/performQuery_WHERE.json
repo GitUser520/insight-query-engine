@@ -1,9 +1,0 @@
-{
-  "title": "query with WHERE",
-  "input":
-  {
-    "WHERE": "string"
-  },
-  "errorExpected": true,
-  "expected": "InsightError"
-}
