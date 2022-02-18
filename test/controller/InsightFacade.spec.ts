@@ -214,12 +214,12 @@ describe("InsightFacade", function () {
 			} catch (err) {
 				expect.fail("cannot add dataset");
 			}
-			// try {
-			// 	await insightFacade.removeDataset("cou");
-			// 	expect.fail("should have thrown an error");
-			// } catch (err) {
-			// 	expect(err).to.be.instanceof(NotFoundError);
-			// }
+			try {
+				await insightFacade.removeDataset("cou");
+				expect.fail("should have thrown an error");
+			} catch (err) {
+				expect(err).to.be.instanceof(NotFoundError);
+			}
 		});
 
 		it("should not remove one dataset given invalid id", async function () {
@@ -279,7 +279,7 @@ describe("InsightFacade", function () {
 					expect(results).to.deep.members([
 						{
 							id: "courses",
-							kind: "courses",
+							kind: InsightDatasetKind.Courses,
 							numRows: 64612,
 						},
 					]);
