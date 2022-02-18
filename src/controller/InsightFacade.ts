@@ -75,7 +75,16 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public removeDataset(id: string): Promise<string> {
-		return Promise.reject("Not implemented.");
+		return new Promise<string>((resolve, reject) => {
+			if (id == null || id.includes("_") || id.trim().length === 0) {
+				return reject(new InsightError("invalid id"));
+			}
+			if (!this.getAddedDatasetIds().includes(id)) {
+				return reject(new NotFoundError("dataset not yet added"));
+			}
+			this.addedDatasets = this.addedDatasets.filter((dataset) => dataset.id !== id);
+			persistToDisk(this.addedDatasets).then(() => resolve(id));
+		});
 	}
 
 	public performQuery(query: unknown): Promise<InsightResult[]> {
@@ -83,7 +92,20 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public listDatasets(): Promise<InsightDataset[]> {
-		return Promise.reject("Not implemented.");
+		let datasetList: InsightDataset[] = [];
+		return new Promise<InsightDataset[]>((resolve) => {
+			let insightDataset: InsightDataset;
+			for (const dataset of this.addedDatasets) {
+				insightDataset = {
+					id: dataset.id,
+					kind: dataset.kind,
+					numRows: dataset.size
+				};
+				datasetList.push(insightDataset);
+			}
+			return resolve(datasetList);
+		});
+
 	}
 
 }
