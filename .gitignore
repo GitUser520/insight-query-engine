@@ -17,4 +17,4 @@ data/
 .DS_Store
 .env
 *.log
-/src/controller/QueryInterfaces.ts
+/src/model/QueryInterfaces.ts

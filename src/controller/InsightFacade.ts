@@ -10,7 +10,14 @@ import {loadFromDisk, parseCourse, persistToDisk} from "../services/DatasetProce
 import JSZip = require("jszip");
 import Dataset from "../model/Dataset";
 import Section from "../model/Section";
-import {query} from "express";
+import {
+	Query, Filter, Options,
+	LComparison, MComparison, SComparison, Negation,
+	MKeyPair, Key, SKey, MKey
+} from "../model/QueryInterfaces";
+
+// todo production remove following line
+/*eslint-disable */
 
 /**
  * This is the main programmatic entry point for the project.
@@ -18,7 +25,6 @@ import {query} from "express";
  *
  */
 export default class InsightFacade implements IInsightFacade {
-
 	public addedDatasets: Dataset[];
 
 	constructor() {
@@ -107,29 +113,103 @@ export default class InsightFacade implements IInsightFacade {
 
 	public performQuery(query: unknown): Promise<InsightResult[]> {
 		// check data is valid
-
-
+		// data should be valid upon checking valid EBNF, because mkey and skey check if item id exists
 		// verify query is in valid EBNF form
 		// if this executes, then that means that we already know query is a valid JSON object
-		this.checkQueryValidEBNF(query);
+		let validEBNF = this.checkQueryValidEBNF(query);
+		if (!validEBNF) {
+			return Promise.reject(new InsightError("Invalid query."));
+		}
 
-		return Promise.reject("Not implemented");
+		let insightResultArray = this.getQuery(query as Query);
+
+		return Promise.resolve(insightResultArray);
 	}
 
-	private checkQueryValidEBNF(query: unknown): boolean {
+	// gets the elements from the dataset using the query
+	private getQuery(queryObject: Query): InsightResult[] {
+		// query
+		let queryWhere = queryObject.WHERE;
+		let queryOptions = queryObject.OPTIONS;
+		// results
+		let queryResults = this.getQueryByFilter(queryWhere);
+		// options
+		let queryColumns = queryOptions.COLUMNS;
+		let queryOrder = queryOptions.ORDER;
+
+
+		return [];
+	}
+
+	private getQueryByFilter(queryWhere: Filter): InsightResult[] {
+		// comparators
+		let queryLComparator = queryWhere.LCOMPARISON;
+		let queryMComparator = queryWhere.MCOMPARISON;
+		let querySComparator = queryWhere.SCOMPARISON;
+		let queryNegation = queryWhere.NEGATION;
+
+		let queryLResults: InsightResult[] = [];
+		let queryMResults: InsightResult[] = [];
+		let querySResults: InsightResult[] = [];
+		let queryNResults: InsightResult[] = [];
+
+		if (queryLComparator !== undefined) {
+			queryLResults = this.getByLComparator(queryLComparator);
+		}
+
+		if (queryMComparator !== undefined) {
+			queryMResults = this.getByMComparator(queryMComparator);
+		}
+
+		if (querySComparator !== undefined) {
+			querySResults = this.getBySComparator(querySComparator);
+		}
+
+		if (queryNegation !== undefined) {
+			queryNResults = this.getByNComparator(queryNegation);
+		}
+
+		// todo merge queryLResults, queryMResults, querySResults, and queryNResults
+
+
+		return [];
+	}
+
+	// todo
+	private getByNComparator(queryNegation: Negation): InsightResult[] {
+
+		return [];
+	}
+
+	// todo
+	private getBySComparator(querySComparator: SComparison): InsightResult[] {
+        throw new Error("Method not implemented.");
+    }
+
+	// todo
+	private getByMComparator(queryMComparator: MComparison): InsightResult[] {
+        throw new Error("Method not implemented.");
+    }
+
+	// todo
+	private getByLComparator(queryLComparator: LComparison): InsightResult[] {
+        throw new Error("Method not implemented.");
+    }
+
+	private checkQueryValidEBNF(queryObject: unknown): boolean {
 		// check if null, check if undefined
-		if (query === null || query === undefined) {
+		if (queryObject === null || queryObject === undefined) {
 			return false;
 		}
 		// check if query is not of type object
-		if (typeof query !== "object") {
+		if (typeof queryObject !== "object") {
 			return false;
 		}
 		// split the query into two parts
 		// one part is based on the body, forms a json object
 		// other part is based on the options, forms a json object
-		let queryBody = (query as Query).WHERE;
-		let queryOptions = (query as Query).OPTIONS;
+		let queryBody = (queryObject as Query).WHERE;
+		let queryOptions = (queryObject as Query).OPTIONS;
 
 		if (queryBody === null || queryBody === undefined) {
 			return false;
@@ -317,7 +397,6 @@ export default class InsightFacade implements IInsightFacade {
 		}
 
 		// check that the columns are valid
-		// TODO
 		let validColumns = this.checkQueryColumns(queryColumns);
 		let validOrder = true;
 
@@ -359,7 +438,6 @@ export default class InsightFacade implements IInsightFacade {
 		return this.checkMKey(mkey) && this.checkSKey(skey);
 	}
 
-	// TODO checkMKey
 	private checkMKey(mkey: MKey): boolean {
 		let mKeyParts = mkey.mkey.split("_");
 		let validMField = ["avg", "pass", "fail", "audit","year"];
@@ -368,12 +446,14 @@ export default class InsightFacade implements IInsightFacade {
 			return false;
 		}
 
-		// TODO check if mKeyParts[0] is a valid id in our values
+		let valid = false;
+		this.addedDatasets.forEach((dataset) => {
+			valid = valid || (dataset.id === mKeyParts[0]);
+		});
 
-		return true;
+		return valid;
 	}
 
-	// TODO checkSKey
 	private checkSKey(skey: SKey): boolean {
 		let sKeyParts = skey.skey.split("_");
 		let validSField = ["dept", "id", "instructor", "title", "uuid"];
@@ -382,64 +462,13 @@ export default class InsightFacade implements IInsightFacade {
 			return false;
 		}
 
-		// TODO check if sKeyParts[0] is a valid id in our values
+		let valid = false;
+		this.addedDatasets.forEach((dataset) => {
+			valid = valid || (dataset.id === sKeyParts[0]);
+		});
 
-		return true;
+		return valid;
 	}
-}
 
-interface Query {
-	WHERE: Filter
-	OPTIONS: Options
 }
-
-interface Filter {
-	LCOMPARISON?: LComparison
-	MCOMPARISON?: MComparison
-	SCOMPARISON?: SComparison
-	NEGATION?: Negation
-}
-
-interface LComparison {
-	AND?: Filter[]
-	OR?: Filter[]
-}
-
-interface MComparison {
-	LT?: MKeyPair
-	GT?: MKeyPair
-	EQ?: MKeyPair
-}
-
-interface MKeyPair {
-	mkey: MKey
-	number: number
-}
-
-interface SComparison {
-	IS: SKey
-}
-
-interface Key {
-	mKey?: MKey
-	sKey?: SKey
-}
-
-interface SKey {
-	skey: string
-}
-
-interface MKey {
-	mkey: string
-}
-
-interface Negation {
-	NOT: Filter
-}
-
-interface Options {
-	COLUMNS: Key[]
-	ORDER?: Key
-}
-
 
