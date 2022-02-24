@@ -35,7 +35,7 @@ export interface Negation {
 }
 
 export interface MKeyPair {
-	mkey: MKey
+	mKey: MKey
 	number: number
 }
 

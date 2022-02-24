@@ -131,11 +131,12 @@ export default class InsightFacade implements IInsightFacade {
 		// query
 		let queryWhere = queryObject.WHERE;
 		let queryOptions = queryObject.OPTIONS;
-		// results
-		let queryResults = this.getQueryByFilter(queryWhere);
 		// options
 		let queryColumns = queryOptions.COLUMNS;
 		let queryOrder = queryOptions.ORDER;
+
+		// results
+		let queryResults = this.getQueryByFilter(queryWhere);
 
 
 		return [];
@@ -177,23 +178,148 @@ export default class InsightFacade implements IInsightFacade {
 
 	// todo
 	private getByNComparator(queryNegation: Negation): InsightResult[] {
+		// take everything that we have in the dataset, and remove queries from
+		// getQueryByFilter from it
 
 		return [];
 	}
 
 	// todo
 	private getBySComparator(querySComparator: SComparison): InsightResult[] {
+		// get the queries following the SKey
+
         throw new Error("Method not implemented.");
     }
 
 	// todo
 	private getByMComparator(queryMComparator: MComparison): InsightResult[] {
-        throw new Error("Method not implemented.");
+		// get the queries based on the MKeyPair
+		// check that there is only one valid pair (even though I think valid EBNF may already do that)
+		let LT = queryMComparator.LT;
+		let GT = queryMComparator.GT;
+		let EQ = queryMComparator.EQ;
+		let comparator: MKeyPair;
+		let flagsLTGTEQ: {LT: boolean, GT: boolean, EQ: boolean} = {
+			LT: false,
+			GT: false,
+			EQ: false
+		}
+
+		if (
+			(LT === undefined && GT === undefined && EQ === undefined)
+			|| (LT !== undefined && GT !== undefined && EQ !== undefined)
+			|| (LT !== undefined && GT !== undefined && EQ === undefined)
+			|| (LT !== undefined && GT === undefined && EQ !== undefined)
+			|| (LT === undefined && GT !== undefined && EQ !== undefined)
+		) {
+			throw new InsightError("Invalid query.");
+		}
+
+		if (LT !== undefined) {
+			comparator = LT;
+			flagsLTGTEQ.LT = true;
+		} else if (GT !== undefined) {
+			comparator = GT;
+			flagsLTGTEQ.GT = true;
+		} else if (EQ !== undefined) {
+			comparator = EQ;
+			flagsLTGTEQ.EQ = true;
+		} else {
+			throw new InsightError("Invalid query.");
+		}
+
+		let keys = this.parseMKey(comparator);
+		const validMKeyValues = ["avg", "pass", "fail", "audit","year"];
+
+		if (!validMKeyValues.includes(keys.field)) {
+			throw new InsightError("Invalid query.");
+		}
+
+		let resultDataset = this.addedDatasets.filter((dataset) => {
+			return dataset.id == keys.id;
+		});
+
+		let result: Section[] = [];
+
+		resultDataset.map((dataset) => {
+			dataset.data.filter((section) => {
+				if (section.hasOwnProperty(keys.field)) {
+					if (flagsLTGTEQ.LT) {
+						return (section as any)[keys.field] <= keys.number;
+					} else if (flagsLTGTEQ.GT) {
+						return (section as any)[keys.field] >= keys.number;
+					} else if (flagsLTGTEQ.EQ) {
+						return (section as any)[keys.field] == keys.number;
+					}
+				}
+				return false;
+			});
+			result.concat(dataset.data);
+		});
+
+		// todo --where I left off
+		// filter result by options
+		result = result.filter(() => {
+
+		});
+
+		return [];
     }
+
+	private parseMKey(comparator: MKeyPair): {id: string, field: string, number: number} {
+		let mkey = comparator.mKey.mkey;
+		let mkeyValues = mkey.split("_");
+
+		return {
+			id: mkeyValues[0],
+			field: mkeyValues[1],
+			number: comparator.number
+		};
+	}
 
 	// todo
 	private getByLComparator(queryLComparator: LComparison): InsightResult[] {
-        throw new Error("Method not implemented.");
+		// check if it is AND or OR
+		// then write everything based on that
+		let arrayAnd = queryLComparator.AND;
+		let arrayOr = queryLComparator.OR;
+
+		if (
+			(arrayAnd === undefined && arrayOr == undefined)
+			|| (arrayAnd !== undefined && arrayOr !== undefined)
+		) {
+			// todo Is it okay to throw an unchecked exception here?
+			// technically, since it passes the valid EBNF check, it should
+			// be fine, but this just feels like poor design
+			throw new InsightError("Invalid query.");
+		}
+
+		let result: InsightResult[] = [];
+
+		if (arrayAnd !== undefined) {
+			let arrayAnd2d: InsightResult[][] = [];
+
+			arrayAnd.forEach((filter) => {
+				arrayAnd2d.push(this.getQueryByFilter(filter));
+			})
+
+			result = arrayAnd2d.reduce((resultArray1, resultArray2): InsightResult[] => {
+				let currentIntersection = resultArray1.filter((result) => {
+					return resultArray2.includes(result);
+				});
+
+				return currentIntersection;
+			});
+		}
+
+		if (arrayOr !== undefined) {
+			arrayOr.forEach((filter) => {
+				let tempResult = this.getQueryByFilter(filter);
+				result.concat(tempResult);
+			});
+		}
+
+		return result;
     }
 
 	private checkQueryValidEBNF(queryObject: unknown): boolean {
