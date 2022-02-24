@@ -135,14 +135,47 @@ export default class InsightFacade implements IInsightFacade {
 		let queryColumns = queryOptions.COLUMNS;
 		let queryOrder = queryOptions.ORDER;
 
+		let jsonFieldTracker: any = {};
+
+		queryColumns.forEach((key) => {
+			let splitArray = this.parseKey(key);
+			let stringID = splitArray[0] + splitArray[1];
+
+			jsonFieldTracker[stringID] = splitArray;
+		});
+
 		// results
-		let queryResults = this.getQueryByFilter(queryWhere);
+		let queryResults = this.getQueryByFilter(queryWhere, jsonFieldTracker);
 
 
 		return [];
 	}
 
-	private getQueryByFilter(queryWhere: Filter): InsightResult[] {
+	private parseKey(key: Key): string[] {
+		let mKey = key.mKey;
+		let sKey = key.sKey;
+
+		if (
+			(mKey === undefined && sKey === undefined)
+			|| (mKey !== undefined && sKey !== undefined)
+		) {
+			throw new InsightError("Invalid query.");
+		}
+
+		let result: string[] = [];
+
+		if (mKey !== undefined) {
+			result.concat(mKey.mkey.split("_"));
+		}
+
+		if (sKey !== undefined) {
+			result.concat(sKey.skey.split("_"));
+		}
+
+		return result;
+	}
+
+	private getQueryByFilter(queryWhere: Filter, jsonFieldTracker: any): InsightResult[] {
 		// comparators
 		let queryLComparator = queryWhere.LCOMPARISON;
 		let queryMComparator = queryWhere.MCOMPARISON;
@@ -159,7 +192,7 @@ export default class InsightFacade implements IInsightFacade {
 		}
 
 		if (queryMComparator !== undefined) {
-			queryMResults = this.getByMComparator(queryMComparator);
+			queryMResults = this.getByMComparator(queryMComparator, jsonFieldTracker);
 		}
 
 		if (querySComparator !== undefined) {
@@ -192,7 +225,7 @@ export default class InsightFacade implements IInsightFacade {
     }
 
 	// todo
-	private getByMComparator(queryMComparator: MComparison): InsightResult[] {
+	private getByMComparator(queryMComparator: MComparison, jsonFieldTracker: any): InsightResult[] {
 		// get the queries based on the MKeyPair
 		// check that there is only one valid pair (even though I think valid EBNF may already do that)
 		let LT = queryMComparator.LT;
@@ -239,7 +272,8 @@ export default class InsightFacade implements IInsightFacade {
 			return dataset.id == keys.id;
 		});
 
-		let result: Section[] = [];
+		let result: InsightResult[] = [];
+		let resultSection: Section[] = [];
 
 		resultDataset.map((dataset) => {
 			dataset.data.filter((section) => {
@@ -254,16 +288,22 @@ export default class InsightFacade implements IInsightFacade {
 				}
 				return false;
 			});
-			result.concat(dataset.data);
+			resultSection.concat(dataset.data);
 		});
 
-		// todo --where I left off
 		// filter result by options
-		result = result.filter(() => {
+		resultSection.forEach((section) => {
+			let tempJSON: any = {};
+			for (var key in Object.keys(jsonFieldTracker)) {
+				let currentField: string = jsonFieldTracker[key][1];
+				if (section.hasOwnProperty(currentField)) {
+					tempJSON[key] = (section as any)[currentField];
+				}
+			}
+			result.push(tempJSON as InsightResult);
+		})
 
-		});
-
-		return [];
+		return result;
     }
 
 	private parseMKey(comparator: MKeyPair): {id: string, field: string, number: number} {
@@ -300,7 +340,7 @@ export default class InsightFacade implements IInsightFacade {
 			let arrayAnd2d: InsightResult[][] = [];
 
 			arrayAnd.forEach((filter) => {
-				arrayAnd2d.push(this.getQueryByFilter(filter));
+				arrayAnd2d.push(this.getQueryByFilter(filter, splitArray));
 			})
 
 			result = arrayAnd2d.reduce((resultArray1, resultArray2): InsightResult[] => {
@@ -314,7 +354,7 @@ export default class InsightFacade implements IInsightFacade {
 
 		if (arrayOr !== undefined) {
 			arrayOr.forEach((filter) => {
-				let tempResult = this.getQueryByFilter(filter);
+				let tempResult = this.getQueryByFilter(filter, splitArray);
 				result.concat(tempResult);
 			});
 		}
