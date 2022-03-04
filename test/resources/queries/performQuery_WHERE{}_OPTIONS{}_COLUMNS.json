@@ -1,0 +1,12 @@
+{
+  "title": "query with WHERE{}, OPTIONS{}, COLUMNS",
+  "input":
+  {
+    "WHERE": {},
+    "OPTIONS": {
+      "COLUMNS": "string"
+    }
+  },
+  "errorExpected": true,
+  "expected": "InsightError"
+}

@@ -1,0 +1,18 @@
+{
+  "title": "query columns misspelled column name fail",
+  "input":
+  {
+    "WHERE": {
+      "GT": {
+        "courses_avg": 95
+      }
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "coursesavg"
+      ]
+    }
+  }	,
+  "errorExpected": true,
+  "expected": "InsightError"
+}

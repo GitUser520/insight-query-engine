@@ -1,0 +1,10 @@
+{
+  "title": "query with WHERE, OPTIONS",
+  "input":
+  {
+    "WHERE": 90,
+    "OPTIONS": "string"
+  },
+  "errorExpected": true,
+  "expected": "InsightError"
+}
