@@ -4,7 +4,7 @@ import {
 	InsightDatasetKind,
 	InsightError,
 	InsightResult,
-	NotFoundError
+	NotFoundError, ResultTooLargeError
 } from "./IInsightFacade";
 import {loadFromDisk, parseCourse, persistToDisk} from "../services/DatasetProcessor";
 import JSZip = require("jszip");
@@ -124,6 +124,10 @@ export default class InsightFacade implements IInsightFacade {
 		}
 		let queryObject = new Query(this.addedDatasets);
 		let insightResultArray = queryObject.getQuery(query as QueryStructure);
+
+		if (insightResultArray.length >= 5000) {
+			return Promise.reject(new ResultTooLargeError("Too Large."));
+		}
 
 		return Promise.resolve(insightResultArray);
 	}
