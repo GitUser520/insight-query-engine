@@ -6,7 +6,7 @@ import {
 	MKeyPair,
 	Negation,
 	Options,
-	Query,
+	QueryStructure,
 	SComparison, SKey,
 	SKeyPair
 } from "./QueryInterfaces";
@@ -31,8 +31,8 @@ export class EBNF {
 		// split the query into two parts
 		// one part is based on the body, forms a json object
 		// other part is based on the options, forms a json object
-		let queryBody = (queryObject as Query).WHERE;
-		let queryOptions = (queryObject as Query).OPTIONS;
+		let queryBody = (queryObject as QueryStructure).WHERE;
+		let queryOptions = (queryObject as QueryStructure).OPTIONS;
 
 		if (queryBody === null || queryBody === undefined) {
 			return false;
