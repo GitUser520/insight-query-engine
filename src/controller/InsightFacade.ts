@@ -13,11 +13,11 @@ import Section from "../model/Section";
 import {
 	Query, Filter, Options,
 	LComparison, MComparison, SComparison, Negation,
-	MKeyPair, Key, SKey, MKey
+	MKeyPair, Key, SKey, MKey, SKeyPair
 } from "../model/QueryInterfaces";
+import {Utils} from "../model/Utils";
+import {EBNF} from "../model/EBNF";
 
-// todo production remove following line
-/*eslint-disable */
 
 /**
  * This is the main programmatic entry point for the project.
@@ -116,7 +116,8 @@ export default class InsightFacade implements IInsightFacade {
 		// data should be valid upon checking valid EBNF, because mkey and skey check if item id exists
 		// verify query is in valid EBNF form
 		// if this executes, then that means that we already know query is a valid JSON object
-		let validEBNF = this.checkQueryValidEBNF(query);
+		let EBNFChecker = new EBNF(this.addedDatasets);
+		let validEBNF = EBNFChecker.checkQueryValidEBNF(query);
 		if (!validEBNF) {
 			return Promise.reject(new InsightError("Invalid query."));
 		}
@@ -138,41 +139,35 @@ export default class InsightFacade implements IInsightFacade {
 		let jsonFieldTracker: any = {};
 
 		queryColumns.forEach((key) => {
-			let splitArray = this.parseKey(key);
-			let stringID = splitArray[0] + splitArray[1];
+			let keyValues = Utils.parseKey(key);
+			let stringID = keyValues.id + keyValues.field;
 
-			jsonFieldTracker[stringID] = splitArray;
+			jsonFieldTracker[stringID] = keyValues;
 		});
 
 		// results
 		let queryResults = this.getQueryByFilter(queryWhere, jsonFieldTracker);
 
+		if (queryOrder !== undefined) {
+			let keyValues = Utils.parseKey(queryOrder);
+			let sortByString = keyValues.field;
 
-		return [];
-	}
-
-	private parseKey(key: Key): string[] {
-		let mKey = key.mKey;
-		let sKey = key.sKey;
-
-		if (
-			(mKey === undefined && sKey === undefined)
-			|| (mKey !== undefined && sKey !== undefined)
-		) {
-			throw new InsightError("Invalid query.");
+			queryResults.sort((a: any,b: any) => {
+				if (typeof a[sortByString] === "string") {
+					return a[sortByString].localeCompare(b[sortByString]);
+				} else {
+					if (a[sortByString] < b[sortByString]) {
+						return -1;
+					} else if (a[sortByString] > b[sortByString]) {
+						return 1;
+					} else {
+						return 0;
+					}
+				}
+			});
 		}
 
-		let result: string[] = [];
-
-		if (mKey !== undefined) {
-			result.concat(mKey.mkey.split("_"));
-		}
-
-		if (sKey !== undefined) {
-			result.concat(sKey.skey.split("_"));
-		}
-
-		return result;
+		return queryResults;
 	}
 
 	private getQueryByFilter(queryWhere: Filter, jsonFieldTracker: any): InsightResult[] {
@@ -188,7 +183,7 @@ export default class InsightFacade implements IInsightFacade {
 		let queryNResults: InsightResult[] = [];
 
 		if (queryLComparator !== undefined) {
-			queryLResults = this.getByLComparator(queryLComparator);
+			queryLResults = this.getByLComparator(queryLComparator, jsonFieldTracker);
 		}
 
 		if (queryMComparator !== undefined) {
@@ -196,58 +191,126 @@ export default class InsightFacade implements IInsightFacade {
 		}
 
 		if (querySComparator !== undefined) {
-			querySResults = this.getBySComparator(querySComparator);
+			querySResults = this.getBySComparator(querySComparator, jsonFieldTracker);
 		}
 
 		if (queryNegation !== undefined) {
-			queryNResults = this.getByNComparator(queryNegation);
+			queryNResults = this.getByNComparator(queryNegation, jsonFieldTracker);
 		}
 
-		// todo merge queryLResults, queryMResults, querySResults, and queryNResults
+		let results: InsightResult[] = [];
+		results.concat(queryLResults).concat(queryMResults).concat(querySResults).concat(queryNResults);
 
-
-		return [];
+		return results;
 	}
 
-	// todo
-	private getByNComparator(queryNegation: Negation): InsightResult[] {
+	private getByNComparator(queryNegation: Negation, jsonFieldTracker: any): InsightResult[] {
 		// take everything that we have in the dataset, and remove queries from
 		// getQueryByFilter from it
+		let deepNotFilter = queryNegation.NOT;
+		let results: InsightResult[] = [];
 
-		return [];
+		if (deepNotFilter.NEGATION !== undefined) {
+			let deepNotNotFilter = deepNotFilter.NEGATION.NOT;
+			results = this.getQueryByFilter(deepNotNotFilter, jsonFieldTracker);
+		} else {
+			let excludeResults = this.getQueryByFilter(deepNotFilter, jsonFieldTracker);
+			let ALL: Filter = {
+
+			};
+			results = this.getQueryByFilter(ALL, jsonFieldTracker);
+
+			results.filter((value) => {
+				return (!excludeResults.includes(value));
+			});
+		}
+
+		return results;
 	}
 
-	// todo
-	private getBySComparator(querySComparator: SComparison): InsightResult[] {
+	private getBySComparator(querySComparator: SComparison, jsonFieldTracker: any): InsightResult[] {
 		// get the queries following the SKey
+		let sKey = querySComparator.IS;
+		let sKeyPairJson = Utils.parseSKeyPair(sKey);
 
-        throw new Error("Method not implemented.");
-    }
+		let currentSections: Section[] = [];
 
-	// todo
+		// filter through the dataset to get the queries satisfying the conditions
+		let currentDataset = this.addedDatasets.filter((dataset) => {
+			return dataset.id === sKeyPairJson.id;
+		});
+
+		currentDataset.map((dataset) => {
+			let tempSections = dataset.data.filter((section: any) => {
+				let field = sKeyPairJson.field;
+				if (section[field] !== undefined) {
+					return this.stringMatches(section[field], sKeyPairJson.inputString);
+				}
+				return false;
+			});
+			currentSections.concat(tempSections);
+		});
+
+		let results: InsightResult[] = [];
+
+		// filter the sections to get the info based on the jsonFieldTracker
+		currentSections.forEach((section: any) => {
+			let tempJSON: any = {};
+			for (let key in Object.keys(jsonFieldTracker)) {
+				let currentField: string = jsonFieldTracker[key].field;
+				if (section[currentField]) {
+					tempJSON[key] = (section as any)[currentField];
+				}
+			}
+			results.push(tempJSON as InsightResult);
+		});
+
+
+		return results;
+	}
+
+	private stringMatches(fieldString: string, inputString: string): boolean {
+		let stringArray = inputString.split("*");
+
+		if (stringArray.length === 1) {
+			return fieldString === stringArray[0];
+		}
+
+		if (stringArray.length === 2) {
+			if (stringArray[0] === "") {
+				return fieldString.includes(stringArray[1]);
+			} else if (stringArray[1] === "") {
+				return fieldString.includes(stringArray[0]);
+			}
+		}
+
+		if (stringArray.length === 3) {
+			if (stringArray[0] === "" && stringArray[2] === "") {
+				return fieldString.includes(stringArray[1]);
+			}
+		}
+
+		return false;
+	}
+
+	// returns all fields that satisfy the comparator
+	// get the queries based on the MKeyPair
+	// check that there is only one valid pair (even though I think valid EBNF may already do that)
 	private getByMComparator(queryMComparator: MComparison, jsonFieldTracker: any): InsightResult[] {
-		// get the queries based on the MKeyPair
-		// check that there is only one valid pair (even though I think valid EBNF may already do that)
 		let LT = queryMComparator.LT;
 		let GT = queryMComparator.GT;
 		let EQ = queryMComparator.EQ;
 		let comparator: MKeyPair;
 		let flagsLTGTEQ: {LT: boolean, GT: boolean, EQ: boolean} = {
-			LT: false,
-			GT: false,
-			EQ: false
-		}
-
-		if (
-			(LT === undefined && GT === undefined && EQ === undefined)
+			LT: false, GT: false, EQ: false
+		};
+		if ((LT === undefined && GT === undefined && EQ === undefined)
 			|| (LT !== undefined && GT !== undefined && EQ !== undefined)
 			|| (LT !== undefined && GT !== undefined && EQ === undefined)
 			|| (LT !== undefined && GT === undefined && EQ !== undefined)
-			|| (LT === undefined && GT !== undefined && EQ !== undefined)
-		) {
+			|| (LT === undefined && GT !== undefined && EQ !== undefined)) {
 			throw new InsightError("Invalid query.");
 		}
-
 		if (LT !== undefined) {
 			comparator = LT;
 			flagsLTGTEQ.LT = true;
@@ -261,7 +324,7 @@ export default class InsightFacade implements IInsightFacade {
 			throw new InsightError("Invalid query.");
 		}
 
-		let keys = this.parseMKey(comparator);
+		let keys = Utils.parseMKeyPair(comparator);
 		const validMKeyValues = ["avg", "pass", "fail", "audit","year"];
 
 		if (!validMKeyValues.includes(keys.field)) {
@@ -269,63 +332,44 @@ export default class InsightFacade implements IInsightFacade {
 		}
 
 		let resultDataset = this.addedDatasets.filter((dataset) => {
-			return dataset.id == keys.id;
+			return dataset.id === keys.id;
 		});
 
-		let result: InsightResult[] = [];
 		let resultSection: Section[] = [];
 
 		resultDataset.map((dataset) => {
-			dataset.data.filter((section) => {
-				if (section.hasOwnProperty(keys.field)) {
-					if (flagsLTGTEQ.LT) {
-						return (section as any)[keys.field] <= keys.number;
-					} else if (flagsLTGTEQ.GT) {
-						return (section as any)[keys.field] >= keys.number;
-					} else if (flagsLTGTEQ.EQ) {
-						return (section as any)[keys.field] == keys.number;
-					}
-				}
-				return false;
+			dataset.data.filter((section: any) => {
+				return this.filterMComparator(section, keys, flagsLTGTEQ);
 			});
 			resultSection.concat(dataset.data);
 		});
 
-		// filter result by options
-		resultSection.forEach((section) => {
-			let tempJSON: any = {};
-			for (var key in Object.keys(jsonFieldTracker)) {
-				let currentField: string = jsonFieldTracker[key][1];
-				if (section.hasOwnProperty(currentField)) {
-					tempJSON[key] = (section as any)[currentField];
-				}
-			}
-			result.push(tempJSON as InsightResult);
-		})
-
-		return result;
-    }
-
-	private parseMKey(comparator: MKeyPair): {id: string, field: string, number: number} {
-		let mkey = comparator.mKey.mkey;
-		let mkeyValues = mkey.split("_");
-
-		return {
-			id: mkeyValues[0],
-			field: mkeyValues[1],
-			number: comparator.number
-		};
+		return Utils.filterByOptions(resultSection, jsonFieldTracker);
 	}
 
-	// todo
-	private getByLComparator(queryLComparator: LComparison): InsightResult[] {
+	private filterMComparator(section: any, keys: {id: string; field: string; number: number},
+		flagsLTGTEQ: {LT: boolean; GT: boolean; EQ: boolean}) {
+		if (section[keys.field]) {
+			if (flagsLTGTEQ.LT) {
+				return (section as any)[keys.field] <= keys.number;
+			} else if (flagsLTGTEQ.GT) {
+				return (section as any)[keys.field] >= keys.number;
+			} else if (flagsLTGTEQ.EQ) {
+				return (section as any)[keys.field] === keys.number;
+			}
+		}
+		return false;
+	}
+
+// returns all fields satisfying AND or OR
+	private getByLComparator(queryLComparator: LComparison, jsonFieldTracker: any): InsightResult[] {
 		// check if it is AND or OR
 		// then write everything based on that
 		let arrayAnd = queryLComparator.AND;
 		let arrayOr = queryLComparator.OR;
 
 		if (
-			(arrayAnd === undefined && arrayOr == undefined)
+			(arrayAnd === undefined && arrayOr === undefined)
 			|| (arrayAnd !== undefined && arrayOr !== undefined)
 		) {
 			// todo Is it okay to throw an unchecked exception here?
@@ -340,12 +384,12 @@ export default class InsightFacade implements IInsightFacade {
 			let arrayAnd2d: InsightResult[][] = [];
 
 			arrayAnd.forEach((filter) => {
-				arrayAnd2d.push(this.getQueryByFilter(filter, splitArray));
-			})
+				arrayAnd2d.push(this.getQueryByFilter(filter, jsonFieldTracker));
+			});
 
 			result = arrayAnd2d.reduce((resultArray1, resultArray2): InsightResult[] => {
-				let currentIntersection = resultArray1.filter((result) => {
-					return resultArray2.includes(result);
+				let currentIntersection = resultArray1.filter((tempResult) => {
+					return resultArray2.includes(tempResult);
 				});
 
 				return currentIntersection;
@@ -354,287 +398,14 @@ export default class InsightFacade implements IInsightFacade {
 
 		if (arrayOr !== undefined) {
 			arrayOr.forEach((filter) => {
-				let tempResult = this.getQueryByFilter(filter, splitArray);
+				let tempResult = this.getQueryByFilter(filter, jsonFieldTracker);
 				result.concat(tempResult);
 			});
 		}
 
 		return result;
-    }
-
-	private checkQueryValidEBNF(queryObject: unknown): boolean {
-		// check if null, check if undefined
-		if (queryObject === null || queryObject === undefined) {
-			return false;
-		}
-		// check if query is not of type object
-		if (typeof queryObject !== "object") {
-			return false;
-		}
-		// split the query into two parts
-		// one part is based on the body, forms a json object
-		// other part is based on the options, forms a json object
-		let queryBody = (queryObject as Query).WHERE;
-		let queryOptions = (queryObject as Query).OPTIONS;
-
-		if (queryBody === null || queryBody === undefined) {
-			return false;
-		}
-		if (queryOptions === null || queryOptions === undefined) {
-			return false;
-		}
-
-		// check the body
-		let validBody = this.checkQueryBody(queryBody);
-		// check the options
-		let validOptions = this.checkQueryOptions(queryOptions);
-
-		return validBody && validOptions;
 	}
 
-	// checks the filters
-	private checkQueryBody(body: object): boolean {
-		// split query into four parts
-		let queryLComparison = (body as Filter).LCOMPARISON;
-		let queryMComparison = (body as Filter).MCOMPARISON;
-		let querySComparison = (body as Filter).SCOMPARISON;
-		let queryNegation = (body as Filter).NEGATION;
-
-		// check if each part is valid
-		// check that none of them are null
-		if (
-			queryLComparison === null ||
-			queryMComparison === null ||
-			querySComparison === null ||
-			queryNegation === null
-		) {
-			return false;
-		}
-
-		// check that at least one of them is defined
-		if (
-			queryLComparison === undefined &&
-			queryMComparison === undefined &&
-			querySComparison === undefined &&
-			queryNegation === undefined
-		) {
-			return false;
-		}
-
-		let validLComparison = true;
-		let validMComparison = true;
-		let validSComparison = true;
-		let validNegation = true;
-
-		if (queryLComparison !== undefined) {
-			validLComparison = this.checkLogicComparison(queryLComparison);
-		}
-		if (queryMComparison !== undefined) {
-			validMComparison = this.checkMComparison(queryMComparison);
-		}
-		if (querySComparison !== undefined) {
-			validSComparison = this.checkSComparison(querySComparison);
-		}
-		if (queryNegation !== undefined) {
-			validNegation = this.checkNegation(queryNegation);
-		}
-
-		return validLComparison && validMComparison && validSComparison && validNegation;
-	}
-
-	private checkLogicComparison(lComparator: object): boolean {
-		let filterANDArray = (lComparator as LComparison).AND;
-		let filterORArray = (lComparator as LComparison).OR;
-
-		if (filterANDArray === null || filterORArray === null) {
-			return false;
-		}
-		if (filterANDArray === undefined && filterORArray === undefined) {
-			return false;
-		}
-
-		let validANDFilter = true;
-		let validORFilter = true;
-
-		if (filterANDArray !== undefined) {
-			filterANDArray.forEach((filter) => {
-				validANDFilter = validANDFilter && this.checkQueryBody(filter);
-			});
-		}
-
-		if (filterORArray !== undefined) {
-			filterORArray.forEach((filter) => {
-				validORFilter = validORFilter && this.checkQueryBody(filter);
-			});
-		}
-
-		return validANDFilter && validORFilter;
-	}
-
-	private checkMComparison(mComparator: object): boolean {
-		let GTComparator = (mComparator as MComparison).GT;
-		let LTComparator = (mComparator as MComparison).LT;
-		let EQComparator = (mComparator as MComparison).EQ;
-		// check that none of them are null
-		if (GTComparator === null || LTComparator === null || EQComparator === null) {
-			return false;
-		}
-		// check that at least one of them is defined
-		if (GTComparator === undefined && LTComparator === undefined && EQComparator === undefined) {
-			return false;
-		}
-
-		let validGT = true;
-		let validLT = true;
-		let validEQ = true;
-		// check that at most one of them is defined
-		if (GTComparator !== undefined) {
-			if (LTComparator !== undefined || EQComparator !== undefined) {
-				return false;
-			}
-
-			let key = (GTComparator as MKeyPair).mkey;
-			let value = (GTComparator as MKeyPair).number;
-
-			validGT = (key !== undefined) && (value !== undefined);
-		}
-		// check that at most one of them is defined
-		if (LTComparator !== undefined) {
-			if (GTComparator !== undefined || EQComparator !== undefined) {
-				return false;
-			}
-
-			let key = (LTComparator as MKeyPair).mkey;
-			let value = (LTComparator as MKeyPair).number;
-
-			validLT = (key !== undefined) && (value !== undefined);
-		}
-		// check that at most one of them is defined
-		if (EQComparator !== undefined) {
-			if (GTComparator !== undefined || LTComparator !== undefined) {
-				return false;
-			}
-
-			let key = (EQComparator as MKeyPair).mkey;
-			let value = (EQComparator as MKeyPair).number;
-
-			validEQ = (key !== undefined) && (value !== undefined);
-		}
-
-		return validGT && validLT && validEQ;
-	}
-
-	private checkSComparison(sComparator: object): boolean {
-		let ISObject = (sComparator as SComparison).IS;
-
-		if (ISObject === null || ISObject === undefined) {
-			return false;
-		}
-
-		let ISValue = (ISObject as SKey).skey;
-
-		if (ISValue === null || ISValue === undefined) {
-			return false;
-		}
-
-		return true;
-	}
-
-	private checkNegation(negation: object): boolean {
-		let queryNegation = (negation as Negation).NOT;
-
-		if (queryNegation === null || queryNegation === undefined) {
-			return false;
-		}
-
-		return this.checkQueryBody(queryNegation);
-	}
-
-	private checkQueryOptions(options: object): boolean {
-		let queryColumns = (options as Options).COLUMNS;
-		let queryOrder = (options as Options).ORDER;
-
-		if (queryColumns === null || queryColumns === undefined) {
-			return false;
-		}
-
-		if (queryOrder === null) {
-			return false;
-		}
-
-		// check that the columns are valid
-		let validColumns = this.checkQueryColumns(queryColumns);
-		let validOrder = true;
-
-		if (queryOrder !== undefined) {
-			validOrder = this.checkQueryOrder(queryOrder);
-		}
-
-		return validColumns && validOrder;
-	}
-
-	// returns true if all elements in the array are valid keys
-	private checkQueryColumns(column: Key[]): boolean {
-		let result = true;
-		column.forEach((key) => {
-			result = result && this.checkValidKey(key);
-		});
-
-		return result;
-	}
-
-	// returns true if the order element is a valid key
-	private checkQueryOrder(order: Key): boolean {
-		return this.checkValidKey(order);
-	}
-
-	// check the validity of a key
-	private checkValidKey(key: object): boolean {
-		let mkey = (key as Key).mKey;
-		let skey = (key as Key).sKey;
-
-		if (mkey === null || mkey === undefined) {
-			return false;
-		}
-
-		if (skey === null || skey === undefined) {
-			return false;
-		}
-
-		return this.checkMKey(mkey) && this.checkSKey(skey);
-	}
-
-	private checkMKey(mkey: MKey): boolean {
-		let mKeyParts = mkey.mkey.split("_");
-		let validMField = ["avg", "pass", "fail", "audit","year"];
-
-		if (!validMField.includes(mKeyParts[1])) {
-			return false;
-		}
-
-		let valid = false;
-		this.addedDatasets.forEach((dataset) => {
-			valid = valid || (dataset.id === mKeyParts[0]);
-		});
-
-		return valid;
-	}
-
-	private checkSKey(skey: SKey): boolean {
-		let sKeyParts = skey.skey.split("_");
-		let validSField = ["dept", "id", "instructor", "title", "uuid"];
-
-		if (!validSField.includes(sKeyParts[1])) {
-			return false;
-		}
-
-		let valid = false;
-		this.addedDatasets.forEach((dataset) => {
-			valid = valid || (dataset.id === sKeyParts[0]);
-		});
-
-		return valid;
-	}
 
 }
 

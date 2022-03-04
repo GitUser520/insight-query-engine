@@ -17,4 +17,4 @@ data/
 .DS_Store
 .env
 *.log
-/src/model/QueryInterfaces.ts
+/LocalNotes.md

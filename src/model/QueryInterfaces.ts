@@ -27,16 +27,19 @@ export interface MComparison {
 }
 
 export interface SComparison {
-	IS: SKey
+	IS: SKeyPair;
 }
 
 export interface Negation {
 	NOT: Filter
 }
 
+export interface SKeyPair {
+	[key: string]: string
+}
+
 export interface MKeyPair {
-	mKey: MKey
-	number: number
+	[key: string]: number
 }
 
 export interface Key {
@@ -45,11 +48,11 @@ export interface Key {
 }
 
 export interface SKey {
-	skey: string
+	sKey: string
 }
 
 export interface MKey {
-	mkey: string
+	mKey: string
 }
 
 
