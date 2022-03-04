@@ -1,0 +1,18 @@
+{
+  "title": "query invalid OR",
+  "input":
+  {
+    "WHERE": {
+      "OR":{
+        "courses_dept": "adhe"
+      }
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept"
+      ]
+    }
+  },
+  "errorExpected": true,
+  "expected": "InsightError"
+}
