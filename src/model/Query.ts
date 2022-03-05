@@ -196,6 +196,8 @@ export class Query {
 			|| (LT !== undefined && GT !== undefined && EQ === undefined)
 			|| (LT !== undefined && GT === undefined && EQ !== undefined)
 			|| (LT === undefined && GT !== undefined && EQ !== undefined)) {
+			// console.log("Error on line: ");
+			// return [];
 			throw new InsightError("Invalid query.");
 		}
 		if (LT !== undefined) {
@@ -208,6 +210,8 @@ export class Query {
 			comparator = EQ;
 			flagsLTGTEQ.EQ = true;
 		} else {
+			// console.log("Error on line: ");
+			// return [];
 			throw new InsightError("Invalid query.");
 		}
 
@@ -215,6 +219,8 @@ export class Query {
 		const validMKeyValues = ["avg", "pass", "fail", "audit","year"];
 
 		if (!validMKeyValues.includes(keys.field)) {
+			// console.log("Error on line: ");
+			// return [];
 			throw new InsightError("Invalid query.");
 		}
 
@@ -259,9 +265,8 @@ export class Query {
 			(arrayAnd === undefined && arrayOr === undefined)
 			|| (arrayAnd !== undefined && arrayOr !== undefined)
 		) {
-			// todo Is it okay to throw an unchecked exception here?
-			// technically, since it passes the valid EBNF check, it should
-			// be fine, but this just feels like poor design
+			// console.log("Error on line: ");
+			// return [];
 			throw new InsightError("Invalid query.");
 		}
 
@@ -289,8 +294,6 @@ export class Query {
 				result.concat(tempResult);
 			});
 		}
-
 		return result;
 	}
-
 }

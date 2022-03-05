@@ -49,6 +49,8 @@ export class Utils {
 			(mKey === undefined && sKey === undefined)
 			|| (mKey !== undefined && sKey !== undefined)
 		) {
+			// console.log("Error on line: ");
+			// return {id: "", field: ""};
 			throw new InsightError("Invalid query.");
 		}
 
@@ -59,6 +61,8 @@ export class Utils {
 		} else if (sKey !== undefined) {
 			result = Utils.parseSKey(sKey);
 		} else {
+			// console.log("Error on line: ");
+			// return {id: "", field: ""};
 			throw new InsightError("Invalid query.");
 		}
 
