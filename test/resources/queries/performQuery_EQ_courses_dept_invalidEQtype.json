@@ -1,0 +1,18 @@
+{
+  "title": "query EQ courses_dept invalid EQ type",
+  "input":
+  {
+    "WHERE": {
+      "EQ":{
+        "courses_dept": "string"
+      }
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept"
+      ]
+    }
+  },
+  "errorExpected": true,
+  "expected": "InsightError"
+}

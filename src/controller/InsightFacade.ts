@@ -4,12 +4,21 @@ import {
 	InsightDatasetKind,
 	InsightError,
 	InsightResult,
-	NotFoundError
+	NotFoundError, ResultTooLargeError
 } from "./IInsightFacade";
 import {loadFromDisk, parseCourse, persistToDisk} from "../services/DatasetProcessor";
 import JSZip = require("jszip");
 import Dataset from "../model/Dataset";
 import Section from "../model/Section";
+import {
+	QueryStructure, Filter, Options,
+	LComparison, MComparison, SComparison, Negation,
+	MKeyPair, Key, SKey, MKey, SKeyPair
+} from "../model/QueryInterfaces";
+import {Utils} from "../model/Utils";
+import {EBNF} from "../model/EBNF";
+import {Query} from "../model/Query";
+
 
 /**
  * This is the main programmatic entry point for the project.
@@ -17,7 +26,6 @@ import Section from "../model/Section";
  *
  */
 export default class InsightFacade implements IInsightFacade {
-
 	public addedDatasets: Dataset[];
 
 	constructor() {
@@ -87,10 +95,6 @@ export default class InsightFacade implements IInsightFacade {
 		});
 	}
 
-	public performQuery(query: unknown): Promise<InsightResult[]> {
-		return Promise.reject("Not implemented.");
-	}
-
 	public listDatasets(): Promise<InsightDataset[]> {
 		let datasetList: InsightDataset[] = [];
 		return new Promise<InsightDataset[]>((resolve) => {
@@ -107,6 +111,27 @@ export default class InsightFacade implements IInsightFacade {
 		});
 
 	}
+
+	public performQuery(query: unknown): Promise<InsightResult[]> {
+		// check data is valid
+		// data should be valid upon checking valid EBNF, because mkey and skey check if item id exists
+		// verify query is in valid EBNF form
+		// if this executes, then that means that we already know query is a valid JSON object
+		let EBNFChecker = new EBNF(this.addedDatasets);
+		let validEBNF = EBNFChecker.checkQueryValidEBNF(query);
+		if (!validEBNF) {
+			return Promise.reject(new InsightError("Invalid query."));
+		}
+		let queryObject = new Query(this.addedDatasets);
+		let insightResultArray = queryObject.getQuery(query as QueryStructure);
+
+		if (insightResultArray.length >= 5000) {
+			return Promise.reject(new ResultTooLargeError("Too Large."));
+		}
+
+		return Promise.resolve(insightResultArray);
+	}
+
 
 }
 

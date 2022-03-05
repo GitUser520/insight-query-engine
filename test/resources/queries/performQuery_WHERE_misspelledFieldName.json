@@ -1,0 +1,18 @@
+{
+  "title": "query where misspelled field name",
+  "input":
+  {
+    "WHERE": {
+      "IS": {
+        "coursesDept": "cpsc"
+      }
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept"
+      ]
+    }
+  }	,
+  "errorExpected": true,
+  "expected": "InsightError"
+}

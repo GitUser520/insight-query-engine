@@ -1,0 +1,18 @@
+{
+  "title": "query GT courses_dept invalid course_dept value",
+  "input":
+  {
+    "WHERE": {
+      "GT":{
+        "courses_dept": 90
+      }
+    },
+    "OPTIONS": {
+      "COLUMNS": [
+        "courses_dept"
+      ]
+    }
+  },
+  "errorExpected": true,
+  "expected": "InsightError"
+}

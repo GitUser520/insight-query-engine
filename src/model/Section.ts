@@ -24,6 +24,5 @@ export default class Section {
 		this.uuid = uuid;
 		this.year = year;
 	}
-
 }
 
