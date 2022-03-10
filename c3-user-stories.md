@@ -29,7 +29,7 @@ When: The user inputs a combination of seats, furniture type, and room type
 and clicks enter.
 Then: The application presents the short name of a room that satisfies the requirements.
 
-Scenario 1: No suitable room is found.
+Scenario 2: No suitable room is found.
 Given: User on find room page.  
 When: The user inputs a combination of seats, furniture type, and room type
 and clicks enter.
