@@ -191,8 +191,7 @@ export class Query {
 		let flagsLTGTEQ: {LT: boolean, GT: boolean, EQ: boolean} = {
 			LT: false, GT: false, EQ: false
 		};
-		if ((LT === undefined && GT === undefined && EQ === undefined)
-			|| (LT !== undefined && GT !== undefined && EQ !== undefined)
+		if ((LT !== undefined && GT !== undefined && EQ !== undefined)
 			|| (LT !== undefined && GT !== undefined && EQ === undefined)
 			|| (LT !== undefined && GT === undefined && EQ !== undefined)
 			|| (LT === undefined && GT !== undefined && EQ !== undefined)) {
@@ -212,31 +211,32 @@ export class Query {
 		} else {
 			// console.log("Error on line: ");
 			// return [];
-			throw new InsightError("Invalid query.");
+			let resultSection: Section[] = [];
+			let resultDataset = this.datasets.map((dataset) => {
+				dataset.data.filter((section: any) => {
+					return this.filterMComparator(section, keys, flagsLTGTEQ);
+				});
+				resultSection.concat(dataset.data);
+			});
+			return Utils.filterByOptions(resultSection, jsonFieldTracker);
 		}
-
 		let keys = Utils.parseMKeyPair(comparator);
 		const validMKeyValues = ["avg", "pass", "fail", "audit","year"];
-
 		if (!validMKeyValues.includes(keys.field)) {
 			// console.log("Error on line: ");
 			// return [];
 			throw new InsightError("Invalid query.");
 		}
-
 		let resultDataset = this.datasets.filter((dataset) => {
 			return dataset.id === keys.id;
 		});
-
 		let resultSection: Section[] = [];
-
 		resultDataset.map((dataset) => {
 			dataset.data.filter((section: any) => {
 				return this.filterMComparator(section, keys, flagsLTGTEQ);
 			});
 			resultSection.concat(dataset.data);
 		});
-
 		return Utils.filterByOptions(resultSection, jsonFieldTracker);
 	}
 

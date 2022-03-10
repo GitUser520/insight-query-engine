@@ -14,6 +14,8 @@ import {
 export class EBNF {
 
 	public datasets: Dataset[];
+	public static mField = ["avg", "pass", "fail", "audit","year"];
+	public static sField = ["dept", "id", "instructor", "title", "uuid"];
 
 	constructor(datasets: Dataset[]) {
 		this.datasets = datasets;
@@ -69,14 +71,14 @@ export class EBNF {
 		}
 
 		// check that at least one of them is defined
-		if (
-			queryLComparison === undefined &&
-			queryMComparison === undefined &&
-			querySComparison === undefined &&
-			queryNegation === undefined
-		) {
-			return false;
-		}
+		// if (
+		// 	queryLComparison === undefined &&
+		// 	queryMComparison === undefined &&
+		// 	querySComparison === undefined &&
+		// 	queryNegation === undefined
+		// ) {
+		// 	return false;
+		// }
 
 		let validLComparison = true;
 		let validMComparison = true;
@@ -215,9 +217,10 @@ export class EBNF {
 			return false;
 		}
 
-		if (queryOrder === null) {
-			return false;
-		}
+		// optional
+		// if (queryOrder === null) {
+		// 	return false;
+		// }
 
 		// check that the columns are valid
 		let validColumns = this.checkQueryColumns(queryColumns);
@@ -246,26 +249,23 @@ export class EBNF {
 	}
 
 	// check the validity of a key
-	private checkValidKey(key: object): boolean {
-		let mkey = (key as Key).mKey;
-		let skey = (key as Key).sKey;
-
-		if (mkey === null || mkey === undefined) {
+	private checkValidKey(key: Key): boolean {
+		if (key === null || key === undefined) {
 			return false;
 		}
 
-		if (skey === null || skey === undefined) {
-			return false;
-		}
+		let keyString = key as Key;
+
+		let mkey = keyString as MKey;
+		let skey = keyString as SKey;
 
 		return this.checkMKey(mkey) && this.checkSKey(skey);
 	}
 
 	private checkMKey(mkey: MKey): boolean {
-		let mKeyParts = mkey.mKey.split("_");
-		let validMField = ["avg", "pass", "fail", "audit","year"];
+		let mKeyParts = mkey.split("_");
 
-		if (!validMField.includes(mKeyParts[1])) {
+		if (!EBNF.mField.includes(mKeyParts[1])) {
 			return false;
 		}
 
@@ -278,10 +278,9 @@ export class EBNF {
 	}
 
 	private checkSKey(skey: SKey): boolean {
-		let sKeyParts = skey.sKey.split("_");
-		let validSField = ["dept", "id", "instructor", "title", "uuid"];
+		let sKeyParts = skey.split("_");
 
-		if (!validSField.includes(sKeyParts[1])) {
+		if (!EBNF.sField.includes(sKeyParts[1])) {
 			return false;
 		}
 
@@ -291,6 +290,26 @@ export class EBNF {
 		});
 
 		return valid;
+	}
+
+	public static checkMKeyUnknownID(mkey: MKey): boolean {
+		let mKeyParts = mkey.split("_");
+
+		if (!EBNF.mField.includes(mKeyParts[1])) {
+			return false;
+		}
+
+		return true;
+	}
+
+	public static checkSKeyUnknownID(skey: SKey): boolean {
+		let sKeyParts = skey.split("_");
+
+		if (!EBNF.sField.includes(sKeyParts[1])) {
+			return false;
+		}
+
+		return true;
 	}
 }
 
