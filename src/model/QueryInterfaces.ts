@@ -3,14 +3,6 @@ export interface QueryStructure {
 	OPTIONS: Options
 }
 
-// todo finish this edit
-// export interface Filter {
-// 	LCOMPARISON?: LComparison
-// 	MCOMPARISON?: MComparison
-// 	SCOMPARISON?: SComparison
-// 	NEGATION?: Negation
-// }
-
 export type Filter = LComparison | MComparison | SComparison | Negation;
 
 export interface Options {

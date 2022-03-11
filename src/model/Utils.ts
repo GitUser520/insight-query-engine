@@ -3,6 +3,7 @@ import {InsightError, InsightResult} from "../controller/IInsightFacade";
 import Section from "../model/Section";
 import Dataset from "./Dataset";
 import {EBNF} from "./EBNF";
+import {EBNFHelper} from "./EBNFHelper";
 
 export class Utils {
 
@@ -10,7 +11,8 @@ export class Utils {
 		let result: InsightResult[] = [];
 		resultSection.forEach((section: any) => {
 			let tempJSON: any = {};
-			for (let key in Object.keys(jsonFieldTracker)) {
+			let keys = Object.keys(jsonFieldTracker);
+			for (const key of keys) {
 				let currentField: string = jsonFieldTracker[key].field;
 				if (section[currentField]) {
 					tempJSON[key] = (section as any)[currentField];
@@ -54,9 +56,9 @@ export class Utils {
 		let sKey = key as SKey;
 		let result: {id: string, field: string};
 
-		if (mKey !== undefined && EBNF.checkMKeyUnknownID(mKey)) {
+		if (mKey !== undefined && EBNFHelper.checkMKeyUnknownID(mKey)) {
 			result = Utils.parseMKey(mKey);
-		} else if (sKey !== undefined && EBNF.checkSKeyUnknownID(sKey)) {
+		} else if (sKey !== undefined && EBNFHelper.checkSKeyUnknownID(sKey)) {
 			result = Utils.parseSKey(sKey);
 		} else {
 			// console.log("Error on line: ");
@@ -81,5 +83,29 @@ export class Utils {
 		return {
 			id: stringArray[0], field: stringArray[1]
 		};
+	}
+
+	public static stringMatches(fieldString: string, inputString: string): boolean {
+		let stringArray = inputString.split("*");
+
+		if (stringArray.length === 1) {
+			return fieldString === stringArray[0];
+		}
+
+		if (stringArray.length === 2) {
+			if (stringArray[0] === "") {
+				return fieldString.includes(stringArray[1]);
+			} else if (stringArray[1] === "") {
+				return fieldString.includes(stringArray[0]);
+			}
+		}
+
+		if (stringArray.length === 3) {
+			if (stringArray[0] === "" && stringArray[2] === "") {
+				return fieldString.includes(stringArray[1]);
+			}
+		}
+
+		return false;
 	}
 }

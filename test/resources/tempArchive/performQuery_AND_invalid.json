@@ -3,9 +3,9 @@
   "input":
   {
     "WHERE": {
-      "AND":{
-        "courses_dept": "adhe"
-      }
+      "AND":[
+
+	  ]
     },
     "OPTIONS": {
       "COLUMNS": [
