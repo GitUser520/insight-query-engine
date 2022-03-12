@@ -111,6 +111,7 @@ export class Query {
 		return results;
 	}
 
+	// todo broken
 	private getBySComparator(querySComparator: SComparison, jsonFieldTracker: any): InsightResult[] {
 		// get the queries following the SKey
 		let sKey = querySComparator.IS;
