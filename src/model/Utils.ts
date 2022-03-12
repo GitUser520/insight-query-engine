@@ -1,6 +1,9 @@
 import {Key, MKey, MKeyPair, SKey, SKeyPair} from "./QueryInterfaces";
 import {InsightError, InsightResult} from "../controller/IInsightFacade";
 import Section from "../model/Section";
+import Dataset from "./Dataset";
+import {EBNF} from "./EBNF";
+import {EBNFHelper} from "./EBNFHelper";
 
 export class Utils {
 
@@ -8,7 +11,8 @@ export class Utils {
 		let result: InsightResult[] = [];
 		resultSection.forEach((section: any) => {
 			let tempJSON: any = {};
-			for (let key in Object.keys(jsonFieldTracker)) {
+			let keys = Object.keys(jsonFieldTracker);
+			for (const key of keys) {
 				let currentField: string = jsonFieldTracker[key].field;
 				if (section[currentField]) {
 					tempJSON[key] = (section as any)[currentField];
@@ -18,6 +22,12 @@ export class Utils {
 		});
 		return result;
 	}
+
+	// public static getInsightResultsFromSections(resultDataset: Dataset[],
+	// 	keys: {id: string, field: string, number: number},
+	// 	flagsLTGTEQ: {LT: boolean, GT: boolean, EQ: boolean}) {
+	//
+	// }
 
 	public static parseSKeyPair(sKeyPair: SKeyPair): {id: string, field: string, inputString: string} {
 		let sKeyJson = Object.keys(sKeyPair)[0];
@@ -42,23 +52,13 @@ export class Utils {
 	}
 
 	public static parseKey(key: Key): {id: string, field: string} {
-		let mKey = key.mKey;
-		let sKey = key.sKey;
-
-		if (
-			(mKey === undefined && sKey === undefined)
-			|| (mKey !== undefined && sKey !== undefined)
-		) {
-			// console.log("Error on line: ");
-			// return {id: "", field: ""};
-			throw new InsightError("Invalid query.");
-		}
-
+		let mKey = key as MKey;
+		let sKey = key as SKey;
 		let result: {id: string, field: string};
 
-		if (mKey !== undefined) {
+		if (mKey !== undefined && EBNFHelper.checkMKeyUnknownID(mKey)) {
 			result = Utils.parseMKey(mKey);
-		} else if (sKey !== undefined) {
+		} else if (sKey !== undefined && EBNFHelper.checkSKeyUnknownID(sKey)) {
 			result = Utils.parseSKey(sKey);
 		} else {
 			// console.log("Error on line: ");
@@ -70,7 +70,7 @@ export class Utils {
 	}
 
 	public static parseMKey(mkey: MKey): {id: string, field: string} {
-		let stringArray = mkey.mKey.split("_");
+		let stringArray = mkey.split("_");
 
 		return {
 			id: stringArray[0], field: stringArray[1]
@@ -78,10 +78,34 @@ export class Utils {
 	}
 
 	public static parseSKey(skey: SKey): {id: string, field: string} {
-		let stringArray = skey.sKey.split("_");
+		let stringArray = skey.split("_");
 
 		return {
 			id: stringArray[0], field: stringArray[1]
 		};
+	}
+
+	public static stringMatches(fieldString: string, inputString: string): boolean {
+		let stringArray = inputString.split("*");
+
+		if (stringArray.length === 1) {
+			return fieldString === stringArray[0];
+		}
+
+		if (stringArray.length === 2) {
+			if (stringArray[0] === "") {
+				return fieldString.includes(stringArray[1]);
+			} else if (stringArray[1] === "") {
+				return fieldString.includes(stringArray[0]);
+			}
+		}
+
+		if (stringArray.length === 3) {
+			if (stringArray[0] === "" && stringArray[2] === "") {
+				return fieldString.includes(stringArray[1]);
+			}
+		}
+
+		return false;
 	}
 }

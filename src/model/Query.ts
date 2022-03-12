@@ -5,7 +5,8 @@ import {
 	QueryStructure, Filter, LComparison, MComparison, MKeyPair, Negation, SComparison
 } from "./QueryInterfaces";
 import Section from "./Section";
-
+import {EBNFHelper} from "./EBNFHelper";
+import {EBNF} from "./EBNF";
 
 export class Query {
 	public datasets: Dataset[];
@@ -27,7 +28,7 @@ export class Query {
 
 		queryColumns.forEach((key) => {
 			let keyValues = Utils.parseKey(key);
-			let stringID = keyValues.id + keyValues.field;
+			let stringID = keyValues.id + "_" + keyValues.field;
 
 			jsonFieldTracker[stringID] = keyValues;
 		});
@@ -59,34 +60,29 @@ export class Query {
 
 	private getQueryByFilter(queryWhere: Filter, jsonFieldTracker: any): InsightResult[] {
 		// comparators
-		let queryLComparator = queryWhere.LCOMPARISON;
-		let queryMComparator = queryWhere.MCOMPARISON;
-		let querySComparator = queryWhere.SCOMPARISON;
-		let queryNegation = queryWhere.NEGATION;
-
 		let queryLResults: InsightResult[] = [];
 		let queryMResults: InsightResult[] = [];
 		let querySResults: InsightResult[] = [];
 		let queryNResults: InsightResult[] = [];
 
-		if (queryLComparator !== undefined) {
-			queryLResults = this.getByLComparator(queryLComparator, jsonFieldTracker);
+		if (EBNFHelper.isInstanceOfLComparison(queryWhere)) {
+			queryLResults = this.getByLComparator(queryWhere as LComparison, jsonFieldTracker);
 		}
 
-		if (queryMComparator !== undefined) {
-			queryMResults = this.getByMComparator(queryMComparator, jsonFieldTracker);
+		if (EBNFHelper.isInstanceOfMComparison(queryWhere)) {
+			queryMResults = this.getByMComparator(queryWhere as MComparison, jsonFieldTracker);
 		}
 
-		if (querySComparator !== undefined) {
-			querySResults = this.getBySComparator(querySComparator, jsonFieldTracker);
+		if (EBNFHelper.isInstanceOfSComparison(queryWhere)) {
+			querySResults = this.getBySComparator(queryWhere as SComparison, jsonFieldTracker);
 		}
 
-		if (queryNegation !== undefined) {
-			queryNResults = this.getByNComparator(queryNegation, jsonFieldTracker);
+		if (EBNFHelper.isInstanceOfNegation(queryWhere)) {
+			queryNResults = this.getByNComparator(queryWhere as Negation, jsonFieldTracker);
 		}
 
 		let results: InsightResult[] = [];
-		results.concat(queryLResults).concat(queryMResults).concat(querySResults).concat(queryNResults);
+		results = results.concat(queryLResults).concat(queryMResults).concat(querySResults).concat(queryNResults);
 
 		return results;
 	}
@@ -97,8 +93,8 @@ export class Query {
 		let deepNotFilter = queryNegation.NOT;
 		let results: InsightResult[] = [];
 
-		if (deepNotFilter.NEGATION !== undefined) {
-			let deepNotNotFilter = deepNotFilter.NEGATION.NOT;
+		if (EBNFHelper.isInstanceOfNegation(deepNotFilter)) {
+			let deepNotNotFilter = (deepNotFilter as Negation).NOT;
 			results = this.getQueryByFilter(deepNotNotFilter, jsonFieldTracker);
 		} else {
 			let excludeResults = this.getQueryByFilter(deepNotFilter, jsonFieldTracker);
@@ -115,6 +111,7 @@ export class Query {
 		return results;
 	}
 
+	// todo broken
 	private getBySComparator(querySComparator: SComparison, jsonFieldTracker: any): InsightResult[] {
 		// get the queries following the SKey
 		let sKey = querySComparator.IS;
@@ -131,7 +128,7 @@ export class Query {
 			let tempSections = dataset.data.filter((section: any) => {
 				let field = sKeyPairJson.field;
 				if (section[field] !== undefined) {
-					return this.stringMatches(section[field], sKeyPairJson.inputString);
+					return Utils.stringMatches(section[field], sKeyPairJson.inputString);
 				}
 				return false;
 			});
@@ -156,30 +153,6 @@ export class Query {
 		return results;
 	}
 
-	private stringMatches(fieldString: string, inputString: string): boolean {
-		let stringArray = inputString.split("*");
-
-		if (stringArray.length === 1) {
-			return fieldString === stringArray[0];
-		}
-
-		if (stringArray.length === 2) {
-			if (stringArray[0] === "") {
-				return fieldString.includes(stringArray[1]);
-			} else if (stringArray[1] === "") {
-				return fieldString.includes(stringArray[0]);
-			}
-		}
-
-		if (stringArray.length === 3) {
-			if (stringArray[0] === "" && stringArray[2] === "") {
-				return fieldString.includes(stringArray[1]);
-			}
-		}
-
-		return false;
-	}
-
 	// returns all fields that satisfy the comparator
 	// get the queries based on the MKeyPair
 	// check that there is only one valid pair (even though I think valid EBNF may already do that)
@@ -191,8 +164,7 @@ export class Query {
 		let flagsLTGTEQ: {LT: boolean, GT: boolean, EQ: boolean} = {
 			LT: false, GT: false, EQ: false
 		};
-		if ((LT === undefined && GT === undefined && EQ === undefined)
-			|| (LT !== undefined && GT !== undefined && EQ !== undefined)
+		if ((LT !== undefined && GT !== undefined && EQ !== undefined)
 			|| (LT !== undefined && GT !== undefined && EQ === undefined)
 			|| (LT !== undefined && GT === undefined && EQ !== undefined)
 			|| (LT === undefined && GT !== undefined && EQ !== undefined)) {
@@ -210,43 +182,43 @@ export class Query {
 			comparator = EQ;
 			flagsLTGTEQ.EQ = true;
 		} else {
+			// todo What is this block of code for?
 			// console.log("Error on line: ");
-			// return [];
-			throw new InsightError("Invalid query.");
+			let resultSection: Section[] = [];
+			let resultDataset = this.datasets.map((dataset) => {
+				dataset.data.filter((section: any) => {
+					return Query.filterMComparator(section, keys, flagsLTGTEQ);
+				});
+				resultSection.concat(dataset.data);
+			});
+			return Utils.filterByOptions(resultSection, jsonFieldTracker);
 		}
-
 		let keys = Utils.parseMKeyPair(comparator);
-		const validMKeyValues = ["avg", "pass", "fail", "audit","year"];
-
-		if (!validMKeyValues.includes(keys.field)) {
+		if (!EBNF.mField.includes(keys.field)) {
 			// console.log("Error on line: ");
 			// return [];
 			throw new InsightError("Invalid query.");
 		}
-
 		let resultDataset = this.datasets.filter((dataset) => {
 			return dataset.id === keys.id;
 		});
-
 		let resultSection: Section[] = [];
-
 		resultDataset.map((dataset) => {
-			dataset.data.filter((section: any) => {
-				return this.filterMComparator(section, keys, flagsLTGTEQ);
+			let filteredDataset = dataset.data.filter((section: any) => {
+				return Query.filterMComparator(section, keys, flagsLTGTEQ);
 			});
-			resultSection.concat(dataset.data);
+			resultSection = resultSection.concat(filteredDataset);
 		});
-
 		return Utils.filterByOptions(resultSection, jsonFieldTracker);
 	}
 
-	private filterMComparator(section: any, keys: {id: string; field: string; number: number},
+	private static filterMComparator(section: any, keys: {id: string; field: string; number: number},
 		flagsLTGTEQ: {LT: boolean; GT: boolean; EQ: boolean}) {
 		if (section[keys.field]) {
 			if (flagsLTGTEQ.LT) {
-				return (section as any)[keys.field] <= keys.number;
+				return (section as any)[keys.field] < keys.number;
 			} else if (flagsLTGTEQ.GT) {
-				return (section as any)[keys.field] >= keys.number;
+				return (section as any)[keys.field] > keys.number;
 			} else if (flagsLTGTEQ.EQ) {
 				return (section as any)[keys.field] === keys.number;
 			}

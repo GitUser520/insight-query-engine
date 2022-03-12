@@ -10,10 +10,14 @@ import {
 	SComparison, SKey,
 	SKeyPair
 } from "./QueryInterfaces";
+import {EBNFHelper} from "./EBNFHelper";
+import {Utils} from "./Utils";
 
 export class EBNF {
 
 	public datasets: Dataset[];
+	public static mField = ["avg", "pass", "fail", "audit","year"];
+	public static sField = ["dept", "id", "instructor", "title", "uuid"];
 
 	constructor(datasets: Dataset[]) {
 		this.datasets = datasets;
@@ -52,51 +56,34 @@ export class EBNF {
 	// checks the filters
 	private checkQueryBody(body: object): boolean {
 		// split query into four parts
-		let queryLComparison = (body as Filter).LCOMPARISON;
-		let queryMComparison = (body as Filter).MCOMPARISON;
-		let querySComparison = (body as Filter).SCOMPARISON;
-		let queryNegation = (body as Filter).NEGATION;
+		let filter = body as Filter;
 
-		// check if each part is valid
-		// check that none of them are null
-		if (
-			queryLComparison === null ||
-			queryMComparison === null ||
-			querySComparison === null ||
-			queryNegation === null
-		) {
+		// check for empty object
+		if (Object.keys(filter).length === 0) {
+			return true;
+		}
+
+		// check not null or undefined
+		if (filter === null || filter === undefined) {
 			return false;
 		}
 
-		// check that at least one of them is defined
-		if (
-			queryLComparison === undefined &&
-			queryMComparison === undefined &&
-			querySComparison === undefined &&
-			queryNegation === undefined
-		) {
-			return false;
+		let validLComparison = false;
+		let validMComparison = false;
+		let validSComparison = false;
+		let validNegation = false;
+
+		if (EBNFHelper.isInstanceOfLComparison(filter)) {
+			validLComparison = this.checkLogicComparison(filter);
+		} else if (EBNFHelper.isInstanceOfMComparison(filter)) {
+			validMComparison = this.checkMComparison(filter);
+		} else if (EBNFHelper.isInstanceOfSComparison(filter)) {
+			validSComparison = this.checkSComparison(filter);
+		} else if (EBNFHelper.isInstanceOfNegation(filter)) {
+			validNegation = this.checkNegation(filter);
 		}
 
-		let validLComparison = true;
-		let validMComparison = true;
-		let validSComparison = true;
-		let validNegation = true;
-
-		if (queryLComparison !== undefined) {
-			validLComparison = this.checkLogicComparison(queryLComparison);
-		}
-		if (queryMComparison !== undefined) {
-			validMComparison = this.checkMComparison(queryMComparison);
-		}
-		if (querySComparison !== undefined) {
-			validSComparison = this.checkSComparison(querySComparison);
-		}
-		if (queryNegation !== undefined) {
-			validNegation = this.checkNegation(queryNegation);
-		}
-
-		return validLComparison && validMComparison && validSComparison && validNegation;
+		return validLComparison || validMComparison || validSComparison || validNegation;
 	}
 
 	private checkLogicComparison(lComparator: object): boolean {
@@ -114,12 +101,20 @@ export class EBNF {
 		let validORFilter = true;
 
 		if (filterANDArray !== undefined) {
+			if (filterANDArray.length === 0) {
+				return false;
+			}
+
 			filterANDArray.forEach((filter) => {
 				validANDFilter = validANDFilter && this.checkQueryBody(filter);
 			});
 		}
 
 		if (filterORArray !== undefined) {
+			if (filterORArray.length === 0) {
+				return false;
+			}
+
 			filterORArray.forEach((filter) => {
 				validORFilter = validORFilter && this.checkQueryBody(filter);
 			});
@@ -149,33 +144,30 @@ export class EBNF {
 			if (LTComparator !== undefined || EQComparator !== undefined) {
 				return false;
 			}
-
-			let key = (GTComparator as MKeyPair).mKey;
-			let value = (GTComparator as MKeyPair).number;
-
-			validGT = (key !== undefined) && (value !== undefined);
+			let mKeyPair = Utils.parseMKeyPair(GTComparator);
+			let mKey = mKeyPair.id + "_" + mKeyPair.field;
+			validGT = mKeyPair.id !== undefined && mKeyPair.field !== undefined
+				&& mKeyPair.number !== undefined && EBNFHelper.checkMKey(mKey, this.datasets);
 		}
 		// check that at most one of them is defined
 		if (LTComparator !== undefined) {
 			if (GTComparator !== undefined || EQComparator !== undefined) {
 				return false;
 			}
-
-			let key = (LTComparator as MKeyPair).mKey;
-			let value = (LTComparator as MKeyPair).number;
-
-			validLT = (key !== undefined) && (value !== undefined);
+			let mKeyPair = Utils.parseMKeyPair(LTComparator);
+			let mKey = mKeyPair.id + "_" + mKeyPair.field;
+			validGT = mKeyPair.id !== undefined && mKeyPair.field !== undefined
+				&& mKeyPair.number !== undefined && EBNFHelper.checkMKey(mKey, this.datasets);
 		}
 		// check that at most one of them is defined
 		if (EQComparator !== undefined) {
 			if (GTComparator !== undefined || LTComparator !== undefined) {
 				return false;
 			}
-
-			let key = (EQComparator as MKeyPair).mKey;
-			let value = (EQComparator as MKeyPair).number;
-
-			validEQ = (key !== undefined) && (value !== undefined);
+			let mKeyPair = Utils.parseMKeyPair(EQComparator);
+			let mKey = mKeyPair.id + "_" + mKeyPair.field;
+			validGT = mKeyPair.id !== undefined && mKeyPair.field !== undefined
+				&& mKeyPair.number !== undefined && EBNFHelper.checkMKey(mKey, this.datasets);
 		}
 
 		return validGT && validLT && validEQ;
@@ -188,13 +180,14 @@ export class EBNF {
 			return false;
 		}
 
-		let ISValue = (ISObject as SKeyPair).sKey;
+		let sKeyPair = Utils.parseSKeyPair(ISObject);
+		let sKey = sKeyPair.id + "_" + sKeyPair.field;
+		let isValidSKeyPair = sKeyPair.id !== undefined && sKeyPair.field !== undefined
+			&& sKeyPair.inputString !== undefined
+			&& EBNFHelper.checkSKey(sKey, this.datasets)
+			&& EBNFHelper.checkIsValidAsteriskString(sKeyPair.inputString);
 
-		if (ISValue === null || ISValue === undefined) {
-			return false;
-		}
-
-		return true;
+		return isValidSKeyPair;
 	}
 
 	private checkNegation(negation: object): boolean {
@@ -215,9 +208,10 @@ export class EBNF {
 			return false;
 		}
 
-		if (queryOrder === null) {
-			return false;
-		}
+		// optional
+		// if (queryOrder === null) {
+		// 	return false;
+		// }
 
 		// check that the columns are valid
 		let validColumns = this.checkQueryColumns(queryColumns);
@@ -246,51 +240,17 @@ export class EBNF {
 	}
 
 	// check the validity of a key
-	private checkValidKey(key: object): boolean {
-		let mkey = (key as Key).mKey;
-		let skey = (key as Key).sKey;
-
-		if (mkey === null || mkey === undefined) {
+	private checkValidKey(key: Key): boolean {
+		if (key === null || key === undefined) {
 			return false;
 		}
 
-		if (skey === null || skey === undefined) {
-			return false;
-		}
+		let keyString = key as Key;
 
-		return this.checkMKey(mkey) && this.checkSKey(skey);
-	}
+		let mkey = keyString as MKey;
+		let skey = keyString as SKey;
 
-	private checkMKey(mkey: MKey): boolean {
-		let mKeyParts = mkey.mKey.split("_");
-		let validMField = ["avg", "pass", "fail", "audit","year"];
-
-		if (!validMField.includes(mKeyParts[1])) {
-			return false;
-		}
-
-		let valid = false;
-		this.datasets.forEach((dataset) => {
-			valid = valid || (dataset.id === mKeyParts[0]);
-		});
-
-		return valid;
-	}
-
-	private checkSKey(skey: SKey): boolean {
-		let sKeyParts = skey.sKey.split("_");
-		let validSField = ["dept", "id", "instructor", "title", "uuid"];
-
-		if (!validSField.includes(sKeyParts[1])) {
-			return false;
-		}
-
-		let valid = false;
-		this.datasets.forEach((dataset) => {
-			valid = valid || (dataset.id === sKeyParts[0]);
-		});
-
-		return valid;
+		return EBNFHelper.checkMKey(mkey, this.datasets) || EBNFHelper.checkSKey(skey, this.datasets);
 	}
 }
 

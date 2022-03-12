@@ -3,12 +3,7 @@ export interface QueryStructure {
 	OPTIONS: Options
 }
 
-export interface Filter {
-	LCOMPARISON?: LComparison
-	MCOMPARISON?: MComparison
-	SCOMPARISON?: SComparison
-	NEGATION?: Negation
-}
+export type Filter = LComparison | MComparison | SComparison | Negation;
 
 export interface Options {
 	COLUMNS: Key[]
@@ -42,17 +37,10 @@ export interface MKeyPair {
 	[key: string]: number
 }
 
-export interface Key {
-	mKey?: MKey
-	sKey?: SKey
-}
+export type Key = MKey | SKey;
 
-export interface SKey {
-	sKey: string
-}
+export type MKey = string;
 
-export interface MKey {
-	mKey: string
-}
+export type SKey = string;
 
 
