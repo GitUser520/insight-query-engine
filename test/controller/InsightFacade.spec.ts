@@ -24,6 +24,7 @@ describe("InsightFacade", function () {
 	// automatically be loaded in the 'before' hook.
 	const datasetsToLoad: {[key: string]: string} = {
 		courses: "./test/resources/archives/courses.zip",
+		rooms: "./test/resources/archives/rooms.zip",
 	};
 
 	before(function () {
@@ -66,6 +67,15 @@ describe("InsightFacade", function () {
 			const content: string = datasetContents.get("courses") ?? "";
 			const expected: string[] = [id];
 			return insightFacade.addDataset(id, content, InsightDatasetKind.Courses).then((result: string[]) => {
+				expect(result).to.deep.equal(expected);
+			});
+		});
+
+		it("Should add a valid dataset rooms", function () {
+			const id: string = "rooms";
+			const content: string = datasetContents.get("rooms") ?? "";
+			const expected: string[] = [id];
+			return insightFacade.addDataset(id, content, InsightDatasetKind.Rooms).then((result: string[]) => {
 				expect(result).to.deep.equal(expected);
 			});
 		});
@@ -238,6 +248,7 @@ describe("InsightFacade", function () {
 		});
 
 		let courseContent: string = getContentFromArchives("courses.zip");
+		let roomContent: string = getContentFromArchives("rooms.zip");
 /*	let facade: InsightFacade;
 	let courseContent: string = getContentFromArchives("courses.zip");
 
@@ -265,6 +276,26 @@ describe("InsightFacade", function () {
 					]);
 				});
 		});
+
+		// it("add one rooms dataset no repeat", function () {
+		// 	return insightFacade
+		// 		.addDataset("rooms", roomContent, InsightDatasetKind.Courses)
+		// 		.then((results: string[]) => {
+		// 			expect(results).to.deep.equal(["rooms"]);
+		//
+		// 			return insightFacade.listDatasets();
+		// 		})
+		// 		.then((insightDatasetArray: InsightDataset[]) => {
+		// 			expect(insightDatasetArray).to.be.an.instanceOf(Array);
+		// 			expect(insightDatasetArray).to.deep.equal([
+		// 				{
+		// 					id: "rooms",
+		// 					kind: InsightDatasetKind.Rooms,
+		// 					numRows: 64612,
+		// 				},
+		// 			]);
+		// 		});
+		// });
 
 		it("add one dataset with repeat", function () {
 			return insightFacade
@@ -503,7 +534,7 @@ describe("InsightFacade", function () {
 	 * You should not need to modify it; instead, add additional files to the queries directory.
 	 * You can still make tests the normal way, this is just a convenient tool for a majority of queries.
 	 */
-	describe("PerformQuery", () => {
+	/* describe("PerformQuery", () => {
 		before(function () {
 			console.info(`Before: ${this.test?.parent?.title}`);
 
@@ -541,5 +572,5 @@ describe("InsightFacade", function () {
 				},
 			}
 		);
-	});
+	});*/
 });
