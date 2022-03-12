@@ -1,7 +1,8 @@
 import Section from "../model/Section";
 import {InsightError} from "../controller/IInsightFacade";
-import Dataset from "../model/Dataset";
-import {mkdirp} from "fs-extra";
+
+import JSZip from "jszip";
+import Room from "../model/Room";
 
 
 export const keyMapping: any = {
@@ -17,20 +18,7 @@ export const keyMapping: any = {
 	Year: "year"
 };
 
-export const typeMapping: any = {
-	Subject: "string",
-	Course: "string",
-	Avg: "number",
-	Professor: "string",
-	Title: "string",
-	Pass: "number",
-	Fail: "number",
-	Audit: "number",
-	id: "string",
-	Year: "string"
-};
-
-const filename: string = "/data/datasets.json";
+const parse5 = require("parse5");
 
 export function parseCourse(json: any): Section[] {
 	const result = json["result"];
@@ -77,33 +65,212 @@ export function isValidSection(json: any): boolean {
 	return true;
 }
 
-export function loadFromDisk(): Dataset[] {
-	const fs = require("fs");
-	let getDirName = require("path").dirname;
-	let result: Dataset[] = [];
-	try {
-		mkdirp(getDirName(filename), function () {
-			result = JSON.parse(fs.readFileSync(filename, "utf8"));
+export function zipCoursesProcessor(content: string): Promise<any[]> {
+	const newZip = new JSZip();
+	let promises = Array<Promise<string>>();
+	return newZip.loadAsync(content, {base64: true})
+		.then((zip) => {
+			if(zip.folder(/courses/).length === 0) {
+				return Promise.reject(new InsightError("no folder named courses in the zip file"));
+			}
+			zip.folder("courses")?.forEach(((relativePath, file) => {
+				promises.push(file.async("string"));
+			}));
+			return Promise.all(promises).then( async (promise: string[]) => {
+				let allSections: Section[] = [];
+				for (const courseData of promise) {
+					const json = JSON.parse(courseData);
+					const result = parseCourse(json);
+					allSections = [...allSections, ...result];
+				}
+				if (allSections.length === 0) {
+					return Promise.reject(new InsightError("no valid section in this dataset"));
+				}
+				return allSections;
+			});
+		})
+		.catch(() => {
+	// console.log(err);
+			return Promise.reject(new InsightError("error in loading zip file"));
 		});
-	} catch(err) {
-		// console.error(err);
-	}
-	return result;
 }
 
-export async function persistToDisk(datasets: Dataset[]): Promise<void> {
-	const fs = require("fs");
-	let getDirName = require("path").dirname;
-	return new Promise((resolve, reject) => {
-		try {
-			mkdirp(getDirName(filename), function () {
-				fs.writeFileSync(filename, JSON.stringify(datasets));
+export function zipRoomsProcessor(content: string): Promise<any[]> {
+	const newZip = new JSZip();
+	return newZip.loadAsync(content, {base64: true})
+		.then((zip) => {
+			let allRooms: any[] = [];
+			const roomsFolderObj: JSZip | null = zip.folder("rooms");
+			if(!roomsFolderObj) {
+				return Promise.reject(new InsightError("no folder named rooms in the zip file"));
+			}
+			const indexFile = roomsFolderObj?.file("index.htm");
+			if(!indexFile) {
+				return Promise.reject(new InsightError("no file named index.htm"));
+			}
+			processIndex(indexFile, content).then((rooms: any[]) => {
+				if (rooms.length === 0) {
+					return Promise.reject(new InsightError("no valid room found"));
+				}
+				return Promise.resolve(rooms);
+			}).catch((err) => {
+				return Promise.reject(new InsightError("error in getting rooms"));
 			});
-		} catch(err) {
-			// console.error(err);
-			return reject(new InsightError("error"));
+			return allRooms;  // todo
+		})
+		.catch(() => {
+			// console.log(err);
+			return Promise.reject(new InsightError("error in loading zip file"));
+		});
+}
+
+function processIndex(indexFile: any, content: string): Promise<any[]> {
+	return new Promise((resolve, reject) => {
+		let roomPromises = Array<Promise<any>>();
+		indexFile.async("text").then((str: any) => {
+			const document = parse5.parse(str);
+			const tbody = getNodeHelper(document, "tbody");
+			for (let rowNode of tbody.childNodes) {
+				if (rowNode.nodeName === "tr") {
+					let address: any = null, href: any = null, code: any = null, fullname: any = null;
+					for (let cellNode of rowNode.childNodes) {
+						if (cellNode.nodeName === "td") {
+							const value = cellNode.attrs[0].value;
+							if (value === "views-field views-field-field-building-address") {
+								address = cellNode.childNodes[0].value.trim();
+							} else if (value === "views-field views-field-title") {
+								const a = getNodeHelper(cellNode, "a");
+								href = a.attrs[0].value;
+								if (a.attrs.length > 1 && a.childNodes[0].nodeName === "#text") {
+									fullname = a.childNodes[0].value.trim();
+								}
+							} else if (value === "views-field views-field-field-building-code") {
+								code = cellNode.childNodes[0].value.trim();
+							}
+						}
+					}
+					// console.log(href);
+					if (address != null && href != null && code != null && fullname != null) {
+						roomPromises.push(parseBuilding(address, href, code, fullname, content));
+					}
+				}
+			}
+			Promise.all(roomPromises).then((results: any[]) => {
+				let rooms = [...results];
+				return resolve(rooms);
+			});
+		}).catch((err: string | undefined) => {
+			reject(new InsightError(err));
+		});
+
+
+	});
+
+}
+
+function getNodeHelper(document: any, nodeName: any): any {
+	if (document == null || document.childNodes === undefined) {
+		return null;
+	}
+	if (document.nodeName === nodeName) {
+		return document;
+	}
+	for (let childNode of document.childNodes) {
+		let node = getNodeHelper(childNode, nodeName);
+		if (node !== null) {
+			return node;
 		}
-		return resolve();
+	}
+	return null;
+}
+
+function parseBuilding(address: string, href: string, code: string, fullname: string, content: string): Promise<any> {
+	let rooms: any[] = [];
+	return new Promise((resolve, reject) => {
+		const geoLocation = getGeoLocation(address);
+		// console.log(geoLocation);
+		const newZip = new JSZip();
+		// const result = roomsFolderObj.file();
+		let roomsData = newZip.loadAsync(content, {base64: true}).then((zip) => {
+			// console.log(href);
+			return zip.files[href].async("text");
+		}).then((data) => {
+			return parse5.parse(data);
+		}).then((tree) => {
+			return getNodeHelper(tree, "tbody");
+		});
+		// console.log(roomsData);
+		Promise.all([geoLocation, roomsData]).then(([resultGeoLocation, resultRoomsData]) => {
+			if (resultRoomsData !== null) {
+				for (let roomNode of resultRoomsData.childNodes) {
+					if (roomNode.nodeName === "tr") {
+						let room: Room = parseRoom(roomNode, code, fullname, address, href, resultGeoLocation);
+						rooms.push(room);
+					}
+				}
+			}
+		}).then(() => {
+			resolve(rooms);
+		}).catch((err) => {
+			reject(new InsightError(err));
+		});
+
+	});
+
+
+}
+
+function parseRoom(node: any, code: string, fullname: string, address: string, href: string, geoLocation: any): any {
+	let number: any = null, capacity: any = null, furniture: any = null, type: any = null;
+	// console.log("here");
+	for (let fieldNode of node.childNodes) {
+		if (fieldNode.nodeName === "td") {
+			const value = fieldNode.attrs[0].value;
+			if (value === "views-field views-field-field-room-number") {
+				const a = getNodeHelper(fieldNode, "a");
+				number = a.childNodes[0].value;
+			} else if (value === "views-field views-field-field-room-capacity") {
+				capacity = fieldNode.childNodes[0].value.trim();
+			} else if (value === "views-field views-field-field-room-furniture") {
+				furniture = fieldNode.childNodes[0].value.trim();
+			} else if (value === "views-field views-field-field-room-type") {
+				type = fieldNode.childNodes[0].value.trim();
+			}
+		}
+	}
+	let name = code + "_" + number;
+	return new Room(fullname, code, number, name, address,
+		geoLocation.lat, geoLocation.lon, capacity, type, furniture, href);
+}
+
+function getGeoLocation(address: string): Promise<any> {
+	return new Promise((resolve, reject) => {
+		let http = require("http");
+		const url = encodeURL(address);
+		// citation: https://nodejs.org/api/http.html#httpgeturl-options-callback
+		http.get(url, (res: any) => {
+			res.setEncoding("utf8");
+			let rawData = "";
+			res.on("data", (chunk: any) => {
+				rawData += chunk;
+			});
+			res.on("end", () => {
+				try {
+					const parsedData = JSON.parse(rawData);
+					// console.log(parsedData);
+					resolve(parsedData);
+				} catch (e: any) {
+					reject(new InsightError(e));
+				}
+			});
+		}).on("error", (e: any) => {
+			reject(new InsightError(e));
+		});
 	});
 }
 
+function encodeURL(address: string): string {
+	const encodedAddress =  address.trim().split(" ").join("%20");
+	const url = "http://cs310.students.cs.ubc.ca:11316/api/v1/project_team617/" + encodedAddress;
+	return url;
+}
