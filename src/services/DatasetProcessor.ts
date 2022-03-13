@@ -76,7 +76,7 @@ export function zipCoursesProcessor(content: string): Promise<any[]> {
 			zip.folder("courses")?.forEach(((relativePath, file) => {
 				promises.push(file.async("string"));
 			}));
-			return Promise.all(promises).then( async (promise: string[]) => {
+			return Promise.all(promises).then((promise: string[]) => {
 				let allSections: Section[] = [];
 				for (const courseData of promise) {
 					const json = JSON.parse(courseData);
@@ -97,26 +97,34 @@ export function zipCoursesProcessor(content: string): Promise<any[]> {
 
 export function zipRoomsProcessor(content: string): Promise<any[]> {
 	const newZip = new JSZip();
+	let promises = Array<Promise<string>>();
 	return newZip.loadAsync(content, {base64: true})
 		.then((zip) => {
-			let allRooms: any[] = [];
-			const roomsFolderObj: JSZip | null = zip.folder("rooms");
+			const roomsFolderObj: any = zip.folder("rooms");
 			if(!roomsFolderObj) {
 				return Promise.reject(new InsightError("no folder named rooms in the zip file"));
 			}
-			const indexFile = roomsFolderObj?.file("index.htm");
+			const indexFile = roomsFolderObj.file("index.htm");
+			// console.log("check0");
 			if(!indexFile) {
 				return Promise.reject(new InsightError("no file named index.htm"));
 			}
-			processIndex(indexFile, content).then((rooms: any[]) => {
+			// console.log("check1");
+			promises.push(indexFile.async("string"));
+			return Promise.all(promises).then((files: string[]) => {
+				// console.log("check2");
+				return processIndex(files, roomsFolderObj);
+			}).then((rooms: any[]) => {
+				// console.log("check7");
 				if (rooms.length === 0) {
+					// console.log("reached here");
 					return Promise.reject(new InsightError("no valid room found"));
 				}
+				// console.log("reached here correct");
 				return Promise.resolve(rooms);
 			}).catch((err) => {
-				return Promise.reject(new InsightError("error in getting rooms"));
+				return Promise.reject(new InsightError("error in getting rooms " + err));
 			});
-			return allRooms;  // todo
 		})
 		.catch(() => {
 			// console.log(err);
@@ -124,45 +132,50 @@ export function zipRoomsProcessor(content: string): Promise<any[]> {
 		});
 }
 
-function processIndex(indexFile: any, content: string): Promise<any[]> {
+function processIndex(files: any[], roomsFolderObj: JSZip): Promise<any[]> {
 	return new Promise((resolve, reject) => {
 		let roomPromises = Array<Promise<any>>();
-		indexFile.async("text").then((str: any) => {
-			const document = parse5.parse(str);
-			const tbody = getNodeHelper(document, "tbody");
-			for (let rowNode of tbody.childNodes) {
-				if (rowNode.nodeName === "tr") {
-					let address: any = null, href: any = null, code: any = null, fullname: any = null;
-					for (let cellNode of rowNode.childNodes) {
-						if (cellNode.nodeName === "td") {
-							const value = cellNode.attrs[0].value;
-							if (value === "views-field views-field-field-building-address") {
-								address = cellNode.childNodes[0].value.trim();
-							} else if (value === "views-field views-field-title") {
-								const a = getNodeHelper(cellNode, "a");
-								href = a.attrs[0].value;
-								if (a.attrs.length > 1 && a.childNodes[0].nodeName === "#text") {
-									fullname = a.childNodes[0].value.trim();
-								}
-							} else if (value === "views-field views-field-field-building-code") {
-								code = cellNode.childNodes[0].value.trim();
+		const document = parse5.parse(files[0]);
+		const tbody = getNodeHelper(document, "tbody");
+		let allRooms: Room[] = [];
+		// console.log("check3");
+		for (let rowNode of tbody.childNodes) {
+			if (rowNode.nodeName === "tr") {
+				let address: any = null, href: any = null, code: any = null, fullname: any = null;
+				for (let cellNode of rowNode.childNodes) {
+					if (cellNode.nodeName === "td") {
+						const value = cellNode.attrs[0].value;
+						if (value === "views-field views-field-field-building-address") {
+							address = cellNode.childNodes[0].value.trim();
+						} else if (value === "views-field views-field-title") {
+							const a = getNodeHelper(cellNode, "a");
+							href = a.attrs[0].value.trim();
+							if (a.attrs.length > 1 && a.childNodes[0].nodeName === "#text") {
+								fullname = a.childNodes[0].value.trim();
 							}
+						} else if (value === "views-field views-field-field-building-code") {
+							code = cellNode.childNodes[0].value.trim();
 						}
 					}
+				}
 					// console.log(href);
-					if (address != null && href != null && code != null && fullname != null) {
-						roomPromises.push(parseBuilding(address, href, code, fullname, content));
-					}
+				if (address != null && href != null && code != null && fullname != null) {
+					// console.log("check!");
+					roomPromises.push(parseBuilding(address, href, code, fullname, roomsFolderObj));
 				}
 			}
-			Promise.all(roomPromises).then((results: any[]) => {
-				let rooms = [...results];
-				return resolve(rooms);
-			});
-		}).catch((err: string | undefined) => {
-			reject(new InsightError(err));
+		}
+		// console.log("check4");
+		Promise.all(roomPromises).then((results: any[]) => {
+			if (results.length > 0) {
+				for (let result of results) {
+					allRooms = [...allRooms, ...result];
+				}
+			}
+			// console.log("check5");
+			// console.log(allRooms[0]);
+			return resolve(allRooms);
 		});
-
 
 	});
 
@@ -184,32 +197,34 @@ function getNodeHelper(document: any, nodeName: any): any {
 	return null;
 }
 
-function parseBuilding(address: string, href: string, code: string, fullname: string, content: string): Promise<any> {
-	let rooms: any[] = [];
+function parseBuilding(address: string, href: string, code: string, fullname: string, roomsFolder: JSZip):
+	Promise<any> {
+	let rooms: Room[] = [];
 	return new Promise((resolve, reject) => {
 		const geoLocation = getGeoLocation(address);
-		// console.log(geoLocation);
-		const newZip = new JSZip();
-		// const result = roomsFolderObj.file();
-		let roomsData = newZip.loadAsync(content, {base64: true}).then((zip) => {
-			// console.log(href);
-			return zip.files[href].async("text");
-		}).then((data) => {
-			return parse5.parse(data);
-		}).then((tree) => {
+		// console.log("here!");
+		// console.log(roomsFolder.file(href.slice(2)));
+		let roomsData = roomsFolder?.file(href.slice(2))?.async("text").then((str: string) => {
+			// console.log("here also");
+			return parse5.parse(str);
+		}).then((tree: any) => {
+			// console.log("check01");
 			return getNodeHelper(tree, "tbody");
 		});
 		// console.log(roomsData);
+		// console.log("check00");
 		Promise.all([geoLocation, roomsData]).then(([resultGeoLocation, resultRoomsData]) => {
-			if (resultRoomsData !== null) {
+			if (resultGeoLocation && resultRoomsData !== null) {
 				for (let roomNode of resultRoomsData.childNodes) {
 					if (roomNode.nodeName === "tr") {
-						let room: Room = parseRoom(roomNode, code, fullname, address, href, resultGeoLocation);
+						const fullHref = "http://students.ubc.ca/" + href.slice(2);
+						let room: Room = parseRoom(roomNode, code, fullname, address, fullHref, resultGeoLocation);
 						rooms.push(room);
 					}
 				}
 			}
 		}).then(() => {
+			// console.log("check!");
 			resolve(rooms);
 		}).catch((err) => {
 			reject(new InsightError(err));
@@ -223,6 +238,7 @@ function parseBuilding(address: string, href: string, code: string, fullname: st
 function parseRoom(node: any, code: string, fullname: string, address: string, href: string, geoLocation: any): any {
 	let number: any = null, capacity: any = null, furniture: any = null, type: any = null;
 	// console.log("here");
+	// console.log("check04");
 	for (let fieldNode of node.childNodes) {
 		if (fieldNode.nodeName === "td") {
 			const value = fieldNode.attrs[0].value;
@@ -245,6 +261,7 @@ function parseRoom(node: any, code: string, fullname: string, address: string, h
 
 function getGeoLocation(address: string): Promise<any> {
 	return new Promise((resolve, reject) => {
+		// console.log("check02");
 		let http = require("http");
 		const url = encodeURL(address);
 		// citation: https://nodejs.org/api/http.html#httpgeturl-options-callback
@@ -258,6 +275,7 @@ function getGeoLocation(address: string): Promise<any> {
 				try {
 					const parsedData = JSON.parse(rawData);
 					// console.log(parsedData);
+					// console.log("check03");
 					resolve(parsedData);
 				} catch (e: any) {
 					reject(new InsightError(e));
@@ -272,5 +290,6 @@ function getGeoLocation(address: string): Promise<any> {
 function encodeURL(address: string): string {
 	const encodedAddress =  address.trim().split(" ").join("%20");
 	const url = "http://cs310.students.cs.ubc.ca:11316/api/v1/project_team617/" + encodedAddress;
+	// console.log(url);
 	return url;
 }

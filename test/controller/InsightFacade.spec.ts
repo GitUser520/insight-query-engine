@@ -277,25 +277,25 @@ describe("InsightFacade", function () {
 				});
 		});
 
-		// it("add one rooms dataset no repeat", function () {
-		// 	return insightFacade
-		// 		.addDataset("rooms", roomContent, InsightDatasetKind.Courses)
-		// 		.then((results: string[]) => {
-		// 			expect(results).to.deep.equal(["rooms"]);
-		//
-		// 			return insightFacade.listDatasets();
-		// 		})
-		// 		.then((insightDatasetArray: InsightDataset[]) => {
-		// 			expect(insightDatasetArray).to.be.an.instanceOf(Array);
-		// 			expect(insightDatasetArray).to.deep.equal([
-		// 				{
-		// 					id: "rooms",
-		// 					kind: InsightDatasetKind.Rooms,
-		// 					numRows: 64612,
-		// 				},
-		// 			]);
-		// 		});
-		// });
+		it("add one rooms dataset no repeat", function () {
+			return insightFacade
+				.addDataset("rooms", roomContent, InsightDatasetKind.Rooms)
+				.then((results: string[]) => {
+					expect(results).to.deep.equal(["rooms"]);
+
+					return insightFacade.listDatasets();
+				})
+				.then((insightDatasetArray: InsightDataset[]) => {
+					expect(insightDatasetArray).to.be.an.instanceOf(Array);
+					expect(insightDatasetArray).to.deep.equal([
+						{
+							id: "rooms",
+							kind: InsightDatasetKind.Rooms,
+							numRows: 364,
+						},
+					]);
+				});
+		});
 
 		it("add one dataset with repeat", function () {
 			return insightFacade
