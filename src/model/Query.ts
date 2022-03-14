@@ -238,9 +238,8 @@ export class Query {
 
 			result = arrayAnd2d.reduce((resultArray1, resultArray2): InsightResult[] => {
 				let currentIntersection = resultArray1.filter((tempResult) => {
-					return resultArray2.includes(tempResult);
+					return Utils.arrayObjectIncludes(resultArray2, tempResult);
 				});
-
 				return currentIntersection;
 			});
 		}
@@ -248,7 +247,7 @@ export class Query {
 		if (arrayOr !== undefined) {
 			arrayOr.forEach((filter) => {
 				let tempResult = this.getQueryByFilter(filter, jsonFieldTracker);
-				result.concat(tempResult);
+				result = result.concat(tempResult);
 			});
 		}
 		return result;

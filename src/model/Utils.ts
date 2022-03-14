@@ -23,6 +23,16 @@ export class Utils {
 		return result;
 	}
 
+	public static arrayObjectIncludes(array: object[], object: object): boolean {
+		let contains = false;
+		let result1 = JSON.stringify(object);
+		array.forEach((tempObject) => {
+			let result2 = JSON.stringify(tempObject);
+			contains = contains || result1 === result2;
+		});
+		return contains;
+	}
+
 	// public static getInsightResultsFromSections(resultDataset: Dataset[],
 	// 	keys: {id: string, field: string, number: number},
 	// 	flagsLTGTEQ: {LT: boolean, GT: boolean, EQ: boolean}) {
