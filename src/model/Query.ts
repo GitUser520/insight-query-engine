@@ -103,7 +103,7 @@ export class Query {
 			};
 			results = this.getQueryByFilter(ALL, jsonFieldTracker);
 
-			results.filter((value) => {
+			results = results.filter((value) => {
 				return (!excludeResults.includes(value));
 			});
 		}
@@ -111,7 +111,6 @@ export class Query {
 		return results;
 	}
 
-	// todo broken
 	private getBySComparator(querySComparator: SComparison, jsonFieldTracker: any): InsightResult[] {
 		// get the queries following the SKey
 		let sKey = querySComparator.IS;

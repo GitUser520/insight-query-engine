@@ -539,6 +539,9 @@ describe("InsightFacade", function () {
 						expect(actual).to.be.instanceof(InsightError);
 					}
 				},
+				assertOnResult(actual, expected, input) {
+					expect(actual).to.deep.members(expected);
+				},
 			}
 		);
 	});
