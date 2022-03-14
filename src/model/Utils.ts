@@ -98,11 +98,14 @@ export class Utils {
 
 			if (stringBeforeAsterisk === "") {
 				let index = fieldString.indexOf(stringAfterAsterisk);
+				if (index === -1) {
+					return false;
+				}
 				let subString = fieldString.substring(index);
 				return subString.length === stringAfterAsterisk.length;
 			} else if (stringAfterAsterisk === "") {
 				let index = fieldString.indexOf(stringBeforeAsterisk);
-				let subString = fieldString.substring(0, index);
+				let subString = fieldString.substring(0, index + 2);
 				return subString.length === stringBeforeAsterisk.length;
 			}
 		}
