@@ -132,25 +132,10 @@ export class Query {
 				}
 				return false;
 			});
-			currentSections.concat(tempSections);
+			currentSections = currentSections.concat(tempSections);
 		});
 
-		let results: InsightResult[] = [];
-
-		// filter the sections to get the info based on the jsonFieldTracker
-		currentSections.forEach((section: any) => {
-			let tempJSON: any = {};
-			for (let key in Object.keys(jsonFieldTracker)) {
-				let currentField: string = jsonFieldTracker[key].field;
-				if (section[currentField]) {
-					tempJSON[key] = (section as any)[currentField];
-				}
-			}
-			results.push(tempJSON as InsightResult);
-		});
-
-
-		return results;
+		return Utils.filterByOptions(currentSections, jsonFieldTracker);
 	}
 
 	// returns all fields that satisfy the comparator
@@ -184,14 +169,15 @@ export class Query {
 		} else {
 			// todo What is this block of code for?
 			// console.log("Error on line: ");
-			let resultSection: Section[] = [];
-			let resultDataset = this.datasets.map((dataset) => {
-				dataset.data.filter((section: any) => {
-					return Query.filterMComparator(section, keys, flagsLTGTEQ);
-				});
-				resultSection.concat(dataset.data);
-			});
-			return Utils.filterByOptions(resultSection, jsonFieldTracker);
+			// let resultSection: Section[] = [];
+			// let resultDataset = this.datasets.map((dataset) => {
+			// 	dataset.data.filter((section: any) => {
+			// 		return Query.filterMComparator(section, keys, flagsLTGTEQ);
+			// 	});
+			// 	resultSection.concat(dataset.data);
+			// });
+			// return Utils.filterByOptions(resultSection, jsonFieldTracker);
+			throw new InsightError("Invalid query.");
 		}
 		let keys = Utils.parseMKeyPair(comparator);
 		if (!EBNF.mField.includes(keys.field)) {

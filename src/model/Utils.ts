@@ -93,16 +93,23 @@ export class Utils {
 		}
 
 		if (stringArray.length === 2) {
-			if (stringArray[0] === "") {
-				return fieldString.includes(stringArray[1]);
-			} else if (stringArray[1] === "") {
-				return fieldString.includes(stringArray[0]);
+			let stringBeforeAsterisk = stringArray[0];
+			let stringAfterAsterisk = stringArray[1];
+
+			if (stringBeforeAsterisk === "") {
+				let index = fieldString.indexOf(stringAfterAsterisk);
+				let subString = fieldString.substring(index);
+				return subString.length === stringAfterAsterisk.length;
+			} else if (stringAfterAsterisk === "") {
+				let index = fieldString.indexOf(stringBeforeAsterisk);
+				let subString = fieldString.substring(0, index);
+				return subString.length === stringBeforeAsterisk.length;
 			}
 		}
 
 		if (stringArray.length === 3) {
 			if (stringArray[0] === "" && stringArray[2] === "") {
-				return fieldString.includes(stringArray[1]);
+				return fieldString.includes(stringArray[0]);
 			}
 		}
 
