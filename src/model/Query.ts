@@ -64,27 +64,34 @@ export class Query {
 		let queryMResults: InsightResult[] = [];
 		let querySResults: InsightResult[] = [];
 		let queryNResults: InsightResult[] = [];
-
-		if (EBNFHelper.isInstanceOfLComparison(queryWhere)) {
-			queryLResults = this.getByLComparator(queryWhere as LComparison, jsonFieldTracker);
-		}
-
-		if (EBNFHelper.isInstanceOfMComparison(queryWhere)) {
-			queryMResults = this.getByMComparator(queryWhere as MComparison, jsonFieldTracker);
-		}
-
-		if (EBNFHelper.isInstanceOfSComparison(queryWhere)) {
-			querySResults = this.getBySComparator(queryWhere as SComparison, jsonFieldTracker);
-		}
-
-		if (EBNFHelper.isInstanceOfNegation(queryWhere)) {
-			queryNResults = this.getByNComparator(queryWhere as Negation, jsonFieldTracker);
-		}
-
 		let results: InsightResult[] = [];
+
+		if (JSON.stringify(queryWhere) === "{}") {
+			results = this.getAll(jsonFieldTracker);
+		} else if (EBNFHelper.isInstanceOfLComparison(queryWhere)) {
+			results = this.getByLComparator(queryWhere as LComparison, jsonFieldTracker);
+		} else if (EBNFHelper.isInstanceOfMComparison(queryWhere)) {
+			results = this.getByMComparator(queryWhere as MComparison, jsonFieldTracker);
+		} else if (EBNFHelper.isInstanceOfSComparison(queryWhere)) {
+			results = this.getBySComparator(queryWhere as SComparison, jsonFieldTracker);
+		} else if (EBNFHelper.isInstanceOfNegation(queryWhere)) {
+			results = this.getByNComparator(queryWhere as Negation, jsonFieldTracker);
+		}
+
+
 		results = results.concat(queryLResults).concat(queryMResults).concat(querySResults).concat(queryNResults);
 
 		return results;
+	}
+
+	private getAll(jsonFieldTracker: any): InsightResult[] {
+		let allSections: Section[] = [];
+
+		this.datasets.forEach((dataset) => {
+			allSections = allSections.concat(dataset.data);
+		});
+
+		return Utils.filterByOptions(allSections, jsonFieldTracker);
 	}
 
 	private getByNComparator(queryNegation: Negation, jsonFieldTracker: any): InsightResult[] {

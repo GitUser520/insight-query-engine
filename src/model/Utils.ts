@@ -122,7 +122,7 @@ export class Utils {
 
 		if (stringArray.length === 3) {
 			if (stringArray[0] === "" && stringArray[2] === "") {
-				return fieldString.includes(stringArray[0]);
+				return fieldString.includes(stringArray[1]);
 			}
 		}
 

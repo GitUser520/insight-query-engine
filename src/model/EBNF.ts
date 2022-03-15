@@ -96,6 +96,12 @@ export class EBNF {
 		if (filterANDArray === undefined && filterORArray === undefined) {
 			return false;
 		}
+		if (filterANDArray === undefined && !Array.isArray(filterORArray)) {
+			return false;
+		}
+		if (filterORArray === undefined && !Array.isArray(filterANDArray)) {
+			return false;
+		}
 
 		let validANDFilter = true;
 		let validORFilter = true;
