@@ -111,7 +111,7 @@ export class Query {
 			results = this.getQueryByFilter(ALL, jsonFieldTracker);
 
 			results = results.filter((value) => {
-				return (!excludeResults.includes(value));
+				return !Utils.arrayObjectIncludes(excludeResults, value);
 			});
 		}
 
@@ -173,16 +173,7 @@ export class Query {
 			comparator = EQ;
 			flagsLTGTEQ.EQ = true;
 		} else {
-			// todo What is this block of code for?
-			// console.log("Error on line: ");
-			// let resultSection: Section[] = [];
-			// let resultDataset = this.datasets.map((dataset) => {
-			// 	dataset.data.filter((section: any) => {
-			// 		return Query.filterMComparator(section, keys, flagsLTGTEQ);
-			// 	});
-			// 	resultSection.concat(dataset.data);
-			// });
-			// return Utils.filterByOptions(resultSection, jsonFieldTracker);
+			// has to be one of the three comparators above
 			throw new InsightError("Invalid query.");
 		}
 		let keys = Utils.parseMKeyPair(comparator);
