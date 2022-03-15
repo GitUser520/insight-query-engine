@@ -43,9 +43,7 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-		// let promises = Array<Promise<string>>();
 		return new Promise((resolve, reject) => {
-			// const newZip = new JSZip();
 			let zipProcessor: any;
 			if (id == null || id.includes("_") || id.trim().length === 0) {
 				return reject(new InsightError("invalid id"));

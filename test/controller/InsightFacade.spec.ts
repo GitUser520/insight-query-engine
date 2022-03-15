@@ -90,6 +90,16 @@ describe("InsightFacade", function () {
 			}
 		});
 
+		it("should not add one dataset given invalid rooms dataset", async function () {
+			const contentInvalid = getContentFromArchives("roomsInvalid.zip");
+			try {
+				await insightFacade.addDataset("rooms", contentInvalid, InsightDatasetKind.Rooms);
+				expect.fail("should have thrown an error");
+			} catch (err) {
+				expect(err).to.be.instanceof(InsightError);
+			}
+		});
+
 		it("should not add one dataset given no valid section", async function () {
 			const contentInvalid = getContentFromArchives("coursesWrongFieldType.zip");
 			try {
@@ -277,25 +287,25 @@ describe("InsightFacade", function () {
 				});
 		});
 
-		// it("add one rooms dataset no repeat", function () {
-		// 	return insightFacade
-		// 		.addDataset("rooms", roomContent, InsightDatasetKind.Courses)
-		// 		.then((results: string[]) => {
-		// 			expect(results).to.deep.equal(["rooms"]);
-		//
-		// 			return insightFacade.listDatasets();
-		// 		})
-		// 		.then((insightDatasetArray: InsightDataset[]) => {
-		// 			expect(insightDatasetArray).to.be.an.instanceOf(Array);
-		// 			expect(insightDatasetArray).to.deep.equal([
-		// 				{
-		// 					id: "rooms",
-		// 					kind: InsightDatasetKind.Rooms,
-		// 					numRows: 64612,
-		// 				},
-		// 			]);
-		// 		});
-		// });
+		it("add one rooms dataset no repeat", function () {
+			return insightFacade
+				.addDataset("rooms", roomContent, InsightDatasetKind.Rooms)
+				.then((results: string[]) => {
+					expect(results).to.deep.equal(["rooms"]);
+
+					return insightFacade.listDatasets();
+				})
+				.then((insightDatasetArray: InsightDataset[]) => {
+					expect(insightDatasetArray).to.be.an.instanceOf(Array);
+					expect(insightDatasetArray).to.deep.equal([
+						{
+							id: "rooms",
+							kind: InsightDatasetKind.Rooms,
+							numRows: 364,
+						},
+					]);
+				});
+		});
 
 		it("add one dataset with repeat", function () {
 			return insightFacade
@@ -345,6 +355,37 @@ describe("InsightFacade", function () {
 							id: "courses-2",
 							kind: InsightDatasetKind.Courses,
 							numRows: 64612,
+						},
+					]);
+				});
+		});
+
+		it("add multiple datasets no repeat different types", function () {
+			return insightFacade
+				.addDataset("courses-1", courseContent, InsightDatasetKind.Courses)
+				.then((results: string[]) => {
+					expect(results).to.deep.members(["courses-1"]);
+
+					return insightFacade.addDataset("rooms-2", roomContent, InsightDatasetKind.Rooms);
+				})
+				.then((results: string[]) => {
+					expect(results).to.deep.members(["courses-1", "rooms-2"]);
+
+					return insightFacade.listDatasets();
+				})
+				.then((insightDatasetArray: InsightDataset[]) => {
+					expect(insightDatasetArray).to.be.an.instanceOf(Array);
+					expect(insightDatasetArray).to.have.length(2);
+					expect(insightDatasetArray).to.have.deep.members([
+						{
+							id: "courses-1",
+							kind: InsightDatasetKind.Courses,
+							numRows: 64612,
+						},
+						{
+							id: "rooms-2",
+							kind: InsightDatasetKind.Rooms,
+							numRows: 364,
 						},
 					]);
 				});

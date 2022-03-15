@@ -76,7 +76,7 @@ export function zipCoursesProcessor(content: string): Promise<any[]> {
 			zip.folder("courses")?.forEach(((relativePath, file) => {
 				promises.push(file.async("string"));
 			}));
-			return Promise.all(promises).then( async (promise: string[]) => {
+			return Promise.all(promises).then((promise: string[]) => {
 				let allSections: Section[] = [];
 				for (const courseData of promise) {
 					const json = JSON.parse(courseData);
@@ -90,79 +90,78 @@ export function zipCoursesProcessor(content: string): Promise<any[]> {
 			});
 		})
 		.catch(() => {
-	// console.log(err);
 			return Promise.reject(new InsightError("error in loading zip file"));
 		});
 }
 
 export function zipRoomsProcessor(content: string): Promise<any[]> {
 	const newZip = new JSZip();
+	let promises = Array<Promise<string>>();
 	return newZip.loadAsync(content, {base64: true})
 		.then((zip) => {
-			let allRooms: any[] = [];
-			const roomsFolderObj: JSZip | null = zip.folder("rooms");
+			const roomsFolderObj: any = zip.folder("rooms");
 			if(!roomsFolderObj) {
 				return Promise.reject(new InsightError("no folder named rooms in the zip file"));
 			}
-			const indexFile = roomsFolderObj?.file("index.htm");
+			const indexFile = roomsFolderObj.file("index.htm");
 			if(!indexFile) {
 				return Promise.reject(new InsightError("no file named index.htm"));
 			}
-			processIndex(indexFile, content).then((rooms: any[]) => {
+			promises.push(indexFile.async("string"));
+			return Promise.all(promises).then((files: string[]) => {
+				return processIndex(files, roomsFolderObj);
+			}).then((rooms: any[]) => {
 				if (rooms.length === 0) {
 					return Promise.reject(new InsightError("no valid room found"));
 				}
 				return Promise.resolve(rooms);
 			}).catch((err) => {
-				return Promise.reject(new InsightError("error in getting rooms"));
+				return Promise.reject(new InsightError("error in getting rooms " + err));
 			});
-			return allRooms;  // todo
 		})
-		.catch(() => {
-			// console.log(err);
-			return Promise.reject(new InsightError("error in loading zip file"));
+		.catch((err) => {
+			return Promise.reject(new InsightError(err));
 		});
 }
 
-function processIndex(indexFile: any, content: string): Promise<any[]> {
+function processIndex(files: any[], roomsFolderObj: JSZip): Promise<any[]> {
 	return new Promise((resolve, reject) => {
 		let roomPromises = Array<Promise<any>>();
-		indexFile.async("text").then((str: any) => {
-			const document = parse5.parse(str);
-			const tbody = getNodeHelper(document, "tbody");
-			for (let rowNode of tbody.childNodes) {
-				if (rowNode.nodeName === "tr") {
-					let address: any = null, href: any = null, code: any = null, fullname: any = null;
-					for (let cellNode of rowNode.childNodes) {
-						if (cellNode.nodeName === "td") {
-							const value = cellNode.attrs[0].value;
-							if (value === "views-field views-field-field-building-address") {
-								address = cellNode.childNodes[0].value.trim();
-							} else if (value === "views-field views-field-title") {
-								const a = getNodeHelper(cellNode, "a");
-								href = a.attrs[0].value;
-								if (a.attrs.length > 1 && a.childNodes[0].nodeName === "#text") {
-									fullname = a.childNodes[0].value.trim();
-								}
-							} else if (value === "views-field views-field-field-building-code") {
-								code = cellNode.childNodes[0].value.trim();
+		const document = parse5.parse(files[0]);
+		const tbody = getNodeHelper(document, "tbody");
+		let allRooms: Room[] = [];
+		for (let rowNode of tbody.childNodes) {
+			if (rowNode.nodeName === "tr") {
+				let address: any = null, href: any = null, code: any = null, fullname: any = null;
+				for (let cellNode of rowNode.childNodes) {
+					if (cellNode.nodeName === "td") {
+						const value = cellNode.attrs[0].value;
+						if (value === "views-field views-field-field-building-address") {
+							address = cellNode.childNodes[0].value.trim();
+						} else if (value === "views-field views-field-title") {
+							const a = getNodeHelper(cellNode, "a");
+							href = a.attrs[0].value.trim();
+							if (a.attrs.length > 1 && a.childNodes[0].nodeName === "#text") {
+								fullname = a.childNodes[0].value.trim();
 							}
+						} else if (value === "views-field views-field-field-building-code") {
+							code = cellNode.childNodes[0].value.trim();
 						}
 					}
-					// console.log(href);
-					if (address != null && href != null && code != null && fullname != null) {
-						roomPromises.push(parseBuilding(address, href, code, fullname, content));
-					}
+				}
+				if (address != null && href != null && code != null && fullname != null) {
+					roomPromises.push(parseBuilding(address, href, code, fullname, roomsFolderObj));
 				}
 			}
-			Promise.all(roomPromises).then((results: any[]) => {
-				let rooms = [...results];
-				return resolve(rooms);
-			});
-		}).catch((err: string | undefined) => {
-			reject(new InsightError(err));
+		}
+		Promise.all(roomPromises).then((results: any[]) => {
+			if (results.length > 0) {
+				for (let result of results) {
+					allRooms = [...allRooms, ...result];
+				}
+			}
+			return resolve(allRooms);
 		});
-
 
 	});
 
@@ -184,27 +183,22 @@ function getNodeHelper(document: any, nodeName: any): any {
 	return null;
 }
 
-function parseBuilding(address: string, href: string, code: string, fullname: string, content: string): Promise<any> {
-	let rooms: any[] = [];
+function parseBuilding(address: string, href: string, code: string, fullname: string, roomsFolder: JSZip):
+	Promise<any> {
+	let rooms: Room[] = [];
 	return new Promise((resolve, reject) => {
 		const geoLocation = getGeoLocation(address);
-		// console.log(geoLocation);
-		const newZip = new JSZip();
-		// const result = roomsFolderObj.file();
-		let roomsData = newZip.loadAsync(content, {base64: true}).then((zip) => {
-			// console.log(href);
-			return zip.files[href].async("text");
-		}).then((data) => {
-			return parse5.parse(data);
-		}).then((tree) => {
+		let roomsData = roomsFolder?.file(href.slice(2))?.async("text").then((str: string) => {
+			return parse5.parse(str);
+		}).then((tree: any) => {
 			return getNodeHelper(tree, "tbody");
 		});
-		// console.log(roomsData);
 		Promise.all([geoLocation, roomsData]).then(([resultGeoLocation, resultRoomsData]) => {
-			if (resultRoomsData !== null) {
+			if (resultGeoLocation && resultRoomsData !== null) {
 				for (let roomNode of resultRoomsData.childNodes) {
 					if (roomNode.nodeName === "tr") {
-						let room: Room = parseRoom(roomNode, code, fullname, address, href, resultGeoLocation);
+						const fullHref = "http://students.ubc.ca/" + href.slice(2);
+						let room: Room = parseRoom(roomNode, code, fullname, address, fullHref, resultGeoLocation);
 						rooms.push(room);
 					}
 				}
@@ -222,7 +216,6 @@ function parseBuilding(address: string, href: string, code: string, fullname: st
 
 function parseRoom(node: any, code: string, fullname: string, address: string, href: string, geoLocation: any): any {
 	let number: any = null, capacity: any = null, furniture: any = null, type: any = null;
-	// console.log("here");
 	for (let fieldNode of node.childNodes) {
 		if (fieldNode.nodeName === "td") {
 			const value = fieldNode.attrs[0].value;
@@ -257,7 +250,6 @@ function getGeoLocation(address: string): Promise<any> {
 			res.on("end", () => {
 				try {
 					const parsedData = JSON.parse(rawData);
-					// console.log(parsedData);
 					resolve(parsedData);
 				} catch (e: any) {
 					reject(new InsightError(e));
