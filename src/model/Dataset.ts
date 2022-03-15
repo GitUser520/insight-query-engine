@@ -5,7 +5,7 @@ import Section from "./Section";
 export default class Dataset {
 	public id: string;
 	public kind: InsightDatasetKind;
-	public data: Section[];
+	public data: any[];
 	public size: number;
 
 	constructor(id: string, kind: InsightDatasetKind) {
