@@ -41,6 +41,7 @@ export async function persistToDisk(datasets: Dataset[]): Promise<void> {
 			for (let d of datasets) {
 				fs.writeFileSync(folder + "/" + d.id, JSON.stringify(d));
 				// console.log(JSON.stringify(d));
+				// console.log(fs.existsSync(folder + "/" + d.id));
 			}
 		} catch(err) {
 			// console.error(err);
