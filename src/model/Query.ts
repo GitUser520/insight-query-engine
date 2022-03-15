@@ -60,10 +60,6 @@ export class Query {
 
 	private getQueryByFilter(queryWhere: Filter, jsonFieldTracker: any): InsightResult[] {
 		// comparators
-		let queryLResults: InsightResult[] = [];
-		let queryMResults: InsightResult[] = [];
-		let querySResults: InsightResult[] = [];
-		let queryNResults: InsightResult[] = [];
 		let results: InsightResult[] = [];
 
 		if (JSON.stringify(queryWhere) === "{}") {
@@ -77,9 +73,6 @@ export class Query {
 		} else if (EBNFHelper.isInstanceOfNegation(queryWhere)) {
 			results = this.getByNComparator(queryWhere as Negation, jsonFieldTracker);
 		}
-
-
-		results = results.concat(queryLResults).concat(queryMResults).concat(querySResults).concat(queryNResults);
 
 		return results;
 	}
