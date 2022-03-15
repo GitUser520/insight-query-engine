@@ -1,37 +1,47 @@
 import Dataset from "../model/Dataset";
-import {mkdirp, mkdirpSync} from "fs-extra";
-import {InsightError} from "../controller/IInsightFacade";
+import {InsightDatasetKind, InsightError} from "../controller/IInsightFacade";
 
 
-const filename: string = "./data/datasets.json";
 const folder: string = "./data";
+const fs = require("fs");
 
 export function loadFromDisk(): Dataset[] {
-	const fs = require("fs");
-	let getDirName = require("path").dirname;
-	let result: Dataset[] = [];
+	if (!fs.existsSync(folder)) {
+		fs.mkdirSync(folder);
+	}
+	let datasets: Dataset[] = [];
 	try {
-		mkdirp(getDirName(filename), function () {
-			result = JSON.parse(fs.readFileSync(filename, "utf8"));
+		const filenames = fs.readdirSync(folder);
+		filenames.forEach((file: any) => {
+			const path = folder + "/" + file;
+			const result: any[] = JSON.parse(fs.readFileSync(path, "utf8"));
+			if (result.length > 0) {
+				let dataset: any;
+				if (result[0].hasOwn("dept")) {
+					dataset = new Dataset(file, InsightDatasetKind.Courses);
+				} else {
+					dataset = new Dataset(file, InsightDatasetKind.Rooms);
+				}
+				dataset.data = result;
+				dataset.size = result.length;
+			}
 		});
 	} catch(err) {
-		// console.error(err);
+		console.error(err);
 	}
-	return result;
+	return datasets;
 }
 
 export async function persistToDisk(datasets: Dataset[]): Promise<void> {
-	const fs = require("fs");
-	let getDirName = require("path").dirname;
-	const projectDir: string[] =  fs.readdirSync("./");
-	if (!projectDir.includes(folder)) {
-		mkdirpSync(folder);
+	if (!fs.existsSync(folder)) {
+		fs.mkdirSync(folder);
 	}
 	return new Promise((resolve, reject) => {
 		try {
-			mkdirp(getDirName(filename), function () {
-				fs.writeFileSync(filename, JSON.stringify(datasets));
-			});
+			for (let d of datasets) {
+				fs.writeFileSync(folder + "/" + d.id, JSON.stringify(d));
+				// console.log(JSON.stringify(d));
+			}
 		} catch(err) {
 			// console.error(err);
 			return reject(new InsightError("error"));
