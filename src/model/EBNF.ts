@@ -96,6 +96,12 @@ export class EBNF {
 		if (filterANDArray === undefined && filterORArray === undefined) {
 			return false;
 		}
+		if (filterANDArray === undefined && !Array.isArray(filterORArray)) {
+			return false;
+		}
+		if (filterORArray === undefined && !Array.isArray(filterANDArray)) {
+			return false;
+		}
 
 		let validANDFilter = true;
 		let validORFilter = true;
@@ -208,17 +214,12 @@ export class EBNF {
 			return false;
 		}
 
-		// optional
-		// if (queryOrder === null) {
-		// 	return false;
-		// }
-
 		// check that the columns are valid
 		let validColumns = this.checkQueryColumns(queryColumns);
 		let validOrder = true;
 
 		if (queryOrder !== undefined) {
-			validOrder = this.checkQueryOrder(queryOrder);
+			validOrder = this.checkQueryOrder(queryOrder, queryColumns);
 		}
 
 		return validColumns && validOrder;
@@ -226,6 +227,9 @@ export class EBNF {
 
 	// returns true if all elements in the array are valid keys
 	private checkQueryColumns(column: Key[]): boolean {
+		if (!Array.isArray(column) || column.length === 0) {
+			return false;
+		}
 		let result = true;
 		column.forEach((key) => {
 			result = result && this.checkValidKey(key);
@@ -235,8 +239,13 @@ export class EBNF {
 	}
 
 	// returns true if the order element is a valid key
-	private checkQueryOrder(order: Key): boolean {
-		return this.checkValidKey(order);
+	private checkQueryOrder(order: Key, columns: Key[]): boolean {
+		let orderInColumns = false;
+		columns.forEach((key) => {
+			orderInColumns = orderInColumns || (key === order);
+		});
+
+		return orderInColumns && this.checkValidKey(order);
 	}
 
 	// check the validity of a key

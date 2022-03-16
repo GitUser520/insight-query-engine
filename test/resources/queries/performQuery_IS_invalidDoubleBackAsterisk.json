@@ -1,0 +1,19 @@
+{
+  "title": "query IS invalid double back asterisk",
+  "input":
+  {
+	  "WHERE": {
+		  "IS": {
+			  "courses_dept": "eece**"
+		  }
+	  },
+	  "OPTIONS": {
+		  "COLUMNS": [
+			  "courses_dept",
+			  "courses_avg"
+		  ]
+	  }
+  },
+  "errorExpected": true,
+  "expected": "InsightError"
+}

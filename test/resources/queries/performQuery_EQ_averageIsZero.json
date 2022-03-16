@@ -1,0 +1,23 @@
+{
+	"title": "query where course_avg is 0",
+	"input":
+	{
+		"WHERE": {
+			"EQ": {
+				"courses_avg": 0
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_dept",
+				"courses_avg"
+			],
+			"ORDER": "courses_avg"
+		}
+	},
+	"errorExpected": false,
+	"expected":
+	[
+		{"courses_dept":"frst","courses_avg":0},{"courses_dept":"lfs","courses_avg":0},{"courses_dept":"lfs","courses_avg":0}
+	]
+}

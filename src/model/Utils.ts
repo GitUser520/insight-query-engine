@@ -23,6 +23,16 @@ export class Utils {
 		return result;
 	}
 
+	public static arrayObjectIncludes(array: object[], object: object): boolean {
+		let contains = false;
+		let result1 = JSON.stringify(object);
+		array.forEach((tempObject) => {
+			let result2 = JSON.stringify(tempObject);
+			contains = contains || result1 === result2;
+		});
+		return contains;
+	}
+
 	// public static getInsightResultsFromSections(resultDataset: Dataset[],
 	// 	keys: {id: string, field: string, number: number},
 	// 	flagsLTGTEQ: {LT: boolean, GT: boolean, EQ: boolean}) {
@@ -93,10 +103,20 @@ export class Utils {
 		}
 
 		if (stringArray.length === 2) {
-			if (stringArray[0] === "") {
-				return fieldString.includes(stringArray[1]);
-			} else if (stringArray[1] === "") {
-				return fieldString.includes(stringArray[0]);
+			let stringBeforeAsterisk = stringArray[0];
+			let stringAfterAsterisk = stringArray[1];
+
+			if (stringBeforeAsterisk === "") {
+				let index = fieldString.indexOf(stringAfterAsterisk);
+				if (index === -1) {
+					return false;
+				}
+				let subString = fieldString.substring(index);
+				return subString.length === stringAfterAsterisk.length;
+			} else if (stringAfterAsterisk === "") {
+				let index = fieldString.indexOf(stringBeforeAsterisk);
+				let subString = fieldString.substring(0, index + 2);
+				return subString.length === stringBeforeAsterisk.length;
 			}
 		}
 
