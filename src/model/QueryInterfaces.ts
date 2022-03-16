@@ -1,3 +1,4 @@
+
 export interface QueryStructure {
 	WHERE: Filter
 	OPTIONS: Options
