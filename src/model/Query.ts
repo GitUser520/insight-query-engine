@@ -10,6 +10,7 @@ import {EBNF} from "./EBNF";
 
 export class Query {
 	public datasets: Dataset[];
+	private notFlag: boolean = false;
 
 	constructor(datasets: Dataset[]) {
 		this.datasets = datasets;
@@ -92,21 +93,9 @@ export class Query {
 		// getQueryByFilter from it
 		let deepNotFilter = queryNegation.NOT;
 		let results: InsightResult[] = [];
+		this.notFlag = !this.notFlag;
 
-		if (EBNFHelper.isInstanceOfNegation(deepNotFilter)) {
-			let deepNotNotFilter = (deepNotFilter as Negation).NOT;
-			results = this.getQueryByFilter(deepNotNotFilter, jsonFieldTracker);
-		} else {
-			let excludeResults = this.getQueryByFilter(deepNotFilter, jsonFieldTracker);
-			let ALL: Filter = {
-
-			};
-			results = this.getQueryByFilter(ALL, jsonFieldTracker);
-
-			results = results.filter((value) => {
-				return !Utils.arrayObjectIncludes(excludeResults, value);
-			});
-		}
+		results = this.getQueryByFilter(deepNotFilter, jsonFieldTracker);
 
 		return results;
 	}
@@ -126,10 +115,17 @@ export class Query {
 		currentDataset.map((dataset) => {
 			let tempSections = dataset.data.filter((section: any) => {
 				let field = sKeyPairJson.field;
-				if (section[field] !== undefined) {
-					return Utils.stringMatches(section[field], sKeyPairJson.inputString);
+				if (!this.notFlag) {
+					if (section[field] !== undefined) {
+						return Utils.stringMatches(section[field], sKeyPairJson.inputString);
+					}
+					return false;
+				} else {
+					if (section[field] !== undefined) {
+						return !Utils.stringMatches(section[field], sKeyPairJson.inputString);
+					}
+					return true;
 				}
-				return false;
 			});
 			currentSections = currentSections.concat(tempSections);
 		});
@@ -181,7 +177,7 @@ export class Query {
 		let resultSection: Section[] = [];
 		resultDataset.map((dataset) => {
 			let filteredDataset = dataset.data.filter((section: any) => {
-				return Query.filterMComparator(section, keys, flagsLTGTEQ);
+				return Query.filterMComparator(section, keys, flagsLTGTEQ, this.notFlag);
 			});
 			resultSection = resultSection.concat(filteredDataset);
 		});
@@ -189,14 +185,24 @@ export class Query {
 	}
 
 	private static filterMComparator(section: any, keys: {id: string; field: string; number: number},
-		flagsLTGTEQ: {LT: boolean; GT: boolean; EQ: boolean}) {
+		flagsLTGTEQ: {LT: boolean; GT: boolean; EQ: boolean}, notFlag: boolean) {
 		if (section[keys.field]) {
-			if (flagsLTGTEQ.LT) {
-				return (section as any)[keys.field] < keys.number;
-			} else if (flagsLTGTEQ.GT) {
-				return (section as any)[keys.field] > keys.number;
-			} else if (flagsLTGTEQ.EQ) {
-				return (section as any)[keys.field] === keys.number;
+			if (!notFlag) {
+				if (flagsLTGTEQ.LT) {
+					return (section as any)[keys.field] < keys.number;
+				} else if (flagsLTGTEQ.GT) {
+					return (section as any)[keys.field] > keys.number;
+				} else if (flagsLTGTEQ.EQ) {
+					return (section as any)[keys.field] === keys.number;
+				}
+			} else {
+				if (flagsLTGTEQ.LT) {
+					return !((section as any)[keys.field] < keys.number);
+				} else if (flagsLTGTEQ.GT) {
+					return !((section as any)[keys.field] > keys.number);
+				} else if (flagsLTGTEQ.EQ) {
+					return !((section as any)[keys.field] === keys.number);
+				}
 			}
 		}
 		return false;

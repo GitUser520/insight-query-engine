@@ -575,7 +575,7 @@ describe("InsightFacade", function () {
 	 * You should not need to modify it; instead, add additional files to the queries directory.
 	 * You can still make tests the normal way, this is just a convenient tool for a majority of queries.
 	 */
-	/* describe("PerformQuery", () => {
+	describe("PerformQuery", () => {
 		before(function () {
 			console.info(`Before: ${this.test?.parent?.title}`);
 
@@ -613,8 +613,10 @@ describe("InsightFacade", function () {
 				},
 				assertOnResult(actual, expected, input) {
 					expect(actual).to.deep.members(expected);
+					expect(actual.length).equal(expected.length);
+					// TODO make a test for the order
 				},
 			}
 		);
-	});*/
+	});
 });
