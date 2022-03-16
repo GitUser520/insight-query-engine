@@ -186,7 +186,8 @@ export class Query {
 
 	private static filterMComparator(section: any, keys: {id: string; field: string; number: number},
 		flagsLTGTEQ: {LT: boolean; GT: boolean; EQ: boolean}, notFlag: boolean) {
-		if (section[keys.field]) {
+		if ((typeof section[keys.field]) === "number") {
+			// console.log(section[keys.field]);
 			if (!notFlag) {
 				if (flagsLTGTEQ.LT) {
 					return (section as any)[keys.field] < keys.number;
