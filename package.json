@@ -1,10 +1,10 @@
 {
-	"name": "insightubc",
-	"description": "CPSC 310 Course Project",
-	"homepage": "https://github.com/ubccpsc/310",
-	"author": "Reid Holmes",
-	"license": "GPL-3.0",
+	"name": "cpsc310-project",
 	"version": "1.0.0",
+	"description": "Project for CPSC 310",
+	"repository": "https://github.students.cs.ubc.ca/CPSC310-2021W-T2/project_team617.git",
+	"author": "none",
+	"license": "none",
 	"engines": {
 		"node": ">= 16 < 17"
 	},

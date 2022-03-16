@@ -24,6 +24,7 @@ describe("InsightFacade", function () {
 	// automatically be loaded in the 'before' hook.
 	const datasetsToLoad: {[key: string]: string} = {
 		courses: "./test/resources/archives/courses.zip",
+		rooms: "./test/resources/archives/rooms.zip",
 	};
 
 	before(function () {
@@ -70,10 +71,29 @@ describe("InsightFacade", function () {
 			});
 		});
 
+		it("Should add a valid dataset rooms", function () {
+			const id: string = "rooms";
+			const content: string = datasetContents.get("rooms") ?? "";
+			const expected: string[] = [id];
+			return insightFacade.addDataset(id, content, InsightDatasetKind.Rooms).then((result: string[]) => {
+				expect(result).to.deep.equal(expected);
+			});
+		});
+
 		it("should not add one dataset given invalid file type", async function () {
 			const contentInvalid = getContentFromArchives("invalid.txt");
 			try {
 				await insightFacade.addDataset("courses", contentInvalid, InsightDatasetKind.Courses);
+				expect.fail("should have thrown an error");
+			} catch (err) {
+				expect(err).to.be.instanceof(InsightError);
+			}
+		});
+
+		it("should not add one dataset given invalid rooms dataset", async function () {
+			const contentInvalid = getContentFromArchives("roomsInvalid.zip");
+			try {
+				await insightFacade.addDataset("rooms", contentInvalid, InsightDatasetKind.Rooms);
 				expect.fail("should have thrown an error");
 			} catch (err) {
 				expect(err).to.be.instanceof(InsightError);
@@ -238,6 +258,7 @@ describe("InsightFacade", function () {
 		});
 
 		let courseContent: string = getContentFromArchives("courses.zip");
+		let roomContent: string = getContentFromArchives("rooms.zip");
 /*	let facade: InsightFacade;
 	let courseContent: string = getContentFromArchives("courses.zip");
 
@@ -261,6 +282,26 @@ describe("InsightFacade", function () {
 							id: "courses",
 							kind: InsightDatasetKind.Courses,
 							numRows: 64612,
+						},
+					]);
+				});
+		});
+
+		it("add one rooms dataset no repeat", function () {
+			return insightFacade
+				.addDataset("rooms", roomContent, InsightDatasetKind.Rooms)
+				.then((results: string[]) => {
+					expect(results).to.deep.equal(["rooms"]);
+
+					return insightFacade.listDatasets();
+				})
+				.then((insightDatasetArray: InsightDataset[]) => {
+					expect(insightDatasetArray).to.be.an.instanceOf(Array);
+					expect(insightDatasetArray).to.deep.equal([
+						{
+							id: "rooms",
+							kind: InsightDatasetKind.Rooms,
+							numRows: 364,
 						},
 					]);
 				});
@@ -314,6 +355,37 @@ describe("InsightFacade", function () {
 							id: "courses-2",
 							kind: InsightDatasetKind.Courses,
 							numRows: 64612,
+						},
+					]);
+				});
+		});
+
+		it("add multiple datasets no repeat different types", function () {
+			return insightFacade
+				.addDataset("courses-1", courseContent, InsightDatasetKind.Courses)
+				.then((results: string[]) => {
+					expect(results).to.deep.members(["courses-1"]);
+
+					return insightFacade.addDataset("rooms-2", roomContent, InsightDatasetKind.Rooms);
+				})
+				.then((results: string[]) => {
+					expect(results).to.deep.members(["courses-1", "rooms-2"]);
+
+					return insightFacade.listDatasets();
+				})
+				.then((insightDatasetArray: InsightDataset[]) => {
+					expect(insightDatasetArray).to.be.an.instanceOf(Array);
+					expect(insightDatasetArray).to.have.length(2);
+					expect(insightDatasetArray).to.have.deep.members([
+						{
+							id: "courses-1",
+							kind: InsightDatasetKind.Courses,
+							numRows: 64612,
+						},
+						{
+							id: "rooms-2",
+							kind: InsightDatasetKind.Rooms,
+							numRows: 364,
 						},
 					]);
 				});
@@ -538,6 +610,11 @@ describe("InsightFacade", function () {
 					} else {
 						expect(actual).to.be.instanceof(InsightError);
 					}
+				},
+				assertOnResult(actual, expected, input) {
+					expect(actual).to.deep.members(expected);
+					expect(actual.length).equal(expected.length);
+					// TODO make a test for the order
 				},
 			}
 		);
