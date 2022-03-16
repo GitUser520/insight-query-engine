@@ -14,7 +14,7 @@ export class Utils {
 			let keys = Object.keys(jsonFieldTracker);
 			for (const key of keys) {
 				let currentField: string = jsonFieldTracker[key].field;
-				if (section[currentField]) {
+				if (section[currentField] !== undefined) {
 					tempJSON[key] = (section as any)[currentField];
 				}
 			}
