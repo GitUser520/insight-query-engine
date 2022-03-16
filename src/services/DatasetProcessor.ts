@@ -31,7 +31,6 @@ export function parseCourse(json: any): Section[] {
 	for (const sectionData of result) {
 		if (isValidSection(sectionData)) {
 			parsedSection = parseSection(sectionData);
-			console.log(parsedSection);
 			allSections.push(parsedSection);
 		}
 	}
@@ -60,7 +59,6 @@ export function isValidSection(json: any): boolean {
 	for (const requiredKey of requiredKeys) {
 		// console.log(requiredKey);
 		if (!keys.includes(requiredKey)) {
-			console.log("HERE!!!");
 			return false;
 		}
 	}
@@ -88,7 +86,7 @@ export function zipCoursesProcessor(content: string): Promise<any[]> {
 				if (allSections.length === 0) {
 					return Promise.reject(new InsightError("no valid section in this dataset"));
 				}
-				console.log(allSections);
+				// console.log(allSections);
 				return allSections;
 			});
 		})
