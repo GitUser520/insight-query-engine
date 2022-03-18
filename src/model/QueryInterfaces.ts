@@ -6,6 +6,7 @@ export interface QueryStructure {
 
 export type Filter = LComparison | MComparison | SComparison | Negation;
 
+
 export interface Options {
 	COLUMNS: Key[]
 	ORDER?: Key
