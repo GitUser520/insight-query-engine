@@ -48,7 +48,7 @@ export function parseSection(sectionData: any): any {
 	let fail = sectionData.Fail;
 	let audit = sectionData.Audit;
 	let uuid = sectionData.id.toString();
-	let year = (sectionData.Session === "overall") ? 1900 : parseInt(sectionData.Year, 10);
+	let year = (sectionData.Section === "overall") ? 1900 : parseInt(sectionData.Year, 10);
 	return new Section(dept, id, avg, instructor, title, pass, fail, audit, uuid, year);
 }
 
@@ -86,6 +86,7 @@ export function zipCoursesProcessor(content: string): Promise<any[]> {
 				if (allSections.length === 0) {
 					return Promise.reject(new InsightError("no valid section in this dataset"));
 				}
+				// console.log(allSections);
 				return allSections;
 			});
 		})
