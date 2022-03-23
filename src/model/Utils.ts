@@ -33,12 +33,6 @@ export class Utils {
 		return contains;
 	}
 
-	// public static getInsightResultsFromSections(resultDataset: Dataset[],
-	// 	keys: {id: string, field: string, number: number},
-	// 	flagsLTGTEQ: {LT: boolean, GT: boolean, EQ: boolean}) {
-	//
-	// }
-
 	public static parseSKeyPair(sKeyPair: SKeyPair): {id: string, field: string, inputString: string} {
 		let sKeyJson = Object.keys(sKeyPair)[0];
 		let sKeyValues = sKeyJson.split("_");
@@ -71,8 +65,6 @@ export class Utils {
 		} else if (sKey !== undefined && EBNFHelper.checkSKeyUnknownID(sKey)) {
 			result = Utils.parseSKey(sKey);
 		} else {
-			// console.log("Error on line: ");
-			// return {id: "", field: ""};
 			throw new InsightError("Invalid query.");
 		}
 
