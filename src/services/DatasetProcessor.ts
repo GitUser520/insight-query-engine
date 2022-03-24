@@ -57,7 +57,6 @@ export function isValidSection(json: any): boolean {
 	const requiredKeys: string[] = Object.keys(keyMapping);
 	// check if containing all keys required
 	for (const requiredKey of requiredKeys) {
-		// console.log(requiredKey);
 		if (!keys.includes(requiredKey)) {
 			return false;
 		}
@@ -86,7 +85,7 @@ export function zipCoursesProcessor(content: string): Promise<any[]> {
 				if (allSections.length === 0) {
 					return Promise.reject(new InsightError("no valid section in this dataset"));
 				}
-				// console.log(allSections);
+
 				return allSections;
 			});
 		})

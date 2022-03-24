@@ -10,7 +10,6 @@ import {EBNF} from "./EBNF";
 
 export class Query {
 	public datasets: Dataset[];
-	private notFlag: boolean = false;
 
 	constructor(datasets: Dataset[]) {
 		this.datasets = datasets;
@@ -35,7 +34,9 @@ export class Query {
 		});
 
 		// results
-		let queryResults = this.getQueryByFilter(queryWhere, jsonFieldTracker);
+		let notFlag = false;
+		let querySectionResults = this.getQueryByFilter(this.datasets, queryWhere, notFlag);
+		let queryResults = Utils.filterByOptions(querySectionResults, jsonFieldTracker);
 
 		if (queryOrder !== undefined) {
 			let keyValues = Utils.parseKey(queryOrder);
@@ -59,48 +60,47 @@ export class Query {
 		return queryResults;
 	}
 
-	private getQueryByFilter(queryWhere: Filter, jsonFieldTracker: any): InsightResult[] {
+	private getQueryByFilter(datasets: Dataset[], queryWhere: Filter, notFlag: boolean): Section[] {
 		// comparators
-		let results: InsightResult[] = [];
+		let results: Section[] = [];
 
 		if (JSON.stringify(queryWhere) === "{}") {
-			results = this.getAll(jsonFieldTracker);
+			results = this.getAll(datasets);
 		} else if (EBNFHelper.isInstanceOfLComparison(queryWhere)) {
-			results = this.getByLComparator(queryWhere as LComparison, jsonFieldTracker);
+			results = this.getByLComparator(datasets, queryWhere as LComparison, notFlag);
 		} else if (EBNFHelper.isInstanceOfMComparison(queryWhere)) {
-			results = this.getByMComparator(queryWhere as MComparison, jsonFieldTracker);
+			results = this.getByMComparator(datasets, queryWhere as MComparison, notFlag);
 		} else if (EBNFHelper.isInstanceOfSComparison(queryWhere)) {
-			results = this.getBySComparator(queryWhere as SComparison, jsonFieldTracker);
+			results = this.getBySComparator(datasets, queryWhere as SComparison, notFlag);
 		} else if (EBNFHelper.isInstanceOfNegation(queryWhere)) {
-			results = this.getByNComparator(queryWhere as Negation, jsonFieldTracker);
+			results = this.getByNComparator(datasets, queryWhere as Negation, notFlag);
 		}
 
 		return results;
 	}
 
-	private getAll(jsonFieldTracker: any): InsightResult[] {
+	private getAll(datasets: Dataset[]): Section[] {
 		let allSections: Section[] = [];
 
-		this.datasets.forEach((dataset) => {
+		datasets.forEach((dataset) => {
 			allSections = allSections.concat(dataset.data);
 		});
 
-		return Utils.filterByOptions(allSections, jsonFieldTracker);
+		return allSections;
 	}
 
-	private getByNComparator(queryNegation: Negation, jsonFieldTracker: any): InsightResult[] {
+	private getByNComparator(datasets: Dataset[], queryNegation: Negation, notFlag: boolean): Section[] {
 		// take everything that we have in the dataset, and remove queries from
 		// getQueryByFilter from it
 		let deepNotFilter = queryNegation.NOT;
-		let results: InsightResult[] = [];
-		this.notFlag = !this.notFlag;
+		let results: Section[] = [];
 
-		results = this.getQueryByFilter(deepNotFilter, jsonFieldTracker);
+		results = this.getQueryByFilter(datasets, deepNotFilter, !notFlag);
 
 		return results;
 	}
 
-	private getBySComparator(querySComparator: SComparison, jsonFieldTracker: any): InsightResult[] {
+	private getBySComparator(datasets: Dataset[], querySComparator: SComparison, notFlag: boolean): Section[] {
 		// get the queries following the SKey
 		let sKey = querySComparator.IS;
 		let sKeyPairJson = Utils.parseSKeyPair(sKey);
@@ -108,14 +108,12 @@ export class Query {
 		let currentSections: Section[] = [];
 
 		// filter through the dataset to get the queries satisfying the conditions
-		let currentDataset = this.datasets.filter((dataset) => {
-			return dataset.id === sKeyPairJson.id;
-		});
+		let currentDataset = Utils.filterByID(datasets, sKeyPairJson.id);
 
 		currentDataset.map((dataset) => {
 			let tempSections = dataset.data.filter((section: any) => {
 				let field = sKeyPairJson.field;
-				if (!this.notFlag) {
+				if (!notFlag) {
 					if (section[field] !== undefined) {
 						return Utils.stringMatches(section[field], sKeyPairJson.inputString);
 					}
@@ -130,13 +128,13 @@ export class Query {
 			currentSections = currentSections.concat(tempSections);
 		});
 
-		return Utils.filterByOptions(currentSections, jsonFieldTracker);
+		return currentSections;
 	}
 
 	// returns all fields that satisfy the comparator
 	// get the queries based on the MKeyPair
 	// check that there is only one valid pair (even though I think valid EBNF may already do that)
-	private getByMComparator(queryMComparator: MComparison, jsonFieldTracker: any): InsightResult[] {
+	private getByMComparator(datasets: Dataset[], queryMComparator: MComparison, notFlag: boolean): Section[] {
 		let LT = queryMComparator.LT;
 		let GT = queryMComparator.GT;
 		let EQ = queryMComparator.EQ;
@@ -148,8 +146,6 @@ export class Query {
 			|| (LT !== undefined && GT !== undefined && EQ === undefined)
 			|| (LT !== undefined && GT === undefined && EQ !== undefined)
 			|| (LT === undefined && GT !== undefined && EQ !== undefined)) {
-			// console.log("Error on line: ");
-			// return [];
 			throw new InsightError("Invalid query.");
 		}
 		if (LT !== undefined) {
@@ -167,27 +163,22 @@ export class Query {
 		}
 		let keys = Utils.parseMKeyPair(comparator);
 		if (!EBNF.mField.includes(keys.field)) {
-			// console.log("Error on line: ");
-			// return [];
 			throw new InsightError("Invalid query.");
 		}
-		let resultDataset = this.datasets.filter((dataset) => {
-			return dataset.id === keys.id;
-		});
+		let resultDataset = Utils.filterByID(datasets, keys.id);
 		let resultSection: Section[] = [];
 		resultDataset.map((dataset) => {
 			let filteredDataset = dataset.data.filter((section: any) => {
-				return Query.filterMComparator(section, keys, flagsLTGTEQ, this.notFlag);
+				return Query.filterMComparator(section, keys, flagsLTGTEQ, notFlag);
 			});
 			resultSection = resultSection.concat(filteredDataset);
 		});
-		return Utils.filterByOptions(resultSection, jsonFieldTracker);
+		return resultSection;
 	}
 
 	private static filterMComparator(section: any, keys: {id: string; field: string; number: number},
 		flagsLTGTEQ: {LT: boolean; GT: boolean; EQ: boolean}, notFlag: boolean) {
 		if ((typeof section[keys.field]) === "number") {
-			// console.log(section[keys.field]);
 			if (!notFlag) {
 				if (flagsLTGTEQ.LT) {
 					return (section as any)[keys.field] < keys.number;
@@ -210,7 +201,7 @@ export class Query {
 	}
 
 	// returns all fields satisfying AND or OR
-	private getByLComparator(queryLComparator: LComparison, jsonFieldTracker: any): InsightResult[] {
+	private getByLComparator(datasets: Dataset[], queryLComparator: LComparison, notFlag: boolean): Section[] {
 		// check if it is AND or OR
 		// then write everything based on that
 		let arrayAnd = queryLComparator.AND;
@@ -220,34 +211,33 @@ export class Query {
 			(arrayAnd === undefined && arrayOr === undefined)
 			|| (arrayAnd !== undefined && arrayOr !== undefined)
 		) {
-			// console.log("Error on line: ");
-			// return [];
 			throw new InsightError("Invalid query.");
 		}
 
-		let result: InsightResult[] = [];
+		let result: Section[] = [];
 
 		if (arrayAnd !== undefined) {
-			let arrayAnd2d: InsightResult[][] = [];
+			let currentResults = this.getQueryByFilter(datasets, arrayAnd[0], notFlag);
 
-			arrayAnd.forEach((filter) => {
-				arrayAnd2d.push(this.getQueryByFilter(filter, jsonFieldTracker));
-			});
-
-			result = arrayAnd2d.reduce((resultArray1, resultArray2): InsightResult[] => {
-				let currentIntersection = resultArray1.filter((tempResult) => {
-					return Utils.arrayObjectIncludes(resultArray2, tempResult);
+			for (let i = 1; i < arrayAnd.length; i++) {
+				let tempSections = this.getQueryByFilter(datasets, arrayAnd[i], notFlag);
+				currentResults = tempSections.filter((tempSection) => {
+					return Utils.arraySectionIncludes(currentResults, tempSection);
 				});
-				return currentIntersection;
-			});
+			}
+
+			result = currentResults;
 		}
 
 		if (arrayOr !== undefined) {
 			arrayOr.forEach((filter) => {
-				let tempResult = this.getQueryByFilter(filter, jsonFieldTracker);
+				let tempResult = this.getQueryByFilter(datasets, filter, notFlag);
 				result = result.concat(tempResult);
 			});
 		}
+
 		return result;
 	}
 }
+
+
