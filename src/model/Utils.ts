@@ -23,6 +23,28 @@ export class Utils {
 		return result;
 	}
 
+	public static filterByID(datasets: Dataset[], key: string): Dataset[] {
+		let resultDatasets = datasets.filter((dataset) => {
+			return dataset.id === key;
+		});
+		return resultDatasets;
+	}
+
+	public static arraySectionIncludes(array: Section[], object: Section): boolean {
+		let contains = false;
+		array.forEach((tempObject) => {
+			let keysEqual = tempObject.dept === object.dept
+				&& tempObject.id === object.id && tempObject.avg === object.avg
+				&& tempObject.instructor === object.instructor
+				&& tempObject.title === object.title && tempObject.pass === object.pass
+				&& tempObject.fail === object.fail && tempObject.audit === object.audit
+				&& tempObject.uuid === object.uuid && tempObject.year === object.year;
+			contains = contains || keysEqual;
+		});
+		return contains;
+	}
+
+	// may be slow
 	public static arrayObjectIncludes(array: object[], object: object): boolean {
 		let contains = false;
 		let result1 = JSON.stringify(object);
