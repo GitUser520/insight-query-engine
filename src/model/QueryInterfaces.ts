@@ -1,15 +1,14 @@
-
 export interface QueryStructure {
 	WHERE: Filter
 	OPTIONS: Options
+	TRANSFORMATIONS?: Transformation
 }
 
 export type Filter = LComparison | MComparison | SComparison | Negation;
 
-
 export interface Options {
-	COLUMNS: Key[]
-	ORDER?: Key
+	COLUMNS: Column
+	ORDER?: OrderValue | AnyKey
 }
 
 export interface LComparison {
@@ -45,4 +44,34 @@ export type MKey = string;
 
 export type SKey = string;
 
+export type Column = Key[];
 
+export type AnyKey = Key | ApplyKey
+
+export interface OrderValue {
+	dir: Direction,
+	keys: AnyKey[],
+}
+
+export type Direction = string;
+
+export interface Transformation {
+	GROUP: Group,
+	APPLY: ApplyRule[]
+}
+
+export type Group = Key[];
+
+export type ApplyKey = string;
+
+export interface ApplyRule {
+	[applyKey: string]: ApplyToken
+}
+
+export interface ApplyToken {
+	MAX?: Key,
+	MIN?: Key,
+	AVG?: Key,
+	COUNT?: Key,
+	SUM?: Key,
+}
