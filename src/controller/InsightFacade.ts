@@ -59,15 +59,15 @@ export default class InsightFacade implements IInsightFacade {
 				reject(new InsightError("unknown dataset kind"));
 			}
 			let dataset: Dataset = new Dataset(id, kind);
-			zipProcessor(content).then(async (result: any[]) => {
+			zipProcessor(content).then((result: any[]) => {
 				dataset.data = result;
 				dataset.size = result.length;
-				// console.log(result.length);
 				this.addedDatasets.push(dataset);
-				await persistToDisk(this.addedDatasets);
+				persistToDisk(this.addedDatasets);
 				return resolve(this.getAddedDatasetIds());
 
 			}).catch((err: any) => {
+				// console.log(err);
 				return reject(new InsightError(err));
 			});
 		});
@@ -83,7 +83,12 @@ export default class InsightFacade implements IInsightFacade {
 				return reject(new NotFoundError("dataset not yet added"));
 			}
 			this.addedDatasets = this.addedDatasets.filter((dataset) => dataset.id !== id);
-			persistToDisk(this.addedDatasets).then(() => resolve(id));
+			try {
+				persistToDisk(this.addedDatasets);
+			} catch (err: any) {
+				return reject(new InsightError("cannot persist to disk"));
+			}
+			return resolve(id);
 		});
 	}
 

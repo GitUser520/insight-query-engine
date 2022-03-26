@@ -195,12 +195,18 @@ function parseBuilding(address: string, href: string, code: string, fullname: st
 			return getNodeHelper(tree, "tbody");
 		});
 		Promise.all([geoLocation, roomsData]).then(([resultGeoLocation, resultRoomsData]) => {
+			// console.log("there0");
 			if (resultGeoLocation && resultRoomsData !== null) {
 				for (let roomNode of resultRoomsData.childNodes) {
 					if (roomNode.nodeName === "tr") {
 						const fullHref = "http://students.ubc.ca/" + href.slice(2);
 						let room: Room = parseRoom(roomNode, code, fullname, address, fullHref, resultGeoLocation);
-						rooms.push(room);
+						if (room.furniture != null && room.number != null && room.type != null) {
+							if (room.seats === null) {
+								room.seats = 0;
+							}
+							rooms.push(room);
+						}
 					}
 				}
 			}

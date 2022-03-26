@@ -1,0 +1,16 @@
+{
+	"title": "query valid NOT",
+	"input":
+	{
+		"WHERE": {
+
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_dept"
+			]
+		}
+	}	,
+	"errorExpected": true,
+	"expected": "ResultTooLargeError"
+}
