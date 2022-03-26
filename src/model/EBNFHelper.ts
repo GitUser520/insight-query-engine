@@ -1,4 +1,4 @@
-import {LComparison, MComparison, MKey, Negation, SComparison, SKey} from "./QueryInterfaces";
+import {LComparison, MComparison, MKey, Negation, OrderValue, SComparison, SKey} from "./QueryInterfaces";
 import {EBNF} from "./EBNF";
 import Dataset from "./Dataset";
 
@@ -57,20 +57,24 @@ export class EBNFHelper {
 		return valid;
 	}
 
-	public static isInstanceOfLComparison(object: object): object is LComparison {
+	public static isInstanceOfLComparison(object: any): object is LComparison {
 		return "AND" in object || "OR" in object;
 	}
 
-	public static isInstanceOfMComparison(object: object): object is MComparison {
+	public static isInstanceOfMComparison(object: any): object is MComparison {
 		return "LT" in object || "GT" in object || "EQ" in object;
 	}
 
-	public static isInstanceOfSComparison(object: object): object is SComparison {
+	public static isInstanceOfSComparison(object: any): object is SComparison {
 		return "IS" in object;
 	}
 
-	public static isInstanceOfNegation(object: object): object is Negation {
+	public static isInstanceOfNegation(object: any): object is Negation {
 		return "NOT" in object;
+	}
+
+	public static isInstanceOfOrderValue(object: any): object is OrderValue {
+		return "dirs" in object && "keys" in object;
 	}
 
 	public static checkIsValidAsteriskString(inputString: string): boolean {

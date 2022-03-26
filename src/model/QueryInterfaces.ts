@@ -62,7 +62,7 @@ export interface Transformation {
 
 export type Group = Key[];
 
-export type ApplyKey = string;
+export type ApplyKey = string;	// format: [^_]+
 
 export interface ApplyRule {
 	[applyKey: string]: ApplyToken

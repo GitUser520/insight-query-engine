@@ -1,14 +1,17 @@
 import Dataset from "./Dataset";
 import {
+	AnyKey, Column,
 	Filter, Key,
 	LComparison,
 	MComparison, MKey,
 	MKeyPair,
 	Negation,
-	Options,
+	Options, OrderValue,
 	QueryStructure,
 	SComparison, SKey,
-	SKeyPair
+	SKeyPair, ApplyRule,
+	ApplyToken, Transformation,
+	Direction, Group
 } from "./QueryInterfaces";
 import {EBNFHelper} from "./EBNFHelper";
 import {Utils} from "./Utils";
@@ -239,13 +242,29 @@ export class EBNF {
 	}
 
 	// returns true if the order element is a valid key
-	private checkQueryOrder(order: Key, columns: Key[]): boolean {
-		let orderInColumns = false;
-		columns.forEach((key) => {
-			orderInColumns = orderInColumns || (key === order);
-		});
+	private checkQueryOrder(orderOrKey: OrderValue | AnyKey, columns: Key[]): boolean {
+		let isValid = false;
+		if (EBNFHelper.isInstanceOfOrderValue(orderOrKey)) {
+			isValid = this.checkValidOrderValue(orderOrKey);
+		} else {
+			isValid = this.checkValidAnyKey(orderOrKey, columns);
+		}
+		return isValid;
 
-		return orderInColumns && this.checkValidKey(order);
+		// let orderInColumns = false;
+		// columns.forEach((key) => {
+		// 	orderInColumns = orderInColumns || (key === order);
+		// });
+		//
+		// return orderInColumns && this.checkValidKey();
+	}
+
+	private checkValidOrderValue(orderValue: OrderValue): boolean {
+
+	}
+
+	private checkValidAnyKey(orderKey: AnyKey, columns: AnyKey[]) {
+
 	}
 
 	// check the validity of a key
