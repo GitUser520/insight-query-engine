@@ -17,7 +17,8 @@ export function loadFromDisk(): Dataset[] {
 			const result: any[] = JSON.parse(fs.readFileSync(path, "utf8"));
 			if (result.length > 0) {
 				let dataset: any;
-				if (result[0].hasOwn("dept")) {
+				// if (result[0].hasOwn("dept")) {
+				if (Object.prototype.hasOwnProperty.call(result[0],"dept")) {
 					dataset = new Dataset(file, InsightDatasetKind.Courses);
 				} else {
 					dataset = new Dataset(file, InsightDatasetKind.Rooms);
@@ -32,22 +33,19 @@ export function loadFromDisk(): Dataset[] {
 	return datasets;
 }
 
-export async function persistToDisk(datasets: Dataset[]): Promise<void> {
+export function persistToDisk(datasets: Dataset[]) {
 	if (!fs.existsSync(folder)) {
 		fs.mkdirSync(folder);
 	}
-	return new Promise((resolve, reject) => {
-		try {
-			for (let d of datasets) {
-				fs.writeFileSync(folder + "/" + d.id, JSON.stringify(d));
-				// console.log(JSON.stringify(d));
-				// console.log(fs.existsSync(folder + "/" + d.id));
-			}
-		} catch(err) {
-			// console.error(err);
-			return reject(new InsightError("error"));
+	try {
+		for (let d of datasets) {
+			fs.writeFileSync(folder + "/" + d.id, JSON.stringify(d));
+			// console.log(JSON.stringify(d));
+			// console.log(fs.existsSync(folder + "/" + d.id));
 		}
-		return resolve();
-	});
+	} catch(err) {
+		// console.error(err);
+		throw new InsightError("error");
+	}
 
 }

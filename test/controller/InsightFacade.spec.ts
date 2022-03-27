@@ -90,8 +90,28 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		it("should not add one dataset given invalid rooms dataset", async function () {
+		it("should not add one dataset given invalid rooms dataset: no room folder", async function () {
 			const contentInvalid = getContentFromArchives("roomsInvalid.zip");
+			try {
+				await insightFacade.addDataset("rooms", contentInvalid, InsightDatasetKind.Rooms);
+				expect.fail("should have thrown an error");
+			} catch (err) {
+				expect(err).to.be.instanceof(InsightError);
+			}
+		});
+
+		it("should not add one dataset given invalid rooms dataset: no index file", async function () {
+			const contentInvalid = getContentFromArchives("roomsInvalid2.zip");
+			try {
+				await insightFacade.addDataset("rooms", contentInvalid, InsightDatasetKind.Rooms);
+				expect.fail("should have thrown an error");
+			} catch (err) {
+				expect(err).to.be.instanceof(InsightError);
+			}
+		});
+
+		it("should not add one dataset given invalid rooms dataset: no valid room", async function () {
+			const contentInvalid = getContentFromArchives("roomsInvalid3.zip");
 			try {
 				await insightFacade.addDataset("rooms", contentInvalid, InsightDatasetKind.Rooms);
 				expect.fail("should have thrown an error");
