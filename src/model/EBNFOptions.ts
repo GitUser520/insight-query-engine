@@ -30,7 +30,7 @@ export class EBNFOptions {
 		}
 		let result = true;
 		column.forEach((key) => {
-			result = result && EBNFOptions.checkValidKey(key, datasets);
+			result = result && EBNFHelper.checkValidKey(key, datasets);
 		});
 
 		return result;
@@ -82,23 +82,13 @@ export class EBNFOptions {
 			return true;
 		}
 		let inColumns = columns.includes(orderKey);
-		return inColumns;
+		let validApplyKey = EBNFHelper.checkValidApplyKey(orderKey);
+		return inColumns && validApplyKey;
 	}
 
 	public static checkValidKeyInColumns(key: Key, columns: AnyKey[], datasets: Dataset[]) {
-		let isValidKey = EBNFOptions.checkValidKey(key, datasets);
+		let isValidKey = EBNFHelper.checkValidKey(key, datasets);
 		let inColumns = columns.includes(key);
 		return isValidKey && inColumns;
-	}
-
-	// check the validity of a key
-	public static checkValidKey(key: Key, datasets: Dataset[]): boolean {
-		if (key === null || key === undefined) {
-			return false;
-		}
-		let keyString = key as Key;
-		let mkey = keyString as MKey;
-		let skey = keyString as SKey;
-		return EBNFHelper.checkMKey(mkey, datasets) || EBNFHelper.checkSKey(skey, datasets);
 	}
 }
