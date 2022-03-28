@@ -1,4 +1,4 @@
-import {LComparison, MComparison, MKey, Negation, OrderValue, SComparison, SKey} from "./QueryInterfaces";
+import {Key, LComparison, MComparison, MKey, Negation, OrderValue, SComparison, SKey} from "./QueryInterfaces";
 import {EBNF} from "./EBNF";
 import Dataset from "./Dataset";
 
@@ -87,5 +87,16 @@ export class EBNFHelper {
 			return stringArray[0] === "" && stringArray[2] === "";
 		}
 		return false;
+	}
+
+	// check the validity of a key
+	public static checkValidKey(key: Key, datasets: Dataset[]): boolean {
+		if (key === null || key === undefined) {
+			return false;
+		}
+		let keyString = key as Key;
+		let mkey = keyString as MKey;
+		let skey = keyString as SKey;
+		return EBNFHelper.checkMKey(mkey, datasets) || EBNFHelper.checkSKey(skey, datasets);
 	}
 }
