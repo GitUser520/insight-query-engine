@@ -1,17 +1,8 @@
 import Dataset from "./Dataset";
 import {
-	AnyKey, Column,
-	Filter, Key,
-	LComparison,
-	MComparison, MKey,
-	MKeyPair,
-	Negation,
-	Options, OrderValue,
-	QueryStructure,
-	SComparison, SKey,
-	SKeyPair, ApplyRule,
-	ApplyToken, Transformation,
-	Direction, Group
+	AnyKey, Column, Filter, Key, LComparison, MComparison, MKey, MKeyPair,
+	Negation, Options, OrderValue, QueryStructure, SComparison, SKey,
+	SKeyPair, ApplyRule, ApplyRuleApplyKey, Transformation, Direction, Group
 } from "./QueryInterfaces";
 import {EBNFHelper} from "./EBNFHelper";
 import {Utils} from "./Utils";
@@ -21,13 +12,10 @@ export class EBNF {
 	public datasets: Dataset[];
 	public static mField = ["avg", "pass", "fail", "audit","year"];
 	public static sField = ["dept", "id", "instructor", "title", "uuid"];
-	private datasetID: string;
-	private idChanged: boolean;
+	public static validDir = ["UP", "DOWN"];
 
 	constructor(datasets: Dataset[]) {
 		this.datasets = datasets;
-		this.datasetID = "";
-		this.idChanged = false;
 	}
 
 	public checkQueryValidEBNF(queryObject: unknown): boolean {
@@ -148,21 +136,19 @@ export class EBNF {
 		if (GTComparator === undefined && LTComparator === undefined && EQComparator === undefined) {
 			return false;
 		}
+
 		let validGT = true;
 		let validLT = true;
 		let validEQ = true;
-		let validID = true;
 		// check that at most one of them is defined
 		if (GTComparator !== undefined) {
 			if (LTComparator !== undefined || EQComparator !== undefined) {
 				return false;
 			}
 			let mKeyPair = Utils.parseMKeyPair(GTComparator);
-			validID = this.checkID(mKeyPair.id);
 			let mKey = mKeyPair.id + "_" + mKeyPair.field;
 			validGT = mKeyPair.id !== undefined && mKeyPair.field !== undefined
-				&& mKeyPair.number !== undefined && (typeof mKeyPair.number === "number")
-				&& EBNFHelper.checkMKey(mKey, this.datasets);
+				&& mKeyPair.number !== undefined && EBNFHelper.checkMKey(mKey, this.datasets);
 		}
 		// check that at most one of them is defined
 		if (LTComparator !== undefined) {
@@ -170,11 +156,9 @@ export class EBNF {
 				return false;
 			}
 			let mKeyPair = Utils.parseMKeyPair(LTComparator);
-			validID = this.checkID(mKeyPair.id);
 			let mKey = mKeyPair.id + "_" + mKeyPair.field;
 			validGT = mKeyPair.id !== undefined && mKeyPair.field !== undefined
-				&& mKeyPair.number !== undefined && (typeof mKeyPair.number === "number")
-				&& EBNFHelper.checkMKey(mKey, this.datasets);
+				&& mKeyPair.number !== undefined && EBNFHelper.checkMKey(mKey, this.datasets);
 		}
 		// check that at most one of them is defined
 		if (EQComparator !== undefined) {
@@ -182,13 +166,12 @@ export class EBNF {
 				return false;
 			}
 			let mKeyPair = Utils.parseMKeyPair(EQComparator);
-			validID = this.checkID(mKeyPair.id);
 			let mKey = mKeyPair.id + "_" + mKeyPair.field;
 			validGT = mKeyPair.id !== undefined && mKeyPair.field !== undefined
-				&& mKeyPair.number !== undefined && (typeof mKeyPair.number === "number")
-				&& EBNFHelper.checkMKey(mKey, this.datasets);
+				&& mKeyPair.number !== undefined && EBNFHelper.checkMKey(mKey, this.datasets);
 		}
-		return validID && validGT && validLT && validEQ;
+
+		return validGT && validLT && validEQ;
 	}
 
 	private checkSComparison(sComparator: object): boolean {
@@ -199,14 +182,13 @@ export class EBNF {
 		}
 
 		let sKeyPair = Utils.parseSKeyPair(ISObject);
-		let validID = this.checkID(sKeyPair.id);
 		let sKey = sKeyPair.id + "_" + sKeyPair.field;
 		let isValidSKeyPair = sKeyPair.id !== undefined && sKeyPair.field !== undefined
 			&& sKeyPair.inputString !== undefined
 			&& EBNFHelper.checkSKey(sKey, this.datasets)
 			&& EBNFHelper.checkIsValidAsteriskString(sKeyPair.inputString);
 
-		return validID && isValidSKeyPair;
+		return isValidSKeyPair;
 	}
 
 	private checkNegation(negation: object): boolean {
@@ -245,7 +227,7 @@ export class EBNF {
 		}
 		let result = true;
 		column.forEach((key) => {
-			result = result && this.checkValidKey(key);
+			result = result && EBNFHelper.checkValidKey(key, this.datasets);
 		});
 
 		return result;
@@ -255,50 +237,54 @@ export class EBNF {
 	private checkQueryOrder(orderOrKey: OrderValue | AnyKey, columns: Key[]): boolean {
 		let isValid = false;
 		if (EBNFHelper.isInstanceOfOrderValue(orderOrKey)) {
-			isValid = this.checkValidOrderValue(orderOrKey);
+			isValid = this.checkValidOrderValue(orderOrKey, columns);
 		} else {
 			isValid = this.checkValidAnyKey(orderOrKey, columns);
 		}
 		return isValid;
-
-		// let orderInColumns = false;
-		// columns.forEach((key) => {
-		// 	orderInColumns = orderInColumns || (key === order);
-		// });
-		//
-		// return orderInColumns && this.checkValidKey();
 	}
 
-	private checkValidOrderValue(orderValue: OrderValue): boolean {
+	private checkValidOrderValue(orderValue: OrderValue, columns: AnyKey[]): boolean {
+		let dir = orderValue.dir;
+		let keys = orderValue.keys;
 
-	}
-
-	private checkValidAnyKey(orderKey: AnyKey, columns: AnyKey[]) {
-
-	}
-
-	// check the validity of a key
-	private checkValidKey(key: Key): boolean {
-		if (key === null || key === undefined) {
+		if (dir === null || dir === undefined) {
+			return false;
+		}
+		if (keys === null || keys === undefined || !Array.isArray(keys)) {
 			return false;
 		}
 
-		let keyString = key as Key;
-
-		let mkey = keyString as MKey;
-		let skey = keyString as SKey;
-
-		return EBNFHelper.checkMKey(mkey, this.datasets) || EBNFHelper.checkSKey(skey, this.datasets);
+		return this.checkValidDir(dir) && this.checkValidKeysField(keys, columns);
 	}
 
-	private checkID(id: string): boolean {
-		if (!this.idChanged) {
-			this.datasetID = id;
-			this.idChanged = true;
-		} else if (this.idChanged && this.datasetID !== id) {
+	private checkValidDir(dir: string): boolean {
+		return EBNF.validDir.includes(dir);
+	}
+
+	private checkValidKeysField(keys: AnyKey[], columns: AnyKey[]): boolean {
+		if (keys.length === 0) {
 			return false;
 		}
-		return true;
+		let valid = true;
+		keys.forEach((anykey) => {
+			valid = valid && this.checkValidAnyKey(anykey, columns);
+		});
+		return valid;
+	}
+
+	private checkValidAnyKey(orderKey: AnyKey, columns: AnyKey[]): boolean {
+		let isKey = this.checkValidKeyInColumns(orderKey, columns);
+		if (isKey) {
+			return true;
+		}
+		let inColumns = columns.includes(orderKey);
+		return inColumns;
+	}
+
+	private checkValidKeyInColumns(key: Key, columns: AnyKey[]) {
+		let isValidKey = EBNFHelper.checkValidKey(key, this.datasets);
+		let inColumns = columns.includes(key);
+		return isValidKey && inColumns;
 	}
 }
-

@@ -65,10 +65,11 @@ export type Group = Key[];
 export type ApplyKey = string;	// format: [^_]+
 
 export interface ApplyRule {
-	[applyKey: string]: ApplyToken
+	[applyKey: string]: ApplyRuleApplyKey
 }
 
-export interface ApplyToken {
+// APPLYTOKEN = 'MAX' | 'MIN' | 'AVG' | 'COUNT' | 'SUM'
+export interface ApplyRuleApplyKey {
 	MAX?: Key,
 	MIN?: Key,
 	AVG?: Key,
