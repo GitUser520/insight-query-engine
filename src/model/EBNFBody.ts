@@ -9,22 +9,18 @@ export class EBNFBody {
 	public static checkQueryBody(body: object, datasets: Dataset[]): boolean {
 		// split query into four parts
 		let filter = body as Filter;
-
 		// check for empty object
 		if (Object.keys(filter).length === 0) {
 			return true;
 		}
-
 		// check not null or undefined
 		if (filter === null || filter === undefined) {
 			return false;
 		}
-
 		let validLComparison = false;
 		let validMComparison = false;
 		let validSComparison = false;
 		let validNegation = false;
-
 		if (EBNFHelper.isInstanceOfLComparison(filter)) {
 			validLComparison = this.checkLogicComparison(filter, datasets);
 		} else if (EBNFHelper.isInstanceOfMComparison(filter)) {
@@ -34,7 +30,6 @@ export class EBNFBody {
 		} else if (EBNFHelper.isInstanceOfNegation(filter)) {
 			validNegation = this.checkNegation(filter, datasets);
 		}
-
 		return validLComparison || validMComparison || validSComparison || validNegation;
 	}
 
