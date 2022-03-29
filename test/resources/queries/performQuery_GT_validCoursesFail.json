@@ -1,0 +1,208 @@
+{
+	"title": "GT valid courses_fail",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"courses_fail": 200
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_avg",
+				"courses_dept",
+				"courses_id",
+				"courses_instructor",
+				"courses_title",
+				"courses_pass",
+				"courses_fail",
+				"courses_audit",
+				"courses_uuid",
+				"courses_year"
+			],
+			"ORDER": "courses_avg"
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"courses_avg": 63.33,
+			"courses_dept": "chem",
+			"courses_id": "233",
+			"courses_instructor": "",
+			"courses_title": "org chem biol sc",
+			"courses_pass": 1006,
+			"courses_fail": 213,
+			"courses_audit": 0,
+			"courses_uuid": "42532",
+			"courses_year": 1900
+		},
+		{
+			"courses_avg": 64.55,
+			"courses_dept": "math",
+			"courses_id": "101",
+			"courses_instructor": "",
+			"courses_title": "int calc ap ph s",
+			"courses_pass": 1012,
+			"courses_fail": 203,
+			"courses_audit": 0,
+			"courses_uuid": "13688",
+			"courses_year": 1900
+		},
+		{
+			"courses_avg": 64.73,
+			"courses_dept": "biol",
+			"courses_id": "200",
+			"courses_instructor": "",
+			"courses_title": "cell biology 1",
+			"courses_pass": 958,
+			"courses_fail": 204,
+			"courses_audit": 0,
+			"courses_uuid": "18074",
+			"courses_year": 1900
+		},
+		{
+			"courses_avg": 64.94,
+			"courses_dept": "chem",
+			"courses_id": "233",
+			"courses_instructor": "",
+			"courses_title": "org chem biol sc",
+			"courses_pass": 936,
+			"courses_fail": 226,
+			"courses_audit": 0,
+			"courses_uuid": "82131",
+			"courses_year": 1900
+		},
+		{
+			"courses_avg": 65.38,
+			"courses_dept": "math",
+			"courses_id": "101",
+			"courses_instructor": "",
+			"courses_title": "int calc ap ph s",
+			"courses_pass": 1122,
+			"courses_fail": 222,
+			"courses_audit": 0,
+			"courses_uuid": "5131",
+			"courses_year": 1900
+		},
+		{
+			"courses_avg": 65.99,
+			"courses_dept": "math",
+			"courses_id": "101",
+			"courses_instructor": "",
+			"courses_title": "int calc ap ph s",
+			"courses_pass": 1390,
+			"courses_fail": 205,
+			"courses_audit": 0,
+			"courses_uuid": "47011",
+			"courses_year": 1900
+		},
+		{
+			"courses_avg": 67.24,
+			"courses_dept": "econ",
+			"courses_id": "101",
+			"courses_instructor": "",
+			"courses_title": "prncpls micrecon",
+			"courses_pass": 2124,
+			"courses_fail": 221,
+			"courses_audit": 0,
+			"courses_uuid": "21433",
+			"courses_year": 1900
+		},
+		{
+			"courses_avg": 67.42,
+			"courses_dept": "chem",
+			"courses_id": "121",
+			"courses_instructor": "",
+			"courses_title": "structural chem",
+			"courses_pass": 1526,
+			"courses_fail": 266,
+			"courses_audit": 0,
+			"courses_uuid": "31192",
+			"courses_year": 1900
+		},
+		{
+			"courses_avg": 68.2,
+			"courses_dept": "chem",
+			"courses_id": "121",
+			"courses_instructor": "",
+			"courses_title": "structural chem",
+			"courses_pass": 1674,
+			"courses_fail": 287,
+			"courses_audit": 0,
+			"courses_uuid": "70069",
+			"courses_year": 1900
+		},
+		{
+			"courses_avg": 68.72,
+			"courses_dept": "chem",
+			"courses_id": "121",
+			"courses_instructor": "",
+			"courses_title": "strctr bond chem",
+			"courses_pass": 1762,
+			"courses_fail": 264,
+			"courses_audit": 0,
+			"courses_uuid": "31631",
+			"courses_year": 1900
+		},
+		{
+			"courses_avg": 68.77,
+			"courses_dept": "biol",
+			"courses_id": "112",
+			"courses_instructor": "",
+			"courses_title": "unicellular life",
+			"courses_pass": 1215,
+			"courses_fail": 230,
+			"courses_audit": 1,
+			"courses_uuid": "34263",
+			"courses_year": 1900
+		},
+		{
+			"courses_avg": 68.77,
+			"courses_dept": "chem",
+			"courses_id": "121",
+			"courses_instructor": "",
+			"courses_title": "structural chem",
+			"courses_pass": 1634,
+			"courses_fail": 260,
+			"courses_audit": 0,
+			"courses_uuid": "82096",
+			"courses_year": 1900
+		},
+		{
+			"courses_avg": 69.3,
+			"courses_dept": "chem",
+			"courses_id": "121",
+			"courses_instructor": "",
+			"courses_title": "structural chem",
+			"courses_pass": 1667,
+			"courses_fail": 250,
+			"courses_audit": 1,
+			"courses_uuid": "64755",
+			"courses_year": 1900
+		},
+		{
+			"courses_avg": 69.41,
+			"courses_dept": "chem",
+			"courses_id": "121",
+			"courses_instructor": "",
+			"courses_title": "strctr bond chem",
+			"courses_pass": 1699,
+			"courses_fail": 251,
+			"courses_audit": 0,
+			"courses_uuid": "89218",
+			"courses_year": 1900
+		},
+		{
+			"courses_avg": 70.22,
+			"courses_dept": "chem",
+			"courses_id": "121",
+			"courses_instructor": "",
+			"courses_title": "structural chem",
+			"courses_pass": 1551,
+			"courses_fail": 235,
+			"courses_audit": 0,
+			"courses_uuid": "54475",
+			"courses_year": 1900
+		}
+	]
+}

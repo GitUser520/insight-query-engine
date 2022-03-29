@@ -1,5 +1,5 @@
 {
-	"title": "IS valid courses_instructor",
+	"title": "invalid query due to referencing two datasets",
 	"input":
 	{
 		"WHERE": {

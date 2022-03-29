@@ -26,6 +26,7 @@ describe("InsightFacade", function () {
 	const datasetsToLoad: {[key: string]: string} = {
 		courses: "./test/resources/archives/courses.zip",
 		rooms: "./test/resources/archives/rooms.zip",
+		miniCoursesDataset: "./test/resources/archives/miniCoursesDataset.zip"
 	};
 
 	before(function () {
@@ -470,6 +471,9 @@ describe("InsightFacade", function () {
 			// Will *fail* if there is a problem reading ANY dataset.
 			const loadDatasetPromises = [
 				insightFacade.addDataset("courses", datasetContents.get("courses") ?? "", InsightDatasetKind.Courses),
+				insightFacade.addDataset(
+					"miniCoursesDataset", datasetContents.get("miniCoursesDataset") ?? "", InsightDatasetKind.Courses
+				),
 			];
 
 			return Promise.all(loadDatasetPromises);
