@@ -37,8 +37,7 @@ export class Query {
 		});
 
 		// results
-		let notFlag = false;
-		let querySectionResults = QueryBody.getQueryByFilter(this.datasets, queryWhere, notFlag);
+		let querySectionResults = QueryBody.getQueryByFilter(this.datasets, queryWhere, false);
 		let queryResults = Utils.filterByOptions(querySectionResults, jsonFieldTracker);
 
 		if (queryOrder !== undefined) {

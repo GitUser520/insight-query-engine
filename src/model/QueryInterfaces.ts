@@ -44,7 +44,7 @@ export type MKey = string;
 
 export type SKey = string;
 
-export type Column = Key[];
+export type Column = AnyKey[];
 
 export type AnyKey = Key | ApplyKey
 
