@@ -1,12 +1,9 @@
 import {
-	AnyKey,
-	ApplyKey,
 	Key,
 	LComparison,
 	MComparison,
 	MKey,
 	Negation,
-	OrderValue,
 	SComparison,
 	SKey
 } from "./QueryInterfaces";
@@ -82,10 +79,6 @@ export class EBNFHelper {
 		return typeof object === "object" && "NOT" in object;
 	}
 
-	public static isInstanceOfOrderValue(object: any): object is OrderValue {
-		return typeof object === "object" && "dirs" in object && "keys" in object;
-	}
-
 	public static checkIsValidAsteriskString(inputString: string): boolean {
 		let stringArray = inputString.split("*");
 		if (stringArray.length === 1) {
@@ -109,12 +102,4 @@ export class EBNFHelper {
 		return EBNFHelper.checkMKey(mkey, datasets) || EBNFHelper.checkSKey(skey, datasets);
 	}
 
-	// check valid apply key
-	public static checkValidApplyKey(applyKey: ApplyKey) {
-		if (applyKey === null || applyKey === undefined) {
-			return false;
-		}
-		let applyKeyArray = applyKey.split("_");
-		return applyKeyArray.length === 1;
-	}
 }
