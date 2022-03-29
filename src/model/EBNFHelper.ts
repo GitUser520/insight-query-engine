@@ -40,11 +40,9 @@ export class EBNFHelper {
 
 	public static checkMKey(mkey: MKey, datasets: Dataset[]): boolean {
 		let mKeyParts = mkey.split("_");
-
 		if (!EBNF.mField.includes(mKeyParts[1])) {
 			return false;
 		}
-
 		let valid = false;
 		datasets.forEach((dataset) => {
 			valid = valid || (dataset.id === mKeyParts[0]);
