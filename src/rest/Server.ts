@@ -1,11 +1,14 @@
 import express, {Application, Request, Response} from "express";
 import * as http from "http";
 import cors from "cors";
+import InsightFacade from "../controller/InsightFacade";
+import {InsightDatasetKind, NotFoundError} from "../controller/IInsightFacade";
 
 export default class Server {
 	private readonly port: number;
 	private express: Application;
 	private server: http.Server | undefined;
+	private static insightFacade: InsightFacade = new InsightFacade();
 
 	constructor(port: number) {
 		console.info(`Server::<init>( ${port} )`);
@@ -18,7 +21,7 @@ export default class Server {
 		// NOTE: you can serve static frontend files in from your express server
 		// by uncommenting the line below. This makes files in ./frontend/public
 		// accessible at http://localhost:<port>/
-		// this.express.use(express.static("./frontend/public"))
+		this.express.use(express.static("./frontend/public"));
 	}
 
 	/**
@@ -85,6 +88,10 @@ export default class Server {
 		this.express.get("/echo/:msg", Server.echo);
 
 		// TODO: your other endpoints should go here
+		this.express.put("/dataset/:id/:kind", Server.put);
+		this.express.delete("/dataset/:id", Server.delete);
+		this.express.post("/query", Server.post);
+		this.express.get("/datasets", Server.get);
 
 	}
 
@@ -108,4 +115,74 @@ export default class Server {
 			return "Message not provided";
 		}
 	}
+
+	private static put(req: Request, res: Response) {
+		try {
+			const id = req.params.id;
+			const content = req.body.toString();
+			const kind = req.params.kind;
+			let datasetKind: InsightDatasetKind;
+			if (kind === "courses") {
+				datasetKind = InsightDatasetKind.Courses;
+			} else if (kind === "rooms") {
+				datasetKind = InsightDatasetKind.Rooms;
+			} else {
+				throw new Error("invalid dataset kind");
+			}
+			return Server.insightFacade.addDataset(id, content, datasetKind).then((result) => {
+				res.status(200).send(result);
+			}).catch((err) => {
+				res.status(400).send(err);
+			});
+		} catch (err) {
+			res.status(400).send(err);
+		}
+	}
+
+	private static delete(req: Request, res: Response) {
+		try {
+			const id = req.params.id;
+			return Server.insightFacade.removeDataset(id).then((result) => {
+				res.status(200).send(result);
+			}).catch((err) => {
+				if (err instanceof NotFoundError) {
+					res.status(404).send(err);
+				}
+				res.status(400).send(err);
+			});
+
+		} catch (err) {
+			if (err instanceof NotFoundError) {
+				res.status(404).send(err);
+			}
+			res.status(400).send(err);
+		}
+	}
+
+	private static post(req: Request, res: Response) {
+		try {
+			const query = req.body;
+			return Server.insightFacade.performQuery(query).then((result) => {
+				res.status(200).send(result);
+			}).catch((err) => {
+				res.status(400).send(err);
+			});
+		} catch (err) {
+			res.status(400).send(err);
+		}
+	}
+
+	private static get(req: Request, res: Response) {
+		try {
+			return Server.insightFacade.listDatasets().then((result) => {
+				res.status(200).send(result);
+			}).catch((err) => {
+				res.status(400).send(err);
+			});
+		} catch (err) {
+			res.status(400).send(err);
+		}
+	}
 }
+
+

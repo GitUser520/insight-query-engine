@@ -14,10 +14,20 @@ describe("Facade D3", function () {
 		facade = new InsightFacade();
 		server = new Server(4321);
 		// TODO: start server here once and handle errors properly
+		server.start().then(() => {
+			console.log("server started");
+		}).catch((err) => {
+			console.log(err);
+		});
 	});
 
 	after(function () {
 		// TODO: stop server here once!
+		server.stop().then(() => {
+			console.log("server stopped");
+		}).catch((err) => {
+			console.log(err);
+		});
 	});
 
 	beforeEach(function () {
