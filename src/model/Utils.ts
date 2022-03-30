@@ -111,7 +111,7 @@ export class Utils {
 
 	public static stringMatches(fieldString: string, inputString: string): boolean {
 		let stringArray = inputString.split("*");
-
+		// ["6723", ""]
 		if (stringArray.length === 1) {
 			return fieldString === stringArray[0];
 		}
@@ -129,7 +129,7 @@ export class Utils {
 				return subString.length === stringAfterAsterisk.length;
 			} else if (stringAfterAsterisk === "") {
 				let index = fieldString.indexOf(stringBeforeAsterisk);
-				let subString = fieldString.substring(0, index + 2);
+				let subString = fieldString.substring(0, index + stringBeforeAsterisk.length);
 				return subString.length === stringBeforeAsterisk.length;
 			}
 		}
