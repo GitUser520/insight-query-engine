@@ -129,58 +129,59 @@ export default class Server {
 			} else {
 				throw new Error("invalid dataset kind");
 			}
-			return Server.insightFacade.addDataset(id, content, datasetKind).then((result) => {
-				res.status(200).send(result);
+			return Server.insightFacade.addDataset(id, content, datasetKind).then((arr) => {
+				res.status(200).json({result: arr});
 			}).catch((err) => {
-				res.status(400).send(err);
+				res.status(400).json({error: "Error: put"});
 			});
 		} catch (err) {
-			res.status(400).send(err);
+			res.status(400).json({error: "Error: put"});
 		}
 	}
 
 	private static delete(req: Request, res: Response) {
 		try {
 			const id = req.params.id;
-			return Server.insightFacade.removeDataset(id).then((result) => {
-				res.status(200).send(result);
+			return Server.insightFacade.removeDataset(id).then((str) => {
+				res.status(200).json({result: str});
 			}).catch((err) => {
 				if (err instanceof NotFoundError) {
-					res.status(404).send(err);
+					res.status(404).json({error: "Error: delete"});
 				}
-				res.status(400).send(err);
+				res.status(400).json({error: "Error: delete"});
 			});
 
 		} catch (err) {
 			if (err instanceof NotFoundError) {
-				res.status(404).send(err);
+				res.status(404).json({error: "Error: delete"});
 			}
-			res.status(400).send(err);
+			res.status(400).json({error: "Error: delete"});
 		}
 	}
 
 	private static post(req: Request, res: Response) {
 		try {
 			const query = req.body;
-			return Server.insightFacade.performQuery(query).then((result) => {
-				res.status(200).send(result);
+			return Server.insightFacade.performQuery(query).then((arr) => {
+				res.status(200).json({result: arr});
 			}).catch((err) => {
-				res.status(400).send(err);
+				res.status(400).json({error: "Error: post"});
 			});
 		} catch (err) {
-			res.status(400).send(err);
+			res.status(400).json({error: "Error: post"});
 		}
 	}
 
 	private static get(req: Request, res: Response) {
 		try {
-			return Server.insightFacade.listDatasets().then((result) => {
-				res.status(200).send(result);
-			}).catch((err) => {
-				res.status(400).send(err);
+			return Server.insightFacade.listDatasets().then((arr) => {
+				res.status(200).json({result: arr});
 			});
+/*				.catch((err) => {
+				res.status(400).json({error: err});
+			});*/
 		} catch (err) {
-			res.status(400).send(err);
+			res.status(400).json({error: "Error: get"});
 		}
 	}
 }
