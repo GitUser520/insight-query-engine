@@ -18,9 +18,13 @@ export class EBNF {
 	public datasets: Dataset[];
 	public static mField = ["avg", "pass", "fail", "audit","year"];
 	public static sField = ["dept", "id", "instructor", "title", "uuid"];
+	private datasetID: string;
+	private idChanged: boolean;
 
 	constructor(datasets: Dataset[]) {
 		this.datasets = datasets;
+		this.datasetID = "";
+		this.idChanged = false;
 	}
 
 	public checkQueryValidEBNF(queryObject: unknown): boolean {
@@ -141,16 +145,17 @@ export class EBNF {
 		if (GTComparator === undefined && LTComparator === undefined && EQComparator === undefined) {
 			return false;
 		}
-
 		let validGT = true;
 		let validLT = true;
 		let validEQ = true;
+		let validID = true;
 		// check that at most one of them is defined
 		if (GTComparator !== undefined) {
 			if (LTComparator !== undefined || EQComparator !== undefined) {
 				return false;
 			}
 			let mKeyPair = Utils.parseMKeyPair(GTComparator);
+			validID = this.checkID(mKeyPair.id);
 			let mKey = mKeyPair.id + "_" + mKeyPair.field;
 			validGT = mKeyPair.id !== undefined && mKeyPair.field !== undefined
 				&& mKeyPair.number !== undefined && EBNFHelper.checkMKey(mKey, this.datasets);
@@ -161,6 +166,7 @@ export class EBNF {
 				return false;
 			}
 			let mKeyPair = Utils.parseMKeyPair(LTComparator);
+			validID = this.checkID(mKeyPair.id);
 			let mKey = mKeyPair.id + "_" + mKeyPair.field;
 			validGT = mKeyPair.id !== undefined && mKeyPair.field !== undefined
 				&& mKeyPair.number !== undefined && EBNFHelper.checkMKey(mKey, this.datasets);
@@ -171,12 +177,12 @@ export class EBNF {
 				return false;
 			}
 			let mKeyPair = Utils.parseMKeyPair(EQComparator);
+			validID = this.checkID(mKeyPair.id);
 			let mKey = mKeyPair.id + "_" + mKeyPair.field;
 			validGT = mKeyPair.id !== undefined && mKeyPair.field !== undefined
 				&& mKeyPair.number !== undefined && EBNFHelper.checkMKey(mKey, this.datasets);
 		}
-
-		return validGT && validLT && validEQ;
+		return validID && validGT && validLT && validEQ;
 	}
 
 	private checkSComparison(sComparator: object): boolean {
@@ -187,13 +193,14 @@ export class EBNF {
 		}
 
 		let sKeyPair = Utils.parseSKeyPair(ISObject);
+		let validID = this.checkID(sKeyPair.id);
 		let sKey = sKeyPair.id + "_" + sKeyPair.field;
 		let isValidSKeyPair = sKeyPair.id !== undefined && sKeyPair.field !== undefined
 			&& sKeyPair.inputString !== undefined
 			&& EBNFHelper.checkSKey(sKey, this.datasets)
 			&& EBNFHelper.checkIsValidAsteriskString(sKeyPair.inputString);
 
-		return isValidSKeyPair;
+		return validID && isValidSKeyPair;
 	}
 
 	private checkNegation(negation: object): boolean {
@@ -260,6 +267,16 @@ export class EBNF {
 		let skey = keyString as SKey;
 
 		return EBNFHelper.checkMKey(mkey, this.datasets) || EBNFHelper.checkSKey(skey, this.datasets);
+	}
+
+	private checkID(id: string): boolean {
+		if (!this.idChanged) {
+			this.datasetID = id;
+			this.idChanged = true;
+		} else if (this.idChanged && this.datasetID !== id) {
+			return false;
+		}
+		return true;
 	}
 }
 

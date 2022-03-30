@@ -1,0 +1,46 @@
+{
+	"title": "invalid query due to referencing two datasets",
+	"input":
+	{
+		"WHERE": {
+			"OR": [
+				{ 	"IS": {
+					"courses_uuid": "6272*"
+					}
+				},
+				{
+					"IS": {
+					"rooms_shortname": "DMP"
+					}
+				}]
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_avg",
+				"courses_dept",
+				"courses_id",
+				"courses_instructor",
+				"courses_title",
+				"courses_pass",
+				"courses_fail",
+				"courses_audit",
+				"courses_uuid",
+				"courses_year",
+				"rooms_fullname",
+				"rooms_shortname",
+				"rooms_number",
+				"rooms_name",
+				"rooms_address",
+				"rooms_lat",
+				"rooms_lon",
+				"rooms_seats",
+				"rooms_type",
+				"rooms_furniture",
+				"rooms_href"
+			],
+			"ORDER": "courses_avg"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

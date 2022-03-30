@@ -1,0 +1,44 @@
+{
+	"title": "invalid query due to referencing two datasets - courses and miniCoursesDataset",
+	"input":
+	{
+		"WHERE": {
+			"OR": [
+				{ 	"IS": {
+					"courses_uuid": "6272*"
+				}},
+				{
+					"GT": {
+						"miniCoursesDataset_avg": 50
+					}
+				}]
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_avg",
+				"courses_dept",
+				"courses_id",
+				"courses_instructor",
+				"courses_title",
+				"courses_pass",
+				"courses_fail",
+				"courses_audit",
+				"courses_uuid",
+				"courses_year",
+				"miniCoursesDataset_avg",
+				"miniCoursesDataset_dept",
+				"miniCoursesDataset_id",
+				"miniCoursesDataset_instructor",
+				"miniCoursesDataset_title",
+				"miniCoursesDataset_pass",
+				"miniCoursesDataset_fail",
+				"miniCoursesDataset_audit",
+				"miniCoursesDataset_uuid",
+				"miniCoursesDataset_year"
+			],
+			"ORDER": "courses_avg"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

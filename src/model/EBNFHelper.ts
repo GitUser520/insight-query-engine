@@ -1,4 +1,12 @@
-import {LComparison, MComparison, MKey, Negation, SComparison, SKey} from "./QueryInterfaces";
+import {
+	Key,
+	LComparison,
+	MComparison,
+	MKey,
+	Negation,
+	SComparison,
+	SKey
+} from "./QueryInterfaces";
 import {EBNF} from "./EBNF";
 import Dataset from "./Dataset";
 
@@ -29,11 +37,9 @@ export class EBNFHelper {
 
 	public static checkMKey(mkey: MKey, datasets: Dataset[]): boolean {
 		let mKeyParts = mkey.split("_");
-
 		if (!EBNF.mField.includes(mKeyParts[1])) {
 			return false;
 		}
-
 		let valid = false;
 		datasets.forEach((dataset) => {
 			valid = valid || (dataset.id === mKeyParts[0]);
@@ -57,20 +63,20 @@ export class EBNFHelper {
 		return valid;
 	}
 
-	public static isInstanceOfLComparison(object: object): object is LComparison {
-		return "AND" in object || "OR" in object;
+	public static isInstanceOfLComparison(object: any): object is LComparison {
+		return typeof object === "object" && "AND" in object || "OR" in object;
 	}
 
-	public static isInstanceOfMComparison(object: object): object is MComparison {
-		return "LT" in object || "GT" in object || "EQ" in object;
+	public static isInstanceOfMComparison(object: any): object is MComparison {
+		return typeof object === "object" && "LT" in object || "GT" in object || "EQ" in object;
 	}
 
-	public static isInstanceOfSComparison(object: object): object is SComparison {
-		return "IS" in object;
+	public static isInstanceOfSComparison(object: any): object is SComparison {
+		return typeof object === "object" && "IS" in object;
 	}
 
-	public static isInstanceOfNegation(object: object): object is Negation {
-		return "NOT" in object;
+	public static isInstanceOfNegation(object: any): object is Negation {
+		return typeof object === "object" && "NOT" in object;
 	}
 
 	public static checkIsValidAsteriskString(inputString: string): boolean {
@@ -84,4 +90,16 @@ export class EBNFHelper {
 		}
 		return false;
 	}
+
+	// check the validity of a key
+	public static checkValidKey(key: Key, datasets: Dataset[]): boolean {
+		if (key === null || key === undefined) {
+			return false;
+		}
+		let keyString = key as Key;
+		let mkey = keyString as MKey;
+		let skey = keyString as SKey;
+		return EBNFHelper.checkMKey(mkey, datasets) || EBNFHelper.checkSKey(skey, datasets);
+	}
+
 }
