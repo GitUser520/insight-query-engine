@@ -148,18 +148,14 @@ export class EBNF {
 		let validGT = true;
 		let validLT = true;
 		let validEQ = true;
+		let validID = true;
 		// check that at most one of them is defined
 		if (GTComparator !== undefined) {
 			if (LTComparator !== undefined || EQComparator !== undefined) {
 				return false;
 			}
 			let mKeyPair = Utils.parseMKeyPair(GTComparator);
-			if (!this.idChanged) {
-				this.datasetID = mKeyPair.id;
-				this.idChanged = true;
-			} else if (this.idChanged && this.datasetID !== mKeyPair.id) {
-				return false;
-			}
+			validID = this.checkID(mKeyPair.id);
 			let mKey = mKeyPair.id + "_" + mKeyPair.field;
 			validGT = mKeyPair.id !== undefined && mKeyPair.field !== undefined
 				&& mKeyPair.number !== undefined && EBNFHelper.checkMKey(mKey, this.datasets);
@@ -170,12 +166,7 @@ export class EBNF {
 				return false;
 			}
 			let mKeyPair = Utils.parseMKeyPair(LTComparator);
-			if (!this.idChanged) {
-				this.datasetID = mKeyPair.id;
-				this.idChanged = true;
-			} else if (this.idChanged && this.datasetID !== mKeyPair.id) {
-				return false;
-			}
+			validID = this.checkID(mKeyPair.id);
 			let mKey = mKeyPair.id + "_" + mKeyPair.field;
 			validGT = mKeyPair.id !== undefined && mKeyPair.field !== undefined
 				&& mKeyPair.number !== undefined && EBNFHelper.checkMKey(mKey, this.datasets);
@@ -186,17 +177,12 @@ export class EBNF {
 				return false;
 			}
 			let mKeyPair = Utils.parseMKeyPair(EQComparator);
-			if (!this.idChanged) {
-				this.datasetID = mKeyPair.id;
-				this.idChanged = true;
-			} else if (this.idChanged && this.datasetID !== mKeyPair.id) {
-				return false;
-			}
+			validID = this.checkID(mKeyPair.id);
 			let mKey = mKeyPair.id + "_" + mKeyPair.field;
 			validGT = mKeyPair.id !== undefined && mKeyPair.field !== undefined
 				&& mKeyPair.number !== undefined && EBNFHelper.checkMKey(mKey, this.datasets);
 		}
-		return validGT && validLT && validEQ;
+		return validID && validGT && validLT && validEQ;
 	}
 
 	private checkSComparison(sComparator: object): boolean {
@@ -207,19 +193,14 @@ export class EBNF {
 		}
 
 		let sKeyPair = Utils.parseSKeyPair(ISObject);
-		if (!this.idChanged) {
-			this.datasetID = sKeyPair.id;
-			this.idChanged = true;
-		} else if (this.idChanged && this.datasetID !== sKeyPair.id) {
-			return false;
-		}
+		let validID = this.checkID(sKeyPair.id);
 		let sKey = sKeyPair.id + "_" + sKeyPair.field;
 		let isValidSKeyPair = sKeyPair.id !== undefined && sKeyPair.field !== undefined
 			&& sKeyPair.inputString !== undefined
 			&& EBNFHelper.checkSKey(sKey, this.datasets)
 			&& EBNFHelper.checkIsValidAsteriskString(sKeyPair.inputString);
 
-		return isValidSKeyPair;
+		return validID && isValidSKeyPair;
 	}
 
 	private checkNegation(negation: object): boolean {
@@ -288,6 +269,14 @@ export class EBNF {
 		return EBNFHelper.checkMKey(mkey, this.datasets) || EBNFHelper.checkSKey(skey, this.datasets);
 	}
 
-
+	private checkID(id: string): boolean {
+		if (!this.idChanged) {
+			this.datasetID = id;
+			this.idChanged = true;
+		} else if (this.idChanged && this.datasetID !== id) {
+			return false;
+		}
+		return true;
+	}
 }
 
