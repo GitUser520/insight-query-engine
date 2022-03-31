@@ -36,7 +36,7 @@ export interface SKeyPair {
 }
 
 export interface MKeyPair {
-	[key: string]: number
+	[key: string]: number  // "courses_avg" : 93
 }
 
 export type Key = MKey | SKey;

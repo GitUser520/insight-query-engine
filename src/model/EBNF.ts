@@ -158,7 +158,8 @@ export class EBNF {
 			validID = this.checkID(mKeyPair.id);
 			let mKey = mKeyPair.id + "_" + mKeyPair.field;
 			validGT = mKeyPair.id !== undefined && mKeyPair.field !== undefined
-				&& mKeyPair.number !== undefined && EBNFHelper.checkMKey(mKey, this.datasets);
+				&& mKeyPair.number !== undefined && (typeof mKeyPair.number === "number")
+				&& EBNFHelper.checkMKey(mKey, this.datasets);
 		}
 		// check that at most one of them is defined
 		if (LTComparator !== undefined) {
@@ -169,7 +170,8 @@ export class EBNF {
 			validID = this.checkID(mKeyPair.id);
 			let mKey = mKeyPair.id + "_" + mKeyPair.field;
 			validGT = mKeyPair.id !== undefined && mKeyPair.field !== undefined
-				&& mKeyPair.number !== undefined && EBNFHelper.checkMKey(mKey, this.datasets);
+				&& mKeyPair.number !== undefined && (typeof mKeyPair.number === "number")
+				&& EBNFHelper.checkMKey(mKey, this.datasets);
 		}
 		// check that at most one of them is defined
 		if (EQComparator !== undefined) {
@@ -180,7 +182,8 @@ export class EBNF {
 			validID = this.checkID(mKeyPair.id);
 			let mKey = mKeyPair.id + "_" + mKeyPair.field;
 			validGT = mKeyPair.id !== undefined && mKeyPair.field !== undefined
-				&& mKeyPair.number !== undefined && EBNFHelper.checkMKey(mKey, this.datasets);
+				&& mKeyPair.number !== undefined && (typeof mKeyPair.number === "number")
+				&& EBNFHelper.checkMKey(mKey, this.datasets);
 		}
 		return validID && validGT && validLT && validEQ;
 	}

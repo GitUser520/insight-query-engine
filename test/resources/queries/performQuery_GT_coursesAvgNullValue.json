@@ -1,0 +1,27 @@
+{
+	"title": "GT invalid courses_avg value (string instead of number)",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"courses_avg": null
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_avg",
+				"courses_dept",
+				"courses_id",
+				"courses_instructor",
+				"courses_title",
+				"courses_pass",
+				"courses_fail",
+				"courses_audit",
+				"courses_uuid",
+				"courses_year"
+			],
+			"ORDER": "courses_avg"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

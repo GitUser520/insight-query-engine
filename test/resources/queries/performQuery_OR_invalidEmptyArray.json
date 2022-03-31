@@ -1,0 +1,18 @@
+{
+	"title": "query invalid OR empty array",
+	"input":
+	{
+		"WHERE": {
+			"OR":[
+
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_dept"
+			]
+		}
+	}	,
+	"errorExpected": true,
+	"expected": "InsightError"
+}

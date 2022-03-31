@@ -1,5 +1,5 @@
 {
-  "title": "query invalid AND",
+  "title": "query invalid AND empty array",
   "input":
   {
     "WHERE": {

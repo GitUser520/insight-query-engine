@@ -64,19 +64,20 @@ export class EBNFHelper {
 	}
 
 	public static isInstanceOfLComparison(object: any): object is LComparison {
-		return typeof object === "object" && "AND" in object || "OR" in object;
+		return typeof object === "object" && (object.AND !== undefined || object.OR !== undefined);
 	}
 
 	public static isInstanceOfMComparison(object: any): object is MComparison {
-		return typeof object === "object" && "LT" in object || "GT" in object || "EQ" in object;
+		return typeof object === "object"
+			&& (object.LT !== undefined || object.GT !== undefined || object.EQ !== undefined);
 	}
 
 	public static isInstanceOfSComparison(object: any): object is SComparison {
-		return typeof object === "object" && "IS" in object;
+		return typeof object === "object" && object.IS !== undefined;
 	}
 
 	public static isInstanceOfNegation(object: any): object is Negation {
-		return typeof object === "object" && "NOT" in object;
+		return typeof object === "object" && object.NOT !== undefined;
 	}
 
 	public static checkIsValidAsteriskString(inputString: string): boolean {
