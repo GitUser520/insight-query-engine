@@ -8,13 +8,13 @@ export default class Server {
 	private readonly port: number;
 	private express: Application;
 	private server: http.Server | undefined;
-	private static insightFacade: InsightFacade = new InsightFacade();
+	private static insightFacade: InsightFacade;
 
 	constructor(port: number) {
 		console.info(`Server::<init>( ${port} )`);
 		this.port = port;
 		this.express = express();
-
+		Server.insightFacade = new InsightFacade();
 		this.registerMiddleware();
 		this.registerRoutes();
 
@@ -119,7 +119,7 @@ export default class Server {
 	private static put(req: Request, res: Response) {
 		try {
 			const id = req.params.id;
-			const content = req.body.toString();
+			const content = req.body.toString("base64");
 			const kind = req.params.kind;
 			let datasetKind: InsightDatasetKind;
 			if (kind === "courses") {
@@ -129,59 +129,60 @@ export default class Server {
 			} else {
 				throw new Error("invalid dataset kind");
 			}
-			return Server.insightFacade.addDataset(id, content, datasetKind).then((arr) => {
+			return this.insightFacade.addDataset(id, content, datasetKind).then((arr) => {
 				res.status(200).json({result: arr});
 			}).catch((err) => {
-				res.status(400).json({error: "Error: put"});
+				res.status(400).json({error: "Error: " + err.message});
 			});
-		} catch (err) {
-			res.status(400).json({error: "Error: put"});
+		} catch (err: any) {
+			res.status(400).json({error: "Error: " + err.message});
 		}
 	}
 
 	private static delete(req: Request, res: Response) {
 		try {
 			const id = req.params.id;
-			return Server.insightFacade.removeDataset(id).then((str) => {
+			return this.insightFacade.removeDataset(id).then((str) => {
 				res.status(200).json({result: str});
 			}).catch((err) => {
 				if (err instanceof NotFoundError) {
 					res.status(404).json({error: "Error: delete"});
+				} else {
+					res.status(400).json({error: "Error: " + err.message});
 				}
-				res.status(400).json({error: "Error: delete"});
 			});
-
-		} catch (err) {
+		} catch (err: any) {
 			if (err instanceof NotFoundError) {
-				res.status(404).json({error: "Error: delete"});
+				res.status(404).json({error: "Error: Resource Not Found"});
+			} else {
+				res.status(400).json({error: "Error: " + err.message});
 			}
-			res.status(400).json({error: "Error: delete"});
 		}
 	}
 
 	private static post(req: Request, res: Response) {
 		try {
 			const query = req.body;
-			return Server.insightFacade.performQuery(query).then((arr) => {
+			return this.insightFacade.performQuery(query).then((arr) => {
 				res.status(200).json({result: arr});
 			}).catch((err) => {
-				res.status(400).json({error: "Error: post"});
+				res.status(400).json({error: "Error: " + err.message});
 			});
-		} catch (err) {
-			res.status(400).json({error: "Error: post"});
+		} catch (err: any) {
+			res.status(400).json({error: "Error: " + err.message});
 		}
 	}
 
 	private static get(req: Request, res: Response) {
 		try {
-			return Server.insightFacade.listDatasets().then((arr) => {
+			return this.insightFacade.listDatasets().then((arr) => {
 				res.status(200).json({result: arr});
 			});
 /*				.catch((err) => {
 				res.status(400).json({error: err});
 			});*/
-		} catch (err) {
-			res.status(400).json({error: "Error: get"});
+		} catch (err: any) {
+			res.status(400).json({error: "Error: " + err.message});
 		}
 	}
 }
