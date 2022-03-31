@@ -8,13 +8,13 @@ export default class Server {
 	private readonly port: number;
 	private express: Application;
 	private server: http.Server | undefined;
-	private static insightFacade: InsightFacade;
+	private insightFacade: InsightFacade;
 
 	constructor(port: number) {
 		console.info(`Server::<init>( ${port} )`);
 		this.port = port;
 		this.express = express();
-		Server.insightFacade = new InsightFacade();
+		this.insightFacade = new InsightFacade();
 		this.registerMiddleware();
 		this.registerRoutes();
 
@@ -88,10 +88,10 @@ export default class Server {
 		this.express.get("/echo/:msg", Server.echo);
 
 		// TODO: your other endpoints should go here
-		this.express.put("/dataset/:id/:kind", Server.put);
-		this.express.delete("/dataset/:id", Server.delete);
-		this.express.post("/query", Server.post);
-		this.express.get("/datasets", Server.get);
+		this.express.put("/dataset/:id/:kind", this.put.bind(this));
+		this.express.delete("/dataset/:id", this.delete.bind(this));
+		this.express.post("/query", this.post.bind(this));
+		this.express.get("/datasets", this.get.bind(this));
 
 	}
 
@@ -116,7 +116,7 @@ export default class Server {
 		}
 	}
 
-	private static put(req: Request, res: Response) {
+	private put(req: Request, res: Response) {
 		try {
 			const id = req.params.id;
 			const content = req.body.toString("base64");
@@ -139,7 +139,7 @@ export default class Server {
 		}
 	}
 
-	private static delete(req: Request, res: Response) {
+	private delete(req: Request, res: Response) {
 		try {
 			const id = req.params.id;
 			return this.insightFacade.removeDataset(id).then((str) => {
@@ -160,7 +160,7 @@ export default class Server {
 		}
 	}
 
-	private static post(req: Request, res: Response) {
+	private post(req: Request, res: Response) {
 		try {
 			const query = req.body;
 			return this.insightFacade.performQuery(query).then((arr) => {
@@ -173,7 +173,7 @@ export default class Server {
 		}
 	}
 
-	private static get(req: Request, res: Response) {
+	private get(req: Request, res: Response) {
 		try {
 			return this.insightFacade.listDatasets().then((arr) => {
 				res.status(200).json({result: arr});
