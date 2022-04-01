@@ -21,7 +21,7 @@ export class EBNFHelper {
 	public static checkMKeyUnknownID(mkey: MKey): boolean {
 		let mKeyParts = mkey.split("_");
 
-		if (!EBNF.mField.includes(mKeyParts[1])) {
+		if (!EBNF.coursesMField.includes(mKeyParts[1])) {
 			return false;
 		}
 
@@ -31,7 +31,7 @@ export class EBNFHelper {
 	public static checkSKeyUnknownID(skey: SKey): boolean {
 		let sKeyParts = skey.split("_");
 
-		if (!EBNF.sField.includes(sKeyParts[1])) {
+		if (!EBNF.coursesSField.includes(sKeyParts[1])) {
 			return false;
 		}
 
@@ -40,7 +40,7 @@ export class EBNFHelper {
 
 	public static checkMKey(mkey: MKey, datasets: Dataset[]): boolean {
 		let mKeyParts = mkey.split("_");
-		if (!EBNF.mField.includes(mKeyParts[1])) {
+		if (!EBNF.coursesMField.includes(mKeyParts[1])) {
 			return false;
 		}
 		let valid = false;
@@ -54,7 +54,7 @@ export class EBNFHelper {
 	public static checkSKey(skey: SKey, datasets: Dataset[]): boolean {
 		let sKeyParts = skey.split("_");
 
-		if (!EBNF.sField.includes(sKeyParts[1])) {
+		if (!EBNF.coursesSField.includes(sKeyParts[1])) {
 			return false;
 		}
 

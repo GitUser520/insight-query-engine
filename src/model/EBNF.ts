@@ -14,8 +14,17 @@ import {EBNFTransforms} from "./EBNFTransforms";
 export class EBNF {
 
 	public datasets: Dataset[];
-	public static mField = ["avg", "pass", "fail", "audit","year"];
-	public static sField = ["dept", "id", "instructor", "title", "uuid"];
+	public static coursesMField = [
+		"avg", "pass", "fail", "audit","year", "lat", "lon", "seats"
+	];
+
+	public static coursesSField = [
+		"dept", "id", "instructor", "title", "uuid", "fullname", "shortname",
+		"number", "name", "address", "type", "furniture", "href"
+	];
+
+	// public static roomsMField = ["lat", "lon", "seats"];
+	// public static roomsSField = ["fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
 	public static validDir = ["UP", "DOWN"];
 
 	constructor(datasets: Dataset[]) {
