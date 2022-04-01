@@ -474,6 +474,7 @@ describe("InsightFacade", function () {
 				insightFacade.addDataset(
 					"miniCoursesDataset", datasetContents.get("miniCoursesDataset") ?? "", InsightDatasetKind.Courses
 				),
+				insightFacade.addDataset("rooms", datasetContents.get("rooms") ?? "", InsightDatasetKind.Rooms),
 			];
 
 			return Promise.all(loadDatasetPromises);
