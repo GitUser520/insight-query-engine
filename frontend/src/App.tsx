@@ -5,10 +5,16 @@ import {SearchRoomBySeatsFurnRType, SearchRoomByShortName} from "./components/Se
 
 function App(): JSX.Element {
 	const [welcome, setWelcome] = useState<boolean>(true);
+	const [displayData, setDisplayData] = useState({});
+
+	const callbackData = (jsonObject: object) => {
+		setDisplayData(jsonObject);
+	};
 
 	useEffect(() => {
 		setTimeout(setWelcome, 2000, false);
 	}, );
+
 
 	if (welcome) {
 		return (
@@ -23,14 +29,16 @@ function App(): JSX.Element {
 			<div className={"Intro"}>
 				<p>
 					Use the following search boxes to find your entries:
-
 				</p>
 			</div>
 			<div className={"SearchRoomByShortName"}>
-				<SearchRoomByShortName/>
+				<SearchRoomByShortName callback = {callbackData}/>
 			</div>
 			<div className={"SearchRoomBySeatsFurnRType"}>
-				<SearchRoomBySeatsFurnRType/>
+				<SearchRoomBySeatsFurnRType callback = {callbackData}/>
+			</div>
+			<div className={"DisplayData"}>
+				<p>{/* TODO display data*/ ""}</p>
 			</div>
 		</div>
 	);
