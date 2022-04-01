@@ -1,7 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import './App.css';
 import {Welcome} from "./components/HomePage";
-import {SearchRoomBySeatsFurnRType, SearchRoomByShortName} from "./components/SearchBox"
+import {
+	SearchRoomBySeatsFurnRType, SearchRoomByShortName, shortName, seatsFurnRType
+} from "./components/SearchBox"
 
 function App(): JSX.Element {
 	const [welcome, setWelcome] = useState<boolean>(true);
@@ -39,18 +41,26 @@ function App(): JSX.Element {
 				<SearchRoomBySeatsFurnRType callback = {callbackData}/>
 			</div>
 			<div className={"DisplayData"}>
-				<p>{htmlToDisplay(displayData)}</p>
+				<p>{htmlToDisplay(displayData, displayState)}</p>
 			</div>
 		</div>
 	);
 }
 
-function htmlToDisplay(json: object): string {
+function htmlToDisplay(json: object, displayState: string): JSX.Element {
 	let jsonString = JSON.stringify(json);
-	if (jsonString === "{}") {
-		return "";
+	if (displayState === shortName) {
+		return (
+			<div>{jsonString}</div>
+		);
+	} else if (displayState === seatsFurnRType) {
+		return (
+			<div>{jsonString}</div>
+		);
 	}
-	return "";
+	return (
+		<div/>
+	);
 }
 
 export default App;

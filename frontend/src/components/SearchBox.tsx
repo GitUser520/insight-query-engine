@@ -3,10 +3,12 @@ import {fchmod} from "fs";
 
 export {SearchRoomByShortName, SearchRoomBySeatsFurnRType};
 
-const ipAddress = "http://localhost:4321";
+export const ipAddress = "http://localhost:4321";
+export const shortName = "shortName";
+export const seatsFurnRType = "seatsFurnRType";
 
 interface callbackFunction {
-	callback: (json: object) => void
+	callback: (json: object, displayState: string) => void;
 }
 
 function SearchRoomByShortName(callback: callbackFunction) {
@@ -58,7 +60,7 @@ function SearchRoomBySeatsFurnRType(callback: callbackFunction) {
 		fetch(queryURL, httpMetadata)
 			.then((response) => {return response.json();})
 			.then((queryData) => {
-				callback.callback(queryData);
+				callback.callback(queryData, seatsFurnRType);
 				console.log(queryData);
 			})
 			.catch((error) => {console.log("Error: " + error.message);});
