@@ -137,13 +137,10 @@ function getURLSeatsFurnRTypeQuery(numSeats: number, furnType: string, roomType:
 			]
 		},
 		OPTIONS: {
-			COLUMNS: ["rooms_shortName"],
-			SORT: {
-				ORDER: {
-					dir: "up",
-					keys: ["rooms_shortName"]
-				}
-			}
+			COLUMNS: [
+				"rooms_shortname"
+			],
+			ORDER: "rooms_shortname"
 		},
 	};
 	return query;
