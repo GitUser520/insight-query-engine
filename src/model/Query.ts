@@ -39,8 +39,7 @@ export class Query {
 		let queryResults = Utils.filterByOptions(querySectionResults, jsonFieldTracker);
 
 		if (queryOrder !== undefined) {
-			let keyValues = Utils.parseKey(queryOrder);
-			let sortByString = keyValues.field;
+			let sortByString = queryOrder;
 
 			queryResults.sort((a: any,b: any) => {
 				if (typeof a[sortByString] === "string") {
