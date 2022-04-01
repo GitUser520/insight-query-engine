@@ -4,12 +4,25 @@ import Section from "../model/Section";
 import Dataset from "./Dataset";
 import {EBNF} from "./EBNF";
 import {EBNFHelper} from "./EBNFHelper";
+import Room from "./Room";
+import {SectionRoom} from "./QueryBody";
 
 export class Utils {
 
-	public static filterByOptions(resultSection: Section[], jsonFieldTracker: any): InsightResult[] {
+	public static filterByOptions(resultSection: SectionRoom, jsonFieldTracker: any): InsightResult[] {
 		let result: InsightResult[] = [];
-		resultSection.forEach((section: any) => {
+		resultSection.sections.forEach((section: any) => {
+			let tempJSON: any = {};
+			let keys = Object.keys(jsonFieldTracker);
+			for (const key of keys) {
+				let currentField: string = jsonFieldTracker[key].field;
+				if (section[currentField] !== undefined) {
+					tempJSON[key] = (section as any)[currentField];
+				}
+			}
+			result.push(tempJSON as InsightResult);
+		});
+		resultSection.rooms.forEach((section: any) => {
 			let tempJSON: any = {};
 			let keys = Object.keys(jsonFieldTracker);
 			for (const key of keys) {
@@ -39,6 +52,23 @@ export class Utils {
 				&& tempObject.title === object.title && tempObject.pass === object.pass
 				&& tempObject.fail === object.fail && tempObject.audit === object.audit
 				&& tempObject.uuid === object.uuid && tempObject.year === object.year;
+			contains = contains || keysEqual;
+		});
+		return contains;
+	}
+
+	public static arrayRoomIncludes(array: Room[], object: Room): boolean {
+		let contains = false;
+		array.forEach((tempObject) => {
+			let keysEqual = tempObject.fullname === object.fullname
+				&& tempObject.shortname === object.shortname
+				&& tempObject.number === object.number
+				&& tempObject.name === object.name
+				&& tempObject.address === object.address
+				&& tempObject.lat === object.lat && tempObject.lon === object.lon
+				&& tempObject.seats === object.seats && tempObject.type === object.type
+				&& tempObject.furniture === object.furniture
+				&& tempObject.href === object.href;
 			contains = contains || keysEqual;
 		});
 		return contains;
