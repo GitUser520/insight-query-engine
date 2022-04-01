@@ -229,7 +229,7 @@ function parseRoom(node: any, code: string, fullname: string, address: string, h
 				const a = getNodeHelper(fieldNode, "a");
 				number = a.childNodes[0].value;
 			} else if (value === "views-field views-field-field-room-capacity") {
-				capacity = fieldNode.childNodes[0].value.trim();
+				capacity = parseInt(fieldNode.childNodes[0].value.trim(), 10);
 			} else if (value === "views-field views-field-field-room-furniture") {
 				furniture = fieldNode.childNodes[0].value.trim();
 			} else if (value === "views-field views-field-field-room-type") {

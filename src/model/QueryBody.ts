@@ -159,42 +159,26 @@ export class QueryBody {
 			});
 		}
 		return resultArray;
-		// let resultSection: Section[] = [];
-		// let resultRoom: Room[] = [];
-		// resultDataset.map((dataset) => {
-		// 	if (dataset.kind === InsightDatasetKind.Courses) {
-		// 		let filteredDataset = dataset.data.filter((section: any) => {
-		// 			return this.filterMComparator(section, keys, flagsLTGTEQ, notFlag);
-		// 		});
-		// 		resultSection = resultSection.concat(filteredDataset);
-		// 	} else if (dataset.kind === InsightDatasetKind.Rooms) {
-		// 		let filteredDataset = dataset.data.filter((section: any) => {
-		// 			return this.filterMComparator(section, keys, flagsLTGTEQ, notFlag);
-		// 		});
-		// 		resultRoom = resultRoom.concat(filteredDataset);
-		// 	}
-		// });
-		// return result;
 	}
 
-	private static filterMComparator(section: any, keys: {id: string; field: string; number: number},
+	private static filterMComparator(sectionOrRoom: any, keys: {id: string; field: string; number: number},
 		flagsLTGTEQ: {LT: boolean; GT: boolean; EQ: boolean}, notFlag: boolean): boolean {
-		if ((typeof section[keys.field]) === "number") {
+		if ((typeof sectionOrRoom[keys.field]) === "number") {
 			if (!notFlag) {
 				if (flagsLTGTEQ.LT) {
-					return (section as any)[keys.field] < keys.number;
+					return (sectionOrRoom as any)[keys.field] < keys.number;
 				} else if (flagsLTGTEQ.GT) {
-					return (section as any)[keys.field] > keys.number;
+					return (sectionOrRoom as any)[keys.field] > keys.number;
 				} else if (flagsLTGTEQ.EQ) {
-					return (section as any)[keys.field] === keys.number;
+					return (sectionOrRoom as any)[keys.field] === keys.number;
 				}
 			} else {
 				if (flagsLTGTEQ.LT) {
-					return !((section as any)[keys.field] < keys.number);
+					return !((sectionOrRoom as any)[keys.field] < keys.number);
 				} else if (flagsLTGTEQ.GT) {
-					return !((section as any)[keys.field] > keys.number);
+					return !((sectionOrRoom as any)[keys.field] > keys.number);
 				} else if (flagsLTGTEQ.EQ) {
-					return !((section as any)[keys.field] === keys.number);
+					return !((sectionOrRoom as any)[keys.field] === keys.number);
 				}
 			}
 		}
@@ -229,7 +213,6 @@ export class QueryBody {
 					return Utils.arrayRoomIncludes(currentResults.rooms, tempSection);
 				});
 			}
-
 			result = currentResults;
 		}
 		if (arrayOr !== undefined) {
