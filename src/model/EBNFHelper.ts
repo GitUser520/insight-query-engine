@@ -1,9 +1,12 @@
 import {
+	AnyKey,
+	ApplyKey,
 	Key,
 	LComparison,
 	MComparison,
 	MKey,
 	Negation,
+	OrderValue,
 	SComparison,
 	SKey
 } from "./QueryInterfaces";
@@ -17,18 +20,16 @@ URL: https://stackoverflow.com/questions/14425568/interface-type-check-with-type
 export class EBNFHelper {
 	public static checkMKeyUnknownID(mkey: MKey): boolean {
 		let mKeyParts = mkey.split("_");
-
-		if (!EBNF.mField.includes(mKeyParts[1])) {
+		if (!EBNF.coursesMField.includes(mKeyParts[1])) {
 			return false;
 		}
-
 		return true;
 	}
 
 	public static checkSKeyUnknownID(skey: SKey): boolean {
 		let sKeyParts = skey.split("_");
 
-		if (!EBNF.sField.includes(sKeyParts[1])) {
+		if (!EBNF.coursesSField.includes(sKeyParts[1])) {
 			return false;
 		}
 
@@ -37,7 +38,7 @@ export class EBNFHelper {
 
 	public static checkMKey(mkey: MKey, datasets: Dataset[]): boolean {
 		let mKeyParts = mkey.split("_");
-		if (!EBNF.mField.includes(mKeyParts[1])) {
+		if (!EBNF.coursesMField.includes(mKeyParts[1])) {
 			return false;
 		}
 		let valid = false;
@@ -51,7 +52,7 @@ export class EBNFHelper {
 	public static checkSKey(skey: SKey, datasets: Dataset[]): boolean {
 		let sKeyParts = skey.split("_");
 
-		if (!EBNF.sField.includes(sKeyParts[1])) {
+		if (!EBNF.coursesSField.includes(sKeyParts[1])) {
 			return false;
 		}
 
@@ -80,6 +81,10 @@ export class EBNFHelper {
 		return typeof object === "object" && object.NOT !== undefined;
 	}
 
+	public static isInstanceOfOrderValue(object: any): object is OrderValue {
+		return typeof object === "object" && (object.dirs !== undefined && object.keys !== undefined);
+	}
+
 	public static checkIsValidAsteriskString(inputString: string): boolean {
 		let stringArray = inputString.split("*");
 		if (stringArray.length === 1) {
@@ -103,4 +108,12 @@ export class EBNFHelper {
 		return EBNFHelper.checkMKey(mkey, datasets) || EBNFHelper.checkSKey(skey, datasets);
 	}
 
+	// check valid apply key
+	public static checkValidApplyKey(applyKey: ApplyKey) {
+		if (applyKey === null || applyKey === undefined) {
+			return false;
+		}
+		let applyKeyArray = applyKey.split("_");
+		return applyKeyArray.length === 1;
+	}
 }

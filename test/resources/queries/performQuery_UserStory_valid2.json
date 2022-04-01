@@ -1,0 +1,36 @@
+{
+	"title": "demo query find suitable room success",
+	"input":
+	{
+		"WHERE": {
+			"AND": [
+				{
+					"GT": {
+						"rooms_seats": 50
+					}
+				},
+				{
+					"IS": {
+						"rooms_furniture": "Classroom-Movable Tables & Chairs"
+					}
+				},
+				{
+					"IS": {
+						"rooms_type": "Small Group"
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"rooms_shortname"
+			],
+			"ORDER": "rooms_shortname"
+		}
+	}	,
+	"errorExpected": false,
+	"expected":
+	[
+		{"rooms_shortname":"MATH"},{"rooms_shortname":"SCRF"}
+	]
+}

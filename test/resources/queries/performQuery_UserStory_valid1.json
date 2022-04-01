@@ -1,0 +1,39 @@
+{
+	"title": "query returns valid lon and lat",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"rooms_shortname": "DMP"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"rooms_lat",
+				"rooms_lon"
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"rooms_lat": 49.26125,
+			"rooms_lon": -123.24807
+		},
+		{
+			"rooms_lat": 49.26125,
+			"rooms_lon": -123.24807
+		},
+		{
+			"rooms_lat": 49.26125,
+			"rooms_lon": -123.24807
+		},
+		{
+			"rooms_lat": 49.26125,
+			"rooms_lon": -123.24807
+		},
+		{
+			"rooms_lat": 49.26125,
+			"rooms_lon": -123.24807
+		}
+	]
+}
