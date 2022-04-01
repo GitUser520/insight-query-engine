@@ -12,7 +12,7 @@
         "courses_dept",
         "courses_title"
       ],
-      "ORDER": "courses_avg"
+      "ORDER": "courses_dept"
     }
   },
   "errorExpected": true,
