@@ -2,13 +2,13 @@ import React, {useState, useEffect} from 'react';
 import './App.css';
 import {Welcome} from "./components/HomePage";
 import {
-	SearchRoomBySeatsFurnRType, SearchRoomByShortName, shortName, seatsFurnRType
+	SearchRoomBySeatsFurnRType, SearchRoomByShortName, SHORTNAME, SEATSFURNRTYPE
 } from "./components/SearchBox"
 
 function App(): JSX.Element {
 	const [welcome, setWelcome] = useState<boolean>(true);
 	const [displayData, setDisplayData] = useState<object>({});
-	const [displayState, setDisplayState] = useState<string>("");
+	const [displayState, setDisplayState] = useState<string>("value");
 
 	const callbackData = (jsonObject: object, displayState: string): void => {
 		setDisplayData(jsonObject);
@@ -16,16 +16,8 @@ function App(): JSX.Element {
 	};
 
 	useEffect(() => {
-		setTimeout(setWelcome, 2000, false);
-	}, );
-
-	if (welcome) {
-		return (
-			<div className={"WelcomePage"}>
-				<Welcome/>
-			</div>
-		);
-	}
+		// alert("Changed");
+	}, [displayState]);
 
 	return (
 		<div className={"SearchPage"}>
@@ -41,7 +33,7 @@ function App(): JSX.Element {
 				<SearchRoomBySeatsFurnRType callback = {callbackData}/>
 			</div>
 			<div className={"DisplayData"}>
-				<p>{htmlToDisplay(displayData, displayState)}</p>
+				{displayState}
 			</div>
 		</div>
 	);
@@ -49,17 +41,17 @@ function App(): JSX.Element {
 
 function htmlToDisplay(json: object, displayState: string): JSX.Element {
 	let jsonString = JSON.stringify(json);
-	if (displayState === shortName) {
+	if (displayState === SHORTNAME) {
 		return (
-			<div>{jsonString}</div>
+			<p>{jsonString}</p>
 		);
-	} else if (displayState === seatsFurnRType) {
+	} else if (displayState === SEATSFURNRTYPE) {
 		return (
-			<div>{jsonString}</div>
+			<p>{jsonString}</p>
 		);
 	}
 	return (
-		<div/>
+		<p></p>
 	);
 }
 

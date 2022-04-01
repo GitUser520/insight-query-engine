@@ -1,25 +1,52 @@
-import {ChangeEvent, useState} from "react";
-import {fchmod} from "fs";
+import {ChangeEvent, FormEvent, useState} from "react";
 
 export {SearchRoomByShortName, SearchRoomBySeatsFurnRType};
 
-export const ipAddress = "http://localhost:4321";
-export const shortName = "shortName";
-export const seatsFurnRType = "seatsFurnRType";
+export const SERVER_URL = "http://localhost:4321";
+export const SHORTNAME = "shortName";
+export const SEATSFURNRTYPE = "seatsFurnRType";
+const QUERY_URL = SERVER_URL + "/query";
 
 interface callbackFunction {
 	callback: (json: object, displayState: string) => void;
 }
 
 function SearchRoomByShortName(callback: callbackFunction) {
+	const [shortName, setShortName] = useState("");
+	const handleShortNameChange = (event: ChangeEvent<HTMLInputElement>): void => {
+		setShortName(event.currentTarget.value);
+	}
+
+	const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
+		event.preventDefault();
+		let queryJSON = getURLShortNameQuery(shortName);
+		let httpMetadata = {
+			method: "POST",
+			headers: {
+				'Content-Type': "application/json"
+			},
+			body: JSON.stringify(queryJSON)
+		}
+		fetch(QUERY_URL, httpMetadata)
+			.then((response) =>
+				response.json()
+			)
+			.then((queryData) => {
+				callback.callback(queryData, SHORTNAME);
+				console.log(queryData);
+			})
+			.catch((error) => {
+				alert("Error: " + error);
+			});
+	}
 
 	return (
-		<form>
+		<form onSubmit={handleSubmit}>
 			<fieldset>
 				<legend>Search Here</legend>
 				<label htmlFor={"shortName"}>Short Name</label>
 				<br/>
-				<input type={"text"} id={"shortName"} name={"shortName"}/>
+				<input type={"text"} id={"shortName"} name={"shortName"} onChange={handleShortNameChange}/>
 				<br/>
 				<input type={"submit"}/>
 			</fieldset>
@@ -35,7 +62,7 @@ function SearchRoomBySeatsFurnRType(callback: callbackFunction) {
 	const handleSeatsChange = (event: ChangeEvent<HTMLInputElement>): void => {
 		let numSeats = parseInt(event.currentTarget.value);
 		if (isNaN(numSeats)) {
-			alert("Invalid input for number of seats");
+			console.log("Invalid input for number of seats");
 		} else {
 			setSeats(numSeats);
 		}
@@ -49,21 +76,27 @@ function SearchRoomBySeatsFurnRType(callback: callbackFunction) {
 		setRType(event.currentTarget.value);
 	}
 
-	const handleSubmit = (): void => {
-		let queryURL = getURLSeatsFurnRTypeQuery(seats, furn, rType);
+	const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
+		event.preventDefault();
+		let queryJSON = getURLSeatsFurnRTypeQuery(seats, furn, rType);
 		let httpMetadata = {
-			method: "GET",
+			method: "POST",
 			headers: {
 				'Content-Type': "application/json"
-			}
+			},
+			body: JSON.stringify(queryJSON)
 		}
-		fetch(queryURL, httpMetadata)
-			.then((response) => {return response.json();})
+		fetch(QUERY_URL, httpMetadata)
+			.then((response) =>
+				response.json()
+			)
 			.then((queryData) => {
-				callback.callback(queryData, seatsFurnRType);
+				callback.callback(queryData, SHORTNAME);
 				console.log(queryData);
 			})
-			.catch((error) => {console.log("Error: " + error.message);});
+			.catch((error) => {
+				alert("Error: " + error);
+			});
 	}
 
 	return (
@@ -73,16 +106,16 @@ function SearchRoomBySeatsFurnRType(callback: callbackFunction) {
 				<label htmlFor={"seats"}>Minimum Number of Seats</label>
 				<input type={"text"} id={"seats"} name={"seats"} onChange={handleSeatsChange}/>
 				<label htmlFor={"furniture_type"}>Furniture Type</label>
-				<input type={"text"} id={"furniture_type"} name={"furniture_type"} onSubmit={handleFurnChange}/>
+				<input type={"text"} id={"furniture_type"} name={"furniture_type"} onChange={handleFurnChange}/>
 				<label htmlFor={"room_type"}>Room Type</label>
-				<input type={"text"} id={"room_type"} name={"room_type"} onSubmit={handleRTypeChange}/>
+				<input type={"text"} id={"room_type"} name={"room_type"} onChange={handleRTypeChange}/>
 				<input type={"submit"}/>
 			</fieldset>
 		</form>
 	)
 }
 
-function getURLSeatsFurnRTypeQuery(numSeats: number, furnType: string, roomType: string): string {
+function getURLSeatsFurnRTypeQuery(numSeats: number, furnType: string, roomType: string): object {
 	let query = {
 		WHERE: {
 			AND: [
@@ -112,13 +145,21 @@ function getURLSeatsFurnRTypeQuery(numSeats: number, furnType: string, roomType:
 				}
 			}
 		},
-	}
-	let validURL = ipAddress + "/" + JSON.stringify(query);
-	return validURL;
+	};
+	return query;
 }
 
-// TODO
-function getURLShortNameQuery(shortName: string): string {
-	return ""
+function getURLShortNameQuery(shortName: string): object {
+	let query = {
+		WHERE: {
+			IS: {
+				"rooms_shortname": shortName
+			}
+		},
+		OPTIONS: {
+			COLUMNS: ["rooms_lat", "rooms_lon"]
+		}
+	};
+	return query;
 }
 
