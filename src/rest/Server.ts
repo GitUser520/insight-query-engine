@@ -118,6 +118,7 @@ export default class Server {
 
 	private put(req: Request, res: Response) {
 		try {
+			console.log("Server::put - received data");
 			const id = req.params.id;
 			const content = req.body.toString("base64");
 			const kind = req.params.kind;
@@ -141,6 +142,7 @@ export default class Server {
 
 	private delete(req: Request, res: Response) {
 		try {
+			console.log("Server::delete - received data");
 			const id = req.params.id;
 			return this.insightFacade.removeDataset(id).then((str) => {
 				res.status(200).json({result: str});
@@ -162,6 +164,7 @@ export default class Server {
 
 	private post(req: Request, res: Response) {
 		try {
+			console.log("Server::post - received data");
 			const query = req.body;
 			return this.insightFacade.performQuery(query).then((arr) => {
 				res.status(200).json({result: arr});
@@ -175,6 +178,7 @@ export default class Server {
 
 	private get(req: Request, res: Response) {
 		try {
+			console.log("Server::get - received data");
 			return this.insightFacade.listDatasets().then((arr) => {
 				res.status(200).json({result: arr});
 			});
