@@ -5,7 +5,11 @@ export {SearchRoomByShortName, SearchRoomBySeatsFurnRType};
 
 const ipAddress = "http://localhost:4321";
 
-function SearchRoomByShortName(callback: (jsonObject: object) => void) {
+interface callbackFunction {
+	callback: (json: object) => void
+}
+
+function SearchRoomByShortName(callback: callbackFunction) {
 
 	return (
 		<form>
@@ -21,7 +25,7 @@ function SearchRoomByShortName(callback: (jsonObject: object) => void) {
 	)
 }
 
-function SearchRoomBySeatsFurnRType(callback: (jsonObject: object) => void) {
+function SearchRoomBySeatsFurnRType(callback: callbackFunction) {
 	const [seats, setSeats] = useState(0);
 	const [furn, setFurn] = useState("");
 	const [rType, setRType] = useState("");
@@ -54,7 +58,7 @@ function SearchRoomBySeatsFurnRType(callback: (jsonObject: object) => void) {
 		fetch(queryURL, httpMetadata)
 			.then((response) => {return response.json();})
 			.then((queryData) => {
-				callback(queryData);
+				callback.callback(queryData);
 				console.log(queryData);
 			})
 			.catch((error) => {console.log("Error: " + error.message);});
