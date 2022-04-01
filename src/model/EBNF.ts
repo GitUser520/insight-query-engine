@@ -26,9 +26,13 @@ export class EBNF {
 	// public static roomsMField = ["lat", "lon", "seats"];
 	// public static roomsSField = ["fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
 	public static validDir = ["UP", "DOWN"];
+	public datasetID: string;
+	public idChanged: boolean;
 
 	constructor(datasets: Dataset[]) {
 		this.datasets = datasets;
+		this.datasetID = "";
+		this.idChanged = false;
 	}
 
 	public checkQueryValidEBNF(queryObject: unknown): boolean {
@@ -58,7 +62,7 @@ export class EBNF {
 			return false;
 		}
 		// check the body
-		let validBody = EBNFBody.checkQueryBody(queryBody, this.datasets);
+		let validBody = EBNFBody.checkQueryBody(queryBody, this.datasets, this);
 		// check the options
 		let validOptions = EBNFOptions.checkQueryOptions(queryOptions, this.datasets);
 		// check optional field TRANSFORMATIONS

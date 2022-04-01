@@ -20,11 +20,9 @@ URL: https://stackoverflow.com/questions/14425568/interface-type-check-with-type
 export class EBNFHelper {
 	public static checkMKeyUnknownID(mkey: MKey): boolean {
 		let mKeyParts = mkey.split("_");
-
 		if (!EBNF.coursesMField.includes(mKeyParts[1])) {
 			return false;
 		}
-
 		return true;
 	}
 
@@ -84,7 +82,7 @@ export class EBNFHelper {
 	}
 
 	public static isInstanceOfOrderValue(object: any): object is OrderValue {
-		return "dirs" in object && "keys" in object;
+		return typeof object === "object" && (object.dirs !== undefined && object.keys !== undefined);
 	}
 
 	public static checkIsValidAsteriskString(inputString: string): boolean {
