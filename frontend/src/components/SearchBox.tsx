@@ -1,8 +1,11 @@
 import {ChangeEvent, useState} from "react";
+import {fchmod} from "fs";
 
 export {SearchRoomByShortName, SearchRoomBySeatsFurnRType};
 
-const SearchRoomByShortName = () => {
+const ipAddress = "http://localhost:4321";
+
+function SearchRoomByShortName(callback: (jsonObject: object) => void) {
 
 	return (
 		<form>
@@ -18,12 +21,12 @@ const SearchRoomByShortName = () => {
 	)
 }
 
-const SearchRoomBySeatsFurnRType = () => {
+function SearchRoomBySeatsFurnRType(callback: (jsonObject: object) => void) {
 	const [seats, setSeats] = useState(0);
 	const [furn, setFurn] = useState("");
 	const [rType, setRType] = useState("");
 
-	const handleSeatsChange = (event: ChangeEvent<HTMLInputElement>) => {
+	const handleSeatsChange = (event: ChangeEvent<HTMLInputElement>): void => {
 		let numSeats = parseInt(event.currentTarget.value);
 		if (isNaN(numSeats)) {
 			alert("Invalid input for number of seats");
@@ -32,17 +35,29 @@ const SearchRoomBySeatsFurnRType = () => {
 		}
 	}
 
-	const handleFurnChange = (event: ChangeEvent<HTMLInputElement>) => {
+	const handleFurnChange = (event: ChangeEvent<HTMLInputElement>): void => {
 		setFurn(event.currentTarget.value);
 	}
 
-	const handleRTypeChange = (event: ChangeEvent<HTMLInputElement>) => {
+	const handleRTypeChange = (event: ChangeEvent<HTMLInputElement>): void => {
 		setRType(event.currentTarget.value);
 	}
 
-	const handleSubmit = () => {
+	const handleSubmit = (): void => {
 		let queryURL = getURLSeatsFurnRTypeQuery(seats, furn, rType);
-		// TODO fetch from server
+		let httpMetadata = {
+			method: "GET",
+			headers: {
+				'Content-Type': "application/json"
+			}
+		}
+		fetch(queryURL, httpMetadata)
+			.then((response) => {return response.json();})
+			.then((queryData) => {
+				callback(queryData);
+				console.log(queryData);
+			})
+			.catch((error) => {console.log("Error: " + error.message);});
 	}
 
 	return (
@@ -92,7 +107,7 @@ function getURLSeatsFurnRTypeQuery(numSeats: number, furnType: string, roomType:
 			}
 		},
 	}
-	let validURL = "/" + JSON.stringify(query);
+	let validURL = ipAddress + "/" + JSON.stringify(query);
 	return validURL;
 }
 
