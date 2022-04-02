@@ -33,13 +33,16 @@ function App(): JSX.Element {
 				<SearchRoomBySeatsFurnRType callback = {callbackData}/>
 			</div>
 			<div className={"DisplayData"}>
-				{displayState}
+				{htmlToDisplay(displayData, displayState)}
 			</div>
 		</div>
 	);
 }
 
 function htmlToDisplay(json: object, displayState: string): JSX.Element {
+	if ((json as any).error !== undefined) {
+		alert("Could not find a valid entry");
+	}
 	let jsonString = JSON.stringify(json);
 	if (displayState === SHORTNAME) {
 		return (

@@ -166,12 +166,16 @@ export default class Server {
 		try {
 			console.log("Server::post - received data");
 			const query = req.body;
+			console.log(typeof query);
 			return this.insightFacade.performQuery(query).then((arr) => {
+				console.log("response here");
 				res.status(200).json({result: arr});
 			}).catch((err) => {
+				console.log(err);
 				res.status(400).json({error: "Error: " + err.message});
 			});
 		} catch (err: any) {
+			console.log("bigger error here");
 			res.status(400).json({error: "Error: " + err.message});
 		}
 	}

@@ -27,6 +27,7 @@ function SearchRoomByShortName(callback: callbackFunction) {
 			},
 			body: JSON.stringify(queryJSON)
 		}
+		console.log(httpMetadata);
 		fetch(QUERY_URL, httpMetadata)
 			.then((response) =>
 				response.json()
@@ -91,7 +92,7 @@ function SearchRoomBySeatsFurnRType(callback: callbackFunction) {
 				response.json()
 			)
 			.then((queryData) => {
-				callback.callback(queryData, SHORTNAME);
+				callback.callback(queryData, SEATSFURNRTYPE);
 				console.log(queryData);
 			})
 			.catch((error) => {
@@ -121,17 +122,17 @@ function getURLSeatsFurnRTypeQuery(numSeats: number, furnType: string, roomType:
 			AND: [
 				{
 					GT: {
-						"rooms_seats": numSeats
+						rooms_seats: numSeats
 					}
 				},
 				{
 					IS: {
-						"rooms_furniture": furnType
+						rooms_furniture: furnType
 					}
 				},
 				{
 					IS: {
-						"rooms_type": roomType
+						rooms_type: roomType
 					}
 				},
 			]
@@ -147,14 +148,18 @@ function getURLSeatsFurnRTypeQuery(numSeats: number, furnType: string, roomType:
 }
 
 function getURLShortNameQuery(shortName: string): object {
-	let query = {
+	let query =
+	{
 		WHERE: {
 			IS: {
-				"rooms_shortname": shortName
+				rooms_shortname: shortName
 			}
 		},
 		OPTIONS: {
-			COLUMNS: ["rooms_lat", "rooms_lon"]
+			COLUMNS: [
+				"rooms_lat",
+				"rooms_lon"
+			]
 		}
 	};
 	return query;
