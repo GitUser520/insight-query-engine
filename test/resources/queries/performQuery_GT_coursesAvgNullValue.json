@@ -1,5 +1,5 @@
 {
-	"title": "GT invalid courses_avg value (string instead of number)",
+	"title": "GT invalid courses_avg value (null instead of number)",
 	"input": {
 		"WHERE": {
 			"GT": {

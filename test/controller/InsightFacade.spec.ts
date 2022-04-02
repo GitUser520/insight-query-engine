@@ -504,7 +504,6 @@ describe("InsightFacade", function () {
 				assertOnResult(actual, expected, input) {
 					expect(actual).to.deep.members(expected);
 					expect(actual.length).equal(expected.length);
-					// TODO make a test for the order
 				},
 			}
 		);
