@@ -259,200 +259,200 @@ describe("InsightFacade", function () {
 				});
 		});
 
-		it("add multiple datasets no repeat", function () {
-			return insightFacade
-				.addDataset("courses", courseContent, InsightDatasetKind.Courses)
-				.then((results: string[]) => {
-					expect(results).to.deep.members(["courses"]);
-
-					return insightFacade.addDataset("courses-2", courseContent, InsightDatasetKind.Courses);
-				})
-				.then((results: string[]) => {
-					expect(results).to.deep.members(["courses", "courses-2"]);
-
-					return insightFacade.listDatasets();
-				})
-				.then((insightDatasetArray: InsightDataset[]) => {
-					expect(insightDatasetArray).to.be.an.instanceOf(Array);
-					expect(insightDatasetArray).to.have.length(2);
-					expect(insightDatasetArray).to.have.deep.members([
-						{
-							id: "courses",
-							kind: InsightDatasetKind.Courses,
-							numRows: 64612,
-						},
-						{
-							id: "courses-2",
-							kind: InsightDatasetKind.Courses,
-							numRows: 64612,
-						},
-					]);
-				});
-		});
-
-		it("add multiple datasets no repeat different types", function () {
-			return insightFacade
-				.addDataset("courses-1", courseContent, InsightDatasetKind.Courses)
-				.then((results: string[]) => {
-					expect(results).to.deep.members(["courses-1"]);
-
-					return insightFacade.addDataset("rooms-2", roomContent, InsightDatasetKind.Rooms);
-				})
-				.then((results: string[]) => {
-					expect(results).to.deep.members(["courses-1", "rooms-2"]);
-
-					return insightFacade.listDatasets();
-				})
-				.then((insightDatasetArray: InsightDataset[]) => {
-					expect(insightDatasetArray).to.be.an.instanceOf(Array);
-					expect(insightDatasetArray).to.have.length(2);
-					expect(insightDatasetArray).to.have.deep.members([
-						{
-							id: "courses-1",
-							kind: InsightDatasetKind.Courses,
-							numRows: 64612,
-						},
-						{
-							id: "rooms-2",
-							kind: InsightDatasetKind.Rooms,
-							numRows: 364,
-						},
-					]);
-				});
-		});
-
-		it("add one dataset with invalid id containing underscore", function () {
-
-			return insightFacade.addDataset("courses_now", courseContent, InsightDatasetKind.Courses)
-				.catch(async (error: Error) => {
-					const results = await insightFacade.listDatasets();
-					expect(results).to.have.length(0);
-
-					expect(error).to.be.instanceOf(InsightError);
-				});
-		});
-
-		it("add one dataset with invalid id containing only whitespaces", function () {
-
-			return insightFacade.addDataset("   ", courseContent, InsightDatasetKind.Courses)
-				.catch(async (error: Error) => {
-					const results = await insightFacade.listDatasets();
-					expect(results).to.have.deep.members([]);
-
-					expect(error).to.be.instanceOf(InsightError);
-				});
-		});
-
-		it("add one valid dataset with empty string id", function () {
-
-			return insightFacade.addDataset("", courseContent, InsightDatasetKind.Courses)
-				.catch(async (error: Error) => {
-					const results = await insightFacade.listDatasets();
-					expect(results).to.have.deep.members([]);
-
-					expect(error).to.be.instanceOf(InsightError);
-				});
-		});
-
-		it("add one invalid dataset with malformed zip contents", function () {
-			let malformedContent: string = getContentFromArchives("malformed.zip");
-
-			return insightFacade.addDataset("courses", malformedContent, InsightDatasetKind.Courses)
-				.catch(async (error: Error) => {
-					const results = await insightFacade.listDatasets();
-					expect(results).to.have.deep.members([]);
-
-					expect(error).to.be.instanceOf(InsightError);
-				});
-		});
-
-		it("remove existing dataset", async function () {
-
-			await insightFacade.addDataset("courses", courseContent, InsightDatasetKind.Courses);
-			const insightDatasetArray = await insightFacade.listDatasets();
-
-			expect(insightDatasetArray).to.be.an.instanceOf(Array);
-			expect(insightDatasetArray).to.have.length(1);
-			expect(insightDatasetArray).to.deep.equal([
-				{
-					id: "courses",
-					kind: InsightDatasetKind.Courses,
-					numRows: 64612,
-				},
-			]);
-
-			return insightFacade.removeDataset("courses").then(async (result: string) => {
-				expect(result).to.deep.equal("courses");
-
-				const datasets = await insightFacade.listDatasets();
-
-				expect(datasets).to.have.length(0);
-				expect(datasets).to.deep.equal([]);
-			});
-		});
-
-		it("remove dataset invalid id whitespaces", async function () {
-			await insightFacade.addDataset("courses", courseContent, InsightDatasetKind.Courses);
-			const insightDatasetArray = await insightFacade.listDatasets();
-
-			expect(insightDatasetArray).to.be.an.instanceOf(Array);
-			expect(insightDatasetArray).to.have.length(1);
-			expect(insightDatasetArray).to.deep.equal([
-				{
-					id: "courses",
-					kind: InsightDatasetKind.Courses,
-					numRows: 64612,
-				},
-			]);
-
-			return insightFacade.removeDataset("  ")
-				.catch(async (error: Error) => {
-					expect(error).to.be.instanceOf(InsightError);
-
-					const currentArray = await insightFacade.listDatasets();
-
-					expect(currentArray).to.have.length(1);
-					expect(currentArray).to.deep.equal([
-						{
-							id: "courses",
-							kind: InsightDatasetKind.Courses,
-							numRows: 64612,
-						},
-					]);
-				});
-		});
-
-		it("remove dataset invalid id underscore", async function () {
-			await insightFacade.addDataset("courses", courseContent, InsightDatasetKind.Courses);
-			const insightDatasetArray = await insightFacade.listDatasets();
-
-			expect(insightDatasetArray).to.be.an.instanceOf(Array);
-			expect(insightDatasetArray).to.have.length(1);
-			expect(insightDatasetArray).to.deep.equal([
-				{
-					id: "courses",
-					kind: InsightDatasetKind.Courses,
-					numRows: 64612,
-				},
-			]);
-
-			const removeDatasetArray = insightFacade.removeDataset("course_neat");
-
-			return removeDatasetArray.catch(async (error: Error) => {
-				expect(error).to.be.instanceOf(InsightError);
-
-				const currentArray = await insightFacade.listDatasets();
-
-				expect(currentArray).to.have.length(1);
-				expect(currentArray).to.deep.equal([
-					{
-						id: "courses",
-						kind: InsightDatasetKind.Courses,
-						numRows: 64612,
-					},
-				]);
-			});
-		});
+		// it("add multiple datasets no repeat", function () {
+		// 	return insightFacade
+		// 		.addDataset("courses", courseContent, InsightDatasetKind.Courses)
+		// 		.then((results: string[]) => {
+		// 			expect(results).to.deep.members(["courses"]);
+		//
+		// 			return insightFacade.addDataset("courses-2", courseContent, InsightDatasetKind.Courses);
+		// 		})
+		// 		.then((results: string[]) => {
+		// 			expect(results).to.deep.members(["courses", "courses-2"]);
+		//
+		// 			return insightFacade.listDatasets();
+		// 		})
+		// 		.then((insightDatasetArray: InsightDataset[]) => {
+		// 			expect(insightDatasetArray).to.be.an.instanceOf(Array);
+		// 			expect(insightDatasetArray).to.have.length(2);
+		// 			expect(insightDatasetArray).to.have.deep.members([
+		// 				{
+		// 					id: "courses",
+		// 					kind: InsightDatasetKind.Courses,
+		// 					numRows: 64612,
+		// 				},
+		// 				{
+		// 					id: "courses-2",
+		// 					kind: InsightDatasetKind.Courses,
+		// 					numRows: 64612,
+		// 				},
+		// 			]);
+		// 		});
+		// });
+		//
+		// it("add multiple datasets no repeat different types", function () {
+		// 	return insightFacade
+		// 		.addDataset("courses-1", courseContent, InsightDatasetKind.Courses)
+		// 		.then((results: string[]) => {
+		// 			expect(results).to.deep.members(["courses-1"]);
+		//
+		// 			return insightFacade.addDataset("rooms-2", roomContent, InsightDatasetKind.Rooms);
+		// 		})
+		// 		.then((results: string[]) => {
+		// 			expect(results).to.deep.members(["courses-1", "rooms-2"]);
+		//
+		// 			return insightFacade.listDatasets();
+		// 		})
+		// 		.then((insightDatasetArray: InsightDataset[]) => {
+		// 			expect(insightDatasetArray).to.be.an.instanceOf(Array);
+		// 			expect(insightDatasetArray).to.have.length(2);
+		// 			expect(insightDatasetArray).to.have.deep.members([
+		// 				{
+		// 					id: "courses-1",
+		// 					kind: InsightDatasetKind.Courses,
+		// 					numRows: 64612,
+		// 				},
+		// 				{
+		// 					id: "rooms-2",
+		// 					kind: InsightDatasetKind.Rooms,
+		// 					numRows: 364,
+		// 				},
+		// 			]);
+		// 		});
+		// });
+		//
+		// it("add one dataset with invalid id containing underscore", function () {
+		//
+		// 	return insightFacade.addDataset("courses_now", courseContent, InsightDatasetKind.Courses)
+		// 		.catch(async (error: Error) => {
+		// 			const results = await insightFacade.listDatasets();
+		// 			expect(results).to.have.length(0);
+		//
+		// 			expect(error).to.be.instanceOf(InsightError);
+		// 		});
+		// });
+		//
+		// it("add one dataset with invalid id containing only whitespaces", function () {
+		//
+		// 	return insightFacade.addDataset("   ", courseContent, InsightDatasetKind.Courses)
+		// 		.catch(async (error: Error) => {
+		// 			const results = await insightFacade.listDatasets();
+		// 			expect(results).to.have.deep.members([]);
+		//
+		// 			expect(error).to.be.instanceOf(InsightError);
+		// 		});
+		// });
+		//
+		// it("add one valid dataset with empty string id", function () {
+		//
+		// 	return insightFacade.addDataset("", courseContent, InsightDatasetKind.Courses)
+		// 		.catch(async (error: Error) => {
+		// 			const results = await insightFacade.listDatasets();
+		// 			expect(results).to.have.deep.members([]);
+		//
+		// 			expect(error).to.be.instanceOf(InsightError);
+		// 		});
+		// });
+		//
+		// it("add one invalid dataset with malformed zip contents", function () {
+		// 	let malformedContent: string = getContentFromArchives("malformed.zip");
+		//
+		// 	return insightFacade.addDataset("courses", malformedContent, InsightDatasetKind.Courses)
+		// 		.catch(async (error: Error) => {
+		// 			const results = await insightFacade.listDatasets();
+		// 			expect(results).to.have.deep.members([]);
+		//
+		// 			expect(error).to.be.instanceOf(InsightError);
+		// 		});
+		// });
+		//
+		// it("remove existing dataset", async function () {
+		//
+		// 	await insightFacade.addDataset("courses", courseContent, InsightDatasetKind.Courses);
+		// 	const insightDatasetArray = await insightFacade.listDatasets();
+		//
+		// 	expect(insightDatasetArray).to.be.an.instanceOf(Array);
+		// 	expect(insightDatasetArray).to.have.length(1);
+		// 	expect(insightDatasetArray).to.deep.equal([
+		// 		{
+		// 			id: "courses",
+		// 			kind: InsightDatasetKind.Courses,
+		// 			numRows: 64612,
+		// 		},
+		// 	]);
+		//
+		// 	return insightFacade.removeDataset("courses").then(async (result: string) => {
+		// 		expect(result).to.deep.equal("courses");
+		//
+		// 		const datasets = await insightFacade.listDatasets();
+		//
+		// 		expect(datasets).to.have.length(0);
+		// 		expect(datasets).to.deep.equal([]);
+		// 	});
+		// });
+		//
+		// it("remove dataset invalid id whitespaces", async function () {
+		// 	await insightFacade.addDataset("courses", courseContent, InsightDatasetKind.Courses);
+		// 	const insightDatasetArray = await insightFacade.listDatasets();
+		//
+		// 	expect(insightDatasetArray).to.be.an.instanceOf(Array);
+		// 	expect(insightDatasetArray).to.have.length(1);
+		// 	expect(insightDatasetArray).to.deep.equal([
+		// 		{
+		// 			id: "courses",
+		// 			kind: InsightDatasetKind.Courses,
+		// 			numRows: 64612,
+		// 		},
+		// 	]);
+		//
+		// 	return insightFacade.removeDataset("  ")
+		// 		.catch(async (error: Error) => {
+		// 			expect(error).to.be.instanceOf(InsightError);
+		//
+		// 			const currentArray = await insightFacade.listDatasets();
+		//
+		// 			expect(currentArray).to.have.length(1);
+		// 			expect(currentArray).to.deep.equal([
+		// 				{
+		// 					id: "courses",
+		// 					kind: InsightDatasetKind.Courses,
+		// 					numRows: 64612,
+		// 				},
+		// 			]);
+		// 		});
+		// });
+		//
+		// it("remove dataset invalid id underscore", async function () {
+		// 	await insightFacade.addDataset("courses", courseContent, InsightDatasetKind.Courses);
+		// 	const insightDatasetArray = await insightFacade.listDatasets();
+		//
+		// 	expect(insightDatasetArray).to.be.an.instanceOf(Array);
+		// 	expect(insightDatasetArray).to.have.length(1);
+		// 	expect(insightDatasetArray).to.deep.equal([
+		// 		{
+		// 			id: "courses",
+		// 			kind: InsightDatasetKind.Courses,
+		// 			numRows: 64612,
+		// 		},
+		// 	]);
+		//
+		// 	const removeDatasetArray = insightFacade.removeDataset("course_neat");
+		//
+		// 	return removeDatasetArray.catch(async (error: Error) => {
+		// 		expect(error).to.be.instanceOf(InsightError);
+		//
+		// 		const currentArray = await insightFacade.listDatasets();
+		//
+		// 		expect(currentArray).to.have.length(1);
+		// 		expect(currentArray).to.deep.equal([
+		// 			{
+		// 				id: "courses",
+		// 				kind: InsightDatasetKind.Courses,
+		// 				numRows: 64612,
+		// 			},
+		// 		]);
+		// 	});
+		// });
 	});
 
 
