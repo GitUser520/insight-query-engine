@@ -114,24 +114,7 @@ export default class InsightFacade implements IInsightFacade {
 		// data should be valid upon checking valid EBNF, because mkey and skey check if item id exists
 		// verify query is in valid EBNF form
 		// if this executes, then that means that we already know query is a valid JSON object
-		// let queryAsObject = query;
-		/*
-		{
-		"WHERE": {
-			"IS": {
-				"rooms_shortname": "DMP"
-			}
-		},
-		"OPTIONS": {
-			"COLUMNS": [
-				"rooms_lat",
-				"rooms_lon"
-			]
-		}
-	}
-		 */
-		let queryAsObject = query;
-		console.log(typeof queryAsObject);
+		let queryAsObject = JSON.parse(JSON.stringify(query));
 		let EBNFChecker = new EBNF(this.addedDatasets);
 		let validEBNF = EBNFChecker.checkQueryValidEBNF(queryAsObject);
 		if (!validEBNF) {
@@ -140,8 +123,8 @@ export default class InsightFacade implements IInsightFacade {
 		let queryObject = new Query(this.addedDatasets);
 		let insightResultArray = queryObject.getQuery(queryAsObject as QueryStructure);
 
-		if (insightResultArray.length >= 5000) {
-			return Promise.reject(new ResultTooLargeError("Result is Too Large."));
+		if (insightResultArray.length > 5000) {
+			return Promise.reject(new ResultTooLargeError("Too Large."));
 		}
 
 		return Promise.resolve(insightResultArray);
