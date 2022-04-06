@@ -38,17 +38,18 @@ export class Query {
 
 		// results
 		let querySectionResults = QueryBody.getQueryByFilter(this.datasets, queryWhere, false);
+		// TODO apply transformations here
+		// let applyTransformationResults = QueryTransform.applyTransform(querySectionResults);
+		// TODO filter by options on top of the new transformations
 		let queryResults = Utils.filterByOptions(querySectionResults, jsonFieldTracker);
-
-		if (queryOrder !== undefined) {
+		if (queryOrder !== null && queryOrder !== undefined) {
 			if (EBNFHelper.isInstanceOfOrderValue(queryOrder)) {
+				console.log("should not be here");
 				let dir = queryOrder.dir;
 				let keys = queryOrder.keys;
 				QuerySort.querySortArray(queryResults, keys, dir);
 			} else {
-				let keyValues = Utils.parseKey(queryOrder);
-				let sortByString = keyValues.field;
-				QuerySort.querySort(queryResults, sortByString);
+				QuerySort.querySort(queryResults, queryOrder);
 			}
 		}
 
