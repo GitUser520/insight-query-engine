@@ -1,0 +1,33 @@
+{
+	"title": "performQuery: ORDER order is OrderValue, invalid direction value type",
+	"input": {
+		"WHERE": {
+			"LT": {
+				"courses_avg": 10
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_avg",
+				"courses_dept",
+				"courses_id",
+				"courses_instructor",
+				"courses_title",
+				"courses_pass",
+				"courses_fail",
+				"courses_audit",
+				"courses_uuid",
+				"courses_year"
+			],
+			"ORDER": {
+				"dir": 10,
+				"keys": [
+					"courses_fail",
+					"courses_avg"
+				]
+			}
+		}
+	},
+	"errorExpected": true,
+	"with": "InsightError"
+}
