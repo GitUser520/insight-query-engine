@@ -78,14 +78,19 @@ export function zipCoursesProcessor(content: string): Promise<any[]> {
 			return Promise.all(promises).then((promise: string[]) => {
 				let allSections: Section[] = [];
 				for (const courseData of promise) {
-					const json = JSON.parse(courseData);
-					const result = parseCourse(json);
-					allSections = [...allSections, ...result];
+					try {
+						const json = JSON.parse(courseData);
+						const result = parseCourse(json);
+						allSections = [...allSections, ...result];
+					} catch (e) {
+						// console.log(e);
+						// invalid format, skip this file
+					}
 				}
 				if (allSections.length === 0) {
 					return Promise.reject(new InsightError("no valid section in this dataset"));
 				}
-
+				// console.log(allSections);
 				return allSections;
 			});
 		})
@@ -114,6 +119,7 @@ export function zipRoomsProcessor(content: string): Promise<any[]> {
 				if (rooms.length === 0) {
 					return Promise.reject(new InsightError("no valid room found"));
 				}
+				console.log(rooms);
 				return Promise.resolve(rooms);
 			}).catch((err) => {
 				return Promise.reject(new InsightError("error in getting rooms " + err));
