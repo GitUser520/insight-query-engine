@@ -43,6 +43,9 @@ function htmlToDisplay(json: object, displayState: string): JSX.Element {
 	if ((json as any).error !== undefined) {
 		alert("Could not find a valid entry");
 	}
+	if ((json as any).result !== undefined && (json as any).result.length === 0) {
+		alert("Not found");
+	}
 	let jsonString = JSON.stringify(json);
 	if (displayState === SHORTNAME) {
 		return (

@@ -21,8 +21,8 @@
 			],
 			"ORDER": {
 				"dir": "UP",
-				"keys": [
-					10
+				"key": [
+					"courses_avg"
 				]
 			}
 		}
