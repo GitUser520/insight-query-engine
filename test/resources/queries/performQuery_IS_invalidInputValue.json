@@ -1,0 +1,34 @@
+{
+	"title": "performQuery: is invalid input value type",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"courses_dept": 98
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_avg",
+				"courses_dept",
+				"courses_id",
+				"courses_instructor",
+				"courses_title",
+				"courses_pass",
+				"courses_fail",
+				"courses_audit",
+				"courses_uuid",
+				"courses_year"
+			],
+			"ORDER": {
+				"dir": "UP",
+				"keys": [
+					"courses_instructor",
+					"courses_pass",
+					"courses_title"
+				]
+			}
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}
