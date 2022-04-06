@@ -131,7 +131,7 @@ export default class InsightFacade implements IInsightFacade {
 	}
 		 */
 		let queryAsObject = query;
-		console.log(typeof queryAsObject);
+		// console.log(typeof queryAsObject);
 		let EBNFChecker = new EBNF(this.addedDatasets);
 		let validEBNF = EBNFChecker.checkQueryValidEBNF(queryAsObject);
 		if (!validEBNF) {
