@@ -1,0 +1,33 @@
+{
+	"errorMsg": "All ORDER keys must be in COLUMNS",
+	"title": "performQuery: ORDER order is OrderValue, invalid key type",
+	"input": {
+		"WHERE": {
+			"LT": {
+				"courses_avg": 10
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_avg",
+				"courses_dept",
+				"courses_id",
+				"courses_instructor",
+				"courses_title",
+				"courses_pass",
+				"courses_fail",
+				"courses_audit",
+				"courses_uuid",
+				"courses_year"
+			],
+			"ORDER": {
+				"dir": "UP",
+				"keys": [
+					10
+				]
+			}
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}
