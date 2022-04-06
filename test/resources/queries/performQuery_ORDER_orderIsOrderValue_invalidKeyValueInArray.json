@@ -1,5 +1,4 @@
 {
-	"errorMsg": "All ORDER keys must be in COLUMNS",
 	"title": "performQuery: ORDER order is OrderValue, invalid key value",
 	"input": {
 		"WHERE": {

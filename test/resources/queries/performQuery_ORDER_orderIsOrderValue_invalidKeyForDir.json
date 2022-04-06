@@ -20,9 +20,9 @@
 				"courses_year"
 			],
 			"ORDER": {
-				"dir": "UP",
+				"dirs": "UP",
 				"keys": [
-					10
+					"courses_avg"
 				]
 			}
 		}
