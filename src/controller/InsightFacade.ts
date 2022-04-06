@@ -123,7 +123,7 @@ export default class InsightFacade implements IInsightFacade {
 		let queryObject = new Query(this.addedDatasets);
 		let insightResultArray = queryObject.getQuery(queryAsObject as QueryStructure);
 
-		if (insightResultArray.length >= 5000) {
+		if (insightResultArray.length > 5000) {
 			return Promise.reject(new ResultTooLargeError("Too Large."));
 		}
 
