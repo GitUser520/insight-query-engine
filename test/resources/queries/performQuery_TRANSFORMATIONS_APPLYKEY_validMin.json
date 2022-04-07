@@ -1,0 +1,720 @@
+{
+	"title": "performQuery: Transformation valid apply key MIN",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"courses_avg": 95
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_avg",
+				"courses_dept",
+				"overallMin"
+			],
+			"ORDER": {
+				"dir": "UP",
+				"keys": [
+					"courses_avg",
+					"courses_dept"
+				]
+			}
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": [
+				"courses_avg",
+				"courses_dept"
+			],
+			"APPLY": [
+				{
+					"overallMin": {
+						"MIN": "courses_avg"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"courses_avg": 95.05,
+			"courses_dept": "apsc",
+			"overallMin": 95.05
+		},
+		{
+			"courses_avg": 95.07,
+			"courses_dept": "phar",
+			"overallMin": 95.07
+		},
+		{
+			"courses_avg": 95.09,
+			"courses_dept": "spph",
+			"overallMin": 95.09
+		},
+		{
+			"courses_avg": 95.1,
+			"courses_dept": "etec",
+			"overallMin": 95.1
+		},
+		{
+			"courses_avg": 95.11,
+			"courses_dept": "epse",
+			"overallMin": 95.11
+		},
+		{
+			"courses_avg": 95.11,
+			"courses_dept": "spph",
+			"overallMin": 95.11
+		},
+		{
+			"courses_avg": 95.13,
+			"courses_dept": "epse",
+			"overallMin": 95.13
+		},
+		{
+			"courses_avg": 95.13,
+			"courses_dept": "nurs",
+			"overallMin": 95.13
+		},
+		{
+			"courses_avg": 95.14,
+			"courses_dept": "epse",
+			"overallMin": 95.14
+		},
+		{
+			"courses_avg": 95.15,
+			"courses_dept": "bmeg",
+			"overallMin": 95.15
+		},
+		{
+			"courses_avg": 95.15,
+			"courses_dept": "epse",
+			"overallMin": 95.15
+		},
+		{
+			"courses_avg": 95.16,
+			"courses_dept": "educ",
+			"overallMin": 95.16
+		},
+		{
+			"courses_avg": 95.16,
+			"courses_dept": "epse",
+			"overallMin": 95.16
+		},
+		{
+			"courses_avg": 95.17,
+			"courses_dept": "epse",
+			"overallMin": 95.17
+		},
+		{
+			"courses_avg": 95.18,
+			"courses_dept": "mine",
+			"overallMin": 95.18
+		},
+		{
+			"courses_avg": 95.19,
+			"courses_dept": "etec",
+			"overallMin": 95.19
+		},
+		{
+			"courses_avg": 95.2,
+			"courses_dept": "thtr",
+			"overallMin": 95.2
+		},
+		{
+			"courses_avg": 95.22,
+			"courses_dept": "epse",
+			"overallMin": 95.22
+		},
+		{
+			"courses_avg": 95.25,
+			"courses_dept": "psyc",
+			"overallMin": 95.25
+		},
+		{
+			"courses_avg": 95.26,
+			"courses_dept": "hgse",
+			"overallMin": 95.26
+		},
+		{
+			"courses_avg": 95.27,
+			"courses_dept": "epse",
+			"overallMin": 95.27
+		},
+		{
+			"courses_avg": 95.29,
+			"courses_dept": "hgse",
+			"overallMin": 95.29
+		},
+		{
+			"courses_avg": 95.29,
+			"courses_dept": "nurs",
+			"overallMin": 95.29
+		},
+		{
+			"courses_avg": 95.3,
+			"courses_dept": "epse",
+			"overallMin": 95.3
+		},
+		{
+			"courses_avg": 95.31,
+			"courses_dept": "chbe",
+			"overallMin": 95.31
+		},
+		{
+			"courses_avg": 95.31,
+			"courses_dept": "epse",
+			"overallMin": 95.31
+		},
+		{
+			"courses_avg": 95.32,
+			"courses_dept": "etec",
+			"overallMin": 95.32
+		},
+		{
+			"courses_avg": 95.33,
+			"courses_dept": "epse",
+			"overallMin": 95.33
+		},
+		{
+			"courses_avg": 95.33,
+			"courses_dept": "etec",
+			"overallMin": 95.33
+		},
+		{
+			"courses_avg": 95.36,
+			"courses_dept": "cnps",
+			"overallMin": 95.36
+		},
+		{
+			"courses_avg": 95.36,
+			"courses_dept": "kin",
+			"overallMin": 95.36
+		},
+		{
+			"courses_avg": 95.37,
+			"courses_dept": "phth",
+			"overallMin": 95.37
+		},
+		{
+			"courses_avg": 95.38,
+			"courses_dept": "musc",
+			"overallMin": 95.38
+		},
+		{
+			"courses_avg": 95.41,
+			"courses_dept": "epse",
+			"overallMin": 95.41
+		},
+		{
+			"courses_avg": 95.43,
+			"courses_dept": "mine",
+			"overallMin": 95.43
+		},
+		{
+			"courses_avg": 95.43,
+			"courses_dept": "nurs",
+			"overallMin": 95.43
+		},
+		{
+			"courses_avg": 95.43,
+			"courses_dept": "phys",
+			"overallMin": 95.43
+		},
+		{
+			"courses_avg": 95.44,
+			"courses_dept": "epse",
+			"overallMin": 95.44
+		},
+		{
+			"courses_avg": 95.44,
+			"courses_dept": "mine",
+			"overallMin": 95.44
+		},
+		{
+			"courses_avg": 95.47,
+			"courses_dept": "epse",
+			"overallMin": 95.47
+		},
+		{
+			"courses_avg": 95.5,
+			"courses_dept": "epse",
+			"overallMin": 95.5
+		},
+		{
+			"courses_avg": 95.54,
+			"courses_dept": "chbe",
+			"overallMin": 95.54
+		},
+		{
+			"courses_avg": 95.56,
+			"courses_dept": "math",
+			"overallMin": 95.56
+		},
+		{
+			"courses_avg": 95.58,
+			"courses_dept": "edcp",
+			"overallMin": 95.58
+		},
+		{
+			"courses_avg": 95.6,
+			"courses_dept": "mine",
+			"overallMin": 95.6
+		},
+		{
+			"courses_avg": 95.63,
+			"courses_dept": "etec",
+			"overallMin": 95.63
+		},
+		{
+			"courses_avg": 95.67,
+			"courses_dept": "epse",
+			"overallMin": 95.67
+		},
+		{
+			"courses_avg": 95.67,
+			"courses_dept": "math",
+			"overallMin": 95.67
+		},
+		{
+			"courses_avg": 95.67,
+			"courses_dept": "musc",
+			"overallMin": 95.67
+		},
+		{
+			"courses_avg": 95.7,
+			"courses_dept": "crwr",
+			"overallMin": 95.7
+		},
+		{
+			"courses_avg": 95.72,
+			"courses_dept": "epse",
+			"overallMin": 95.72
+		},
+		{
+			"courses_avg": 95.75,
+			"courses_dept": "psyc",
+			"overallMin": 95.75
+		},
+		{
+			"courses_avg": 95.75,
+			"courses_dept": "spph",
+			"overallMin": 95.75
+		},
+		{
+			"courses_avg": 95.76,
+			"courses_dept": "spph",
+			"overallMin": 95.76
+		},
+		{
+			"courses_avg": 95.78,
+			"courses_dept": "cnps",
+			"overallMin": 95.78
+		},
+		{
+			"courses_avg": 95.78,
+			"courses_dept": "edst",
+			"overallMin": 95.78
+		},
+		{
+			"courses_avg": 95.83,
+			"courses_dept": "epse",
+			"overallMin": 95.83
+		},
+		{
+			"courses_avg": 95.86,
+			"courses_dept": "epse",
+			"overallMin": 95.86
+		},
+		{
+			"courses_avg": 95.9,
+			"courses_dept": "epse",
+			"overallMin": 95.9
+		},
+		{
+			"courses_avg": 95.93,
+			"courses_dept": "sowk",
+			"overallMin": 95.93
+		},
+		{
+			"courses_avg": 95.94,
+			"courses_dept": "apsc",
+			"overallMin": 95.94
+		},
+		{
+			"courses_avg": 95.95,
+			"courses_dept": "apsc",
+			"overallMin": 95.95
+		},
+		{
+			"courses_avg": 95.96,
+			"courses_dept": "etec",
+			"overallMin": 95.96
+		},
+		{
+			"courses_avg": 96,
+			"courses_dept": "apsc",
+			"overallMin": 96
+		},
+		{
+			"courses_avg": 96,
+			"courses_dept": "cnps",
+			"overallMin": 96
+		},
+		{
+			"courses_avg": 96,
+			"courses_dept": "crwr",
+			"overallMin": 96
+		},
+		{
+			"courses_avg": 96,
+			"courses_dept": "epse",
+			"overallMin": 96
+		},
+		{
+			"courses_avg": 96,
+			"courses_dept": "kin",
+			"overallMin": 96
+		},
+		{
+			"courses_avg": 96,
+			"courses_dept": "pcth",
+			"overallMin": 96
+		},
+		{
+			"courses_avg": 96,
+			"courses_dept": "phil",
+			"overallMin": 96
+		},
+		{
+			"courses_avg": 96,
+			"courses_dept": "psyc",
+			"overallMin": 96
+		},
+		{
+			"courses_avg": 96.03,
+			"courses_dept": "epse",
+			"overallMin": 96.03
+		},
+		{
+			"courses_avg": 96.06,
+			"courses_dept": "kin",
+			"overallMin": 96.06
+		},
+		{
+			"courses_avg": 96.09,
+			"courses_dept": "sowk",
+			"overallMin": 96.09
+		},
+		{
+			"courses_avg": 96.1,
+			"courses_dept": "libr",
+			"overallMin": 96.1
+		},
+		{
+			"courses_avg": 96.11,
+			"courses_dept": "adhe",
+			"overallMin": 96.11
+		},
+		{
+			"courses_avg": 96.15,
+			"courses_dept": "sowk",
+			"overallMin": 96.15
+		},
+		{
+			"courses_avg": 96.16,
+			"courses_dept": "cnps",
+			"overallMin": 96.16
+		},
+		{
+			"courses_avg": 96.21,
+			"courses_dept": "epse",
+			"overallMin": 96.21
+		},
+		{
+			"courses_avg": 96.23,
+			"courses_dept": "epse",
+			"overallMin": 96.23
+		},
+		{
+			"courses_avg": 96.24,
+			"courses_dept": "epse",
+			"overallMin": 96.24
+		},
+		{
+			"courses_avg": 96.25,
+			"courses_dept": "math",
+			"overallMin": 96.25
+		},
+		{
+			"courses_avg": 96.25,
+			"courses_dept": "mtrl",
+			"overallMin": 96.25
+		},
+		{
+			"courses_avg": 96.27,
+			"courses_dept": "civl",
+			"overallMin": 96.27
+		},
+		{
+			"courses_avg": 96.33,
+			"courses_dept": "cnps",
+			"overallMin": 96.33
+		},
+		{
+			"courses_avg": 96.33,
+			"courses_dept": "epse",
+			"overallMin": 96.33
+		},
+		{
+			"courses_avg": 96.33,
+			"courses_dept": "math",
+			"overallMin": 96.33
+		},
+		{
+			"courses_avg": 96.36,
+			"courses_dept": "frst",
+			"overallMin": 96.36
+		},
+		{
+			"courses_avg": 96.4,
+			"courses_dept": "fipr",
+			"overallMin": 96.4
+		},
+		{
+			"courses_avg": 96.44,
+			"courses_dept": "math",
+			"overallMin": 96.44
+		},
+		{
+			"courses_avg": 96.46,
+			"courses_dept": "edst",
+			"overallMin": 96.46
+		},
+		{
+			"courses_avg": 96.47,
+			"courses_dept": "etec",
+			"overallMin": 96.47
+		},
+		{
+			"courses_avg": 96.47,
+			"courses_dept": "plan",
+			"overallMin": 96.47
+		},
+		{
+			"courses_avg": 96.5,
+			"courses_dept": "midw",
+			"overallMin": 96.5
+		},
+		{
+			"courses_avg": 96.5,
+			"courses_dept": "musc",
+			"overallMin": 96.5
+		},
+		{
+			"courses_avg": 96.59,
+			"courses_dept": "mine",
+			"overallMin": 96.59
+		},
+		{
+			"courses_avg": 96.64,
+			"courses_dept": "nurs",
+			"overallMin": 96.64
+		},
+		{
+			"courses_avg": 96.73,
+			"courses_dept": "nurs",
+			"overallMin": 96.73
+		},
+		{
+			"courses_avg": 96.8,
+			"courses_dept": "spph",
+			"overallMin": 96.8
+		},
+		{
+			"courses_avg": 96.83,
+			"courses_dept": "math",
+			"overallMin": 96.83
+		},
+		{
+			"courses_avg": 96.9,
+			"courses_dept": "audi",
+			"overallMin": 96.9
+		},
+		{
+			"courses_avg": 96.9,
+			"courses_dept": "epse",
+			"overallMin": 96.9
+		},
+		{
+			"courses_avg": 96.94,
+			"courses_dept": "arst",
+			"overallMin": 96.94
+		},
+		{
+			"courses_avg": 96.96,
+			"courses_dept": "spph",
+			"overallMin": 96.96
+		},
+		{
+			"courses_avg": 97,
+			"courses_dept": "crwr",
+			"overallMin": 97
+		},
+		{
+			"courses_avg": 97,
+			"courses_dept": "epse",
+			"overallMin": 97
+		},
+		{
+			"courses_avg": 97,
+			"courses_dept": "psyc",
+			"overallMin": 97
+		},
+		{
+			"courses_avg": 97.09,
+			"courses_dept": "epse",
+			"overallMin": 97.09
+		},
+		{
+			"courses_avg": 97.09,
+			"courses_dept": "math",
+			"overallMin": 97.09
+		},
+		{
+			"courses_avg": 97.25,
+			"courses_dept": "math",
+			"overallMin": 97.25
+		},
+		{
+			"courses_avg": 97.29,
+			"courses_dept": "epse",
+			"overallMin": 97.29
+		},
+		{
+			"courses_avg": 97.33,
+			"courses_dept": "nurs",
+			"overallMin": 97.33
+		},
+		{
+			"courses_avg": 97.41,
+			"courses_dept": "epse",
+			"overallMin": 97.41
+		},
+		{
+			"courses_avg": 97.47,
+			"courses_dept": "cnps",
+			"overallMin": 97.47
+		},
+		{
+			"courses_avg": 97.48,
+			"courses_dept": "math",
+			"overallMin": 97.48
+		},
+		{
+			"courses_avg": 97.5,
+			"courses_dept": "educ",
+			"overallMin": 97.5
+		},
+		{
+			"courses_avg": 97.53,
+			"courses_dept": "nurs",
+			"overallMin": 97.53
+		},
+		{
+			"courses_avg": 97.67,
+			"courses_dept": "epse",
+			"overallMin": 97.67
+		},
+		{
+			"courses_avg": 97.69,
+			"courses_dept": "epse",
+			"overallMin": 97.69
+		},
+		{
+			"courses_avg": 97.78,
+			"courses_dept": "epse",
+			"overallMin": 97.78
+		},
+		{
+			"courses_avg": 98,
+			"courses_dept": "crwr",
+			"overallMin": 98
+		},
+		{
+			"courses_avg": 98.08,
+			"courses_dept": "epse",
+			"overallMin": 98.08
+		},
+		{
+			"courses_avg": 98.21,
+			"courses_dept": "nurs",
+			"overallMin": 98.21
+		},
+		{
+			"courses_avg": 98.36,
+			"courses_dept": "epse",
+			"overallMin": 98.36
+		},
+		{
+			"courses_avg": 98.45,
+			"courses_dept": "epse",
+			"overallMin": 98.45
+		},
+		{
+			"courses_avg": 98.5,
+			"courses_dept": "nurs",
+			"overallMin": 98.5
+		},
+		{
+			"courses_avg": 98.58,
+			"courses_dept": "epse",
+			"overallMin": 98.58
+		},
+		{
+			"courses_avg": 98.58,
+			"courses_dept": "nurs",
+			"overallMin": 98.58
+		},
+		{
+			"courses_avg": 98.7,
+			"courses_dept": "epse",
+			"overallMin": 98.7
+		},
+		{
+			"courses_avg": 98.71,
+			"courses_dept": "nurs",
+			"overallMin": 98.71
+		},
+		{
+			"courses_avg": 98.75,
+			"courses_dept": "eece",
+			"overallMin": 98.75
+		},
+		{
+			"courses_avg": 98.76,
+			"courses_dept": "epse",
+			"overallMin": 98.76
+		},
+		{
+			"courses_avg": 98.8,
+			"courses_dept": "epse",
+			"overallMin": 98.8
+		},
+		{
+			"courses_avg": 98.98,
+			"courses_dept": "spph",
+			"overallMin": 98.98
+		},
+		{
+			"courses_avg": 99.19,
+			"courses_dept": "cnps",
+			"overallMin": 99.19
+		},
+		{
+			"courses_avg": 99.78,
+			"courses_dept": "math",
+			"overallMin": 99.78
+		}
+	]
+}
