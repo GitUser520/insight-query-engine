@@ -13,6 +13,8 @@ import * as fs from "fs-extra";
 import {folderTest} from "@ubccpsc310/folder-test";
 import {expect} from "chai";
 import InsightFacade from "../../src/controller/InsightFacade";
+import {QueryStructure} from "../../src/model/QueryInterfaces";
+import {EBNFHelper} from "../../src/model/EBNFHelper";
 
 
 describe("InsightFacade", function () {
@@ -520,8 +522,41 @@ describe("InsightFacade", function () {
 				assertOnResult(actual, expected, input) {
 					expect(actual).to.deep.members(expected);
 					expect(actual.length).equal(expected.length);
+					// TODO make a test for the order
+					// expect(actual).to.deep.equals(expected);
+					expect(checkOrder(actual, input)).to.equal(true);
 				},
 			}
 		);
 	});
 });
+
+function checkOrder(array: InsightResult[], input: unknown): boolean {
+	let options = (input as QueryStructure).OPTIONS;
+	let order = options.ORDER;
+	if (options === null && options === undefined) {
+		return false;
+	}
+	if (order === null) {
+		return false;
+	}
+	if (order === undefined) {
+		return true;
+	}
+
+	let valid = true;
+	console.log(order);
+	if (EBNFHelper.isInstanceOfOrderValue(order)) {
+		return false;
+	} else {
+		for (let i = 1; i < array.length; i++) {
+			let currentOrderValid = (array[i - 1] as any)[order] <= (array[i] as any)[order];
+			if (!currentOrderValid) {
+				console.log("These are in wrong order: \n" +
+					JSON.stringify(array[i - 1]) + "\n" + JSON.stringify(array[i]));
+			}
+			valid = valid && currentOrderValid;
+		}
+	}
+	return valid;
+}
