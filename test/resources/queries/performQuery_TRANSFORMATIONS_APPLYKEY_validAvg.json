@@ -1,0 +1,1117 @@
+{
+	"title": "performQuery: Transformation valid group by AVG",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"courses_avg": 95
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_id",
+				"courses_instructor",
+				"courses_title",
+				"overallAvg"
+			],
+			"ORDER": {
+				"dir": "UP",
+				"keys": [
+					"courses_instructor",
+					"courses_title",
+					"courses_id"
+				]
+			}
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": [
+				"courses_title",
+				"courses_instructor",
+				"courses_id"
+			],
+			"APPLY": [
+				{
+					"overallAvg": {
+						"AVG": "courses_avg"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"courses_id": "516",
+			"courses_instructor": "",
+			"courses_title": "able&creatv lrnr",
+			"overallAvg": 95.3
+		},
+		{
+			"courses_id": "534",
+			"courses_instructor": "",
+			"courses_title": "acad assess schl",
+			"overallAvg": 97.41
+		},
+		{
+			"courses_id": "575",
+			"courses_instructor": "",
+			"courses_title": "acad libraries",
+			"overallAvg": 96.1
+		},
+		{
+			"courses_id": "520",
+			"courses_instructor": "",
+			"courses_title": "adlt edu pract",
+			"overallAvg": 96.46
+		},
+		{
+			"courses_id": "532",
+			"courses_instructor": "",
+			"courses_title": "algb geometry i",
+			"overallAvg": 97.48
+		},
+		{
+			"courses_id": "527",
+			"courses_instructor": "",
+			"courses_title": "algb topology i",
+			"overallAvg": 99.78
+		},
+		{
+			"courses_id": "502",
+			"courses_instructor": "",
+			"courses_title": "algebra ii",
+			"overallAvg": 96.44
+		},
+		{
+			"courses_id": "421",
+			"courses_instructor": "",
+			"courses_title": "assess lrn diffi",
+			"overallAvg": 97.83
+		},
+		{
+			"courses_id": "550",
+			"courses_instructor": "",
+			"courses_title": "aud&non-txt arch",
+			"overallAvg": 96.94
+		},
+		{
+			"courses_id": "568",
+			"courses_instructor": "",
+			"courses_title": "audi prctcm iv",
+			"overallAvg": 96.9
+		},
+		{
+			"courses_id": "411",
+			"courses_instructor": "",
+			"courses_title": "augmt&alt comm",
+			"overallAvg": 95.5
+		},
+		{
+			"courses_id": "528",
+			"courses_instructor": "",
+			"courses_title": "basic princ meas",
+			"overallAvg": 95.86
+		},
+		{
+			"courses_id": "574",
+			"courses_instructor": "",
+			"courses_title": "career planning",
+			"overallAvg": 97.47
+		},
+		{
+			"courses_id": "509",
+			"courses_instructor": "",
+			"courses_title": "cl pro prim care",
+			"overallAvg": 96.55
+		},
+		{
+			"courses_id": "432",
+			"courses_instructor": "",
+			"courses_title": "classroom mgmt",
+			"overallAvg": 95.67
+		},
+		{
+			"courses_id": "566",
+			"courses_instructor": "",
+			"courses_title": "clin make iv",
+			"overallAvg": 95.37
+		},
+		{
+			"courses_id": "101",
+			"courses_instructor": "",
+			"courses_title": "cnsl mat cr prov",
+			"overallAvg": 96.5
+		},
+		{
+			"courses_id": "545",
+			"courses_instructor": "",
+			"courses_title": "com hlth prom",
+			"overallAvg": 95.09
+		},
+		{
+			"courses_id": "596",
+			"courses_instructor": "",
+			"courses_title": "cor des ed res",
+			"overallAvg": 97.09
+		},
+		{
+			"courses_id": "514",
+			"courses_instructor": "",
+			"courses_title": "counsl adolescnt",
+			"overallAvg": 95.36
+		},
+		{
+			"courses_id": "520",
+			"courses_instructor": "",
+			"courses_title": "cur dev e df&hrd",
+			"overallAvg": 95.83
+		},
+		{
+			"courses_id": "519",
+			"courses_instructor": "",
+			"courses_title": "dev el sk df&hrd",
+			"overallAvg": 98.45
+		},
+		{
+			"courses_id": "568",
+			"courses_instructor": "",
+			"courses_title": "dev neuropsych",
+			"overallAvg": 95.17
+		},
+		{
+			"courses_id": "525",
+			"courses_instructor": "",
+			"courses_title": "diff geometry i",
+			"overallAvg": 97.25
+		},
+		{
+			"courses_id": "562",
+			"courses_instructor": "",
+			"courses_title": "ds intl forstry",
+			"overallAvg": 96.36
+		},
+		{
+			"courses_id": "377",
+			"courses_instructor": "",
+			"courses_title": "ds tec ii sc c&p",
+			"overallAvg": 95.58
+		},
+		{
+			"courses_id": "508",
+			"courses_instructor": "",
+			"courses_title": "dynam struct 2",
+			"overallAvg": 96.27
+		},
+		{
+			"courses_id": "408",
+			"courses_instructor": "",
+			"courses_title": "ed prg hghly abl",
+			"overallAvg": 95.22
+		},
+		{
+			"courses_id": "449",
+			"courses_instructor": "",
+			"courses_title": "educ stds autism",
+			"overallAvg": 97.69
+		},
+		{
+			"courses_id": "537",
+			"courses_instructor": "",
+			"courses_title": "eth & prof clin",
+			"overallAvg": 95.75
+		},
+		{
+			"courses_id": "591",
+			"courses_instructor": "",
+			"courses_title": "eth&profl issues",
+			"overallAvg": 97.03
+		},
+		{
+			"courses_id": "592",
+			"courses_instructor": "",
+			"courses_title": "exp des anl ed",
+			"overallAvg": 95.16
+		},
+		{
+			"courses_id": "578",
+			"courses_instructor": "",
+			"courses_title": "fam nrs pract",
+			"overallAvg": 97.97
+		},
+		{
+			"courses_id": "505",
+			"courses_instructor": "",
+			"courses_title": "fn & educ change",
+			"overallAvg": 95.78
+		},
+		{
+			"courses_id": "510",
+			"courses_instructor": "",
+			"courses_title": "functional analy",
+			"overallAvg": 95.67
+		},
+		{
+			"courses_id": "541",
+			"courses_instructor": "",
+			"courses_title": "harmonic anal i",
+			"overallAvg": 97.09
+		},
+		{
+			"courses_id": "501",
+			"courses_instructor": "",
+			"courses_title": "health psych",
+			"overallAvg": 96
+		},
+		{
+			"courses_id": "564",
+			"courses_instructor": "",
+			"courses_title": "hydrmtllgcl rctr",
+			"overallAvg": 96.25
+		},
+		{
+			"courses_id": "521",
+			"courses_instructor": "",
+			"courses_title": "indig, tech&ed",
+			"overallAvg": 95.63
+		},
+		{
+			"courses_id": "312",
+			"courses_instructor": "",
+			"courses_title": "intro excp child",
+			"overallAvg": 96.03
+		},
+		{
+			"courses_id": "541",
+			"courses_instructor": "",
+			"courses_title": "intro psychthrpy",
+			"overallAvg": 95.25
+		},
+		{
+			"courses_id": "357",
+			"courses_instructor": "",
+			"courses_title": "islnd wild mgmt",
+			"overallAvg": 95.28
+		},
+		{
+			"courses_id": "499",
+			"courses_instructor": "",
+			"courses_title": "kin project",
+			"overallAvg": 96
+		},
+		{
+			"courses_id": "534",
+			"courses_instructor": "",
+			"courses_title": "lie theory i",
+			"overallAvg": 95.56
+		},
+		{
+			"courses_id": "549",
+			"courses_instructor": "",
+			"courses_title": "masters thesis",
+			"overallAvg": 96.5
+		},
+		{
+			"courses_id": "518",
+			"courses_instructor": "",
+			"courses_title": "math mdl com dis",
+			"overallAvg": 95.75
+		},
+		{
+			"courses_id": "553",
+			"courses_instructor": "",
+			"courses_title": "math operations",
+			"overallAvg": 95.31
+		},
+		{
+			"courses_id": "501",
+			"courses_instructor": "",
+			"courses_title": "med tech project",
+			"overallAvg": 95.15
+		},
+		{
+			"courses_id": "553",
+			"courses_instructor": "",
+			"courses_title": "mgmt sc meth",
+			"overallAvg": 95.43
+		},
+		{
+			"courses_id": "333",
+			"courses_instructor": "",
+			"courses_title": "mo pict prod i",
+			"overallAvg": 96.4
+		},
+		{
+			"courses_id": "549",
+			"courses_instructor": "",
+			"courses_title": "ms thesis",
+			"overallAvg": 96
+		},
+		{
+			"courses_id": "589",
+			"courses_instructor": "",
+			"courses_title": "msc major essay",
+			"overallAvg": 96.33
+		},
+		{
+			"courses_id": "541",
+			"courses_instructor": "",
+			"courses_title": "multimedia sys",
+			"overallAvg": 98.75
+		},
+		{
+			"courses_id": "595",
+			"courses_instructor": "",
+			"courses_title": "nat resrce mngmt",
+			"overallAvg": 96.47
+		},
+		{
+			"courses_id": "506",
+			"courses_instructor": "",
+			"courses_title": "orch repertoire",
+			"overallAvg": 95.67
+		},
+		{
+			"courses_id": "565",
+			"courses_instructor": "",
+			"courses_title": "phyl asp phy act",
+			"overallAvg": 95.71
+		},
+		{
+			"courses_id": "530",
+			"courses_instructor": "",
+			"courses_title": "prep writ career",
+			"overallAvg": 95.7
+		},
+		{
+			"courses_id": "584",
+			"courses_instructor": "",
+			"courses_title": "prgm devl cnsl",
+			"overallAvg": 96.16
+		},
+		{
+			"courses_id": "545",
+			"courses_instructor": "",
+			"courses_title": "probability ii",
+			"overallAvg": 96.83
+		},
+		{
+			"courses_id": "516",
+			"courses_instructor": "",
+			"courses_title": "prt diff equa i",
+			"overallAvg": 96.25
+		},
+		{
+			"courses_id": "508",
+			"courses_instructor": "",
+			"courses_title": "quant fld theory",
+			"overallAvg": 95.43
+		},
+		{
+			"courses_id": "350",
+			"courses_instructor": "",
+			"courses_title": "scenery prod i",
+			"overallAvg": 95.2
+		},
+		{
+			"courses_id": "504",
+			"courses_instructor": "",
+			"courses_title": "schl counselling",
+			"overallAvg": 95.78
+		},
+		{
+			"courses_id": "393",
+			"courses_instructor": "",
+			"courses_title": "seminar",
+			"overallAvg": 95.18
+		},
+		{
+			"courses_id": "505",
+			"courses_instructor": "",
+			"courses_title": "social analysis",
+			"overallAvg": 96.04
+		},
+		{
+			"courses_id": "200",
+			"courses_instructor": "",
+			"courses_title": "sociocult determ",
+			"overallAvg": 95.76
+		},
+		{
+			"courses_id": "526",
+			"courses_instructor": "",
+			"courses_title": "specific lrn dis",
+			"overallAvg": 96.33
+		},
+		{
+			"courses_id": "436",
+			"courses_instructor": "",
+			"courses_title": "surv bhvr dis ch",
+			"overallAvg": 95.47
+		},
+		{
+			"courses_id": "515",
+			"courses_instructor": "",
+			"courses_title": "survlnc&monitrng",
+			"overallAvg": 96.8
+		},
+		{
+			"courses_id": "303",
+			"courses_instructor": "",
+			"courses_title": "tch'g hghly able",
+			"overallAvg": 96
+		},
+		{
+			"courses_id": "320",
+			"courses_instructor": "",
+			"courses_title": "tchg st visl imp",
+			"overallAvg": 95.27
+		},
+		{
+			"courses_id": "415",
+			"courses_instructor": "",
+			"courses_title": "tech for vis imp",
+			"overallAvg": 95.67
+		},
+		{
+			"courses_id": "533",
+			"courses_instructor": "",
+			"courses_title": "tech math sci",
+			"overallAvg": 95.58
+		},
+		{
+			"courses_id": "551",
+			"courses_instructor": "",
+			"courses_title": "thermodynamics",
+			"overallAvg": 95.54
+		},
+		{
+			"courses_id": "553",
+			"courses_instructor": "",
+			"courses_title": "thy cognt assess",
+			"overallAvg": 95.31
+		},
+		{
+			"courses_id": "559",
+			"courses_instructor": "",
+			"courses_title": "ubc chamb string",
+			"overallAvg": 96.5
+		},
+		{
+			"courses_id": "300",
+			"courses_instructor": "",
+			"courses_title": "work int health",
+			"overallAvg": 98.98
+		},
+		{
+			"courses_id": "568",
+			"courses_instructor": "adelman, sharon",
+			"courses_title": "audi prctcm iv",
+			"overallAvg": 96.9
+		},
+		{
+			"courses_id": "500",
+			"courses_instructor": "adler, james douglas;scott, sandra",
+			"courses_title": "res mthd in educ",
+			"overallAvg": 95.16
+		},
+		{
+			"courses_id": "534",
+			"courses_instructor": "amaral, deborah;ford, laurie",
+			"courses_title": "acad assess schl",
+			"overallAvg": 97.39
+		},
+		{
+			"courses_id": "329",
+			"courses_instructor": "bishundayal, deonarine",
+			"courses_title": "dev wkshp/sem",
+			"overallAvg": 96.11
+		},
+		{
+			"courses_id": "509",
+			"courses_instructor": "brew, nancy",
+			"courses_title": "cl pro prim care",
+			"overallAvg": 97.07
+		},
+		{
+			"courses_id": "591",
+			"courses_instructor": "brew, nancy",
+			"courses_title": "eth&profl issues",
+			"overallAvg": 97.33
+		},
+		{
+			"courses_id": "505",
+			"courses_instructor": "bryson, stephanie;o'connor, deborah;stainton, timothy;sullivan, t richard;tester, frank",
+			"courses_title": "social analysis",
+			"overallAvg": 96.15
+		},
+		{
+			"courses_id": "591",
+			"courses_instructor": "burrows, marlene",
+			"courses_title": "eth&profl issues",
+			"overallAvg": 96.73
+		},
+		{
+			"courses_id": "578",
+			"courses_instructor": "burrows, marlene;harding, jillian;krist, jennifer;mccuaig, fairleth",
+			"courses_title": "fam nrs pract",
+			"overallAvg": 98.02
+		},
+		{
+			"courses_id": "530",
+			"courses_instructor": "campbell, deborah",
+			"courses_title": "prep writ career",
+			"overallAvg": 95.7
+		},
+		{
+			"courses_id": "599",
+			"courses_instructor": "campbell, deborah",
+			"courses_title": "thesis",
+			"overallAvg": 97
+		},
+		{
+			"courses_id": "519",
+			"courses_instructor": "cannon, joanna",
+			"courses_title": "dev el sk df&hrd",
+			"overallAvg": 98.45
+		},
+		{
+			"courses_id": "584",
+			"courses_instructor": "carter, john",
+			"courses_title": "prgm devl cnsl",
+			"overallAvg": 96
+		},
+		{
+			"courses_id": "436",
+			"courses_instructor": "champion, kathleen",
+			"courses_title": "surv bhvr dis ch",
+			"overallAvg": 95.47
+		},
+		{
+			"courses_id": "528",
+			"courses_instructor": "chan, eric",
+			"courses_title": "basic princ meas",
+			"overallAvg": 95.86
+		},
+		{
+			"courses_id": "421",
+			"courses_instructor": "cole, kenneth",
+			"courses_title": "assess lrn diffi",
+			"overallAvg": 97.57
+		},
+		{
+			"courses_id": "541",
+			"courses_instructor": "coria, lino",
+			"courses_title": "multimedia sys",
+			"overallAvg": 98.75
+		},
+		{
+			"courses_id": "574",
+			"courses_instructor": "cox, daniel",
+			"courses_title": "career planning",
+			"overallAvg": 99.19
+		},
+		{
+			"courses_id": "584",
+			"courses_instructor": "cox, daniel",
+			"courses_title": "prgm devl cnsl",
+			"overallAvg": 96.33
+		},
+		{
+			"courses_id": "501",
+			"courses_instructor": "de longis, anita",
+			"courses_title": "health psych",
+			"overallAvg": 96
+		},
+		{
+			"courses_id": "564",
+			"courses_instructor": "dixon, david",
+			"courses_title": "hydrmtllgcl rctr",
+			"overallAvg": 96.25
+		},
+		{
+			"courses_id": "595",
+			"courses_instructor": "dorcey, anthony h j",
+			"courses_title": "nat resrce mngmt",
+			"overallAvg": 96.47
+		},
+		{
+			"courses_id": "553",
+			"courses_instructor": "dunbar, w scott",
+			"courses_title": "mgmt sc meth",
+			"overallAvg": 95.52
+		},
+		{
+			"courses_id": "432",
+			"courses_instructor": "ervin, ruth",
+			"courses_title": "classroom mgmt",
+			"overallAvg": 96.21
+		},
+		{
+			"courses_id": "575",
+			"courses_instructor": "farrell, adam",
+			"courses_title": "acad libraries",
+			"overallAvg": 96.1
+		},
+		{
+			"courses_id": "531",
+			"courses_instructor": "feng, francis",
+			"courses_title": "curric issu",
+			"overallAvg": 95.33
+		},
+		{
+			"courses_id": "553",
+			"courses_instructor": "ford, laurie",
+			"courses_title": "thy cognt assess",
+			"overallAvg": 95.31
+		},
+		{
+			"courses_id": "300",
+			"courses_instructor": "frank, erica",
+			"courses_title": "work int health",
+			"overallAvg": 98.98
+		},
+		{
+			"courses_id": "545",
+			"courses_instructor": "frankish, charles james",
+			"courses_title": "com hlth prom",
+			"overallAvg": 95.09
+		},
+		{
+			"courses_id": "200",
+			"courses_instructor": "frankish, charles james",
+			"courses_title": "sociocult determ",
+			"overallAvg": 96.96
+		},
+		{
+			"courses_id": "525",
+			"courses_instructor": "fraser, ailana",
+			"courses_title": "diff geometry i",
+			"overallAvg": 97.25
+		},
+		{
+			"courses_id": "599",
+			"courses_instructor": "galloway, steve",
+			"courses_title": "thesis",
+			"overallAvg": 96
+		},
+		{
+			"courses_id": "312",
+			"courses_instructor": "gaster, sean",
+			"courses_title": "intro excp child",
+			"overallAvg": 96.9
+		},
+		{
+			"courses_id": "551",
+			"courses_instructor": "gill, deana",
+			"courses_title": "hlth & soc care",
+			"overallAvg": 96.09
+		},
+		{
+			"courses_id": "505",
+			"courses_instructor": "gill, deana",
+			"courses_title": "social analysis",
+			"overallAvg": 95.93
+		},
+		{
+			"courses_id": "506",
+			"courses_instructor": "girard, jonathan",
+			"courses_title": "orch repertoire",
+			"overallAvg": 95.38
+		},
+		{
+			"courses_id": "559",
+			"courses_instructor": "girard, jonathan",
+			"courses_title": "ubc chamb string",
+			"overallAvg": 96.5
+		},
+		{
+			"courses_id": "527",
+			"courses_instructor": "gomez, jose",
+			"courses_title": "algb topology i",
+			"overallAvg": 99.78
+		},
+		{
+			"courses_id": "553",
+			"courses_instructor": "gopaluni, bhushan",
+			"courses_title": "math operations",
+			"overallAvg": 95.31
+		},
+		{
+			"courses_id": "551",
+			"courses_instructor": "gopaluni, bhushan",
+			"courses_title": "thermodynamics",
+			"overallAvg": 95.54
+		},
+		{
+			"courses_id": "534",
+			"courses_instructor": "gordon, julia yulia",
+			"courses_title": "lie theory i",
+			"overallAvg": 95.56
+		},
+		{
+			"courses_id": "599",
+			"courses_instructor": "grady, albert wayne",
+			"courses_title": "thesis",
+			"overallAvg": 98
+		},
+		{
+			"courses_id": "449",
+			"courses_instructor": "grow, laura",
+			"courses_title": "educ stds autism",
+			"overallAvg": 97.57
+		},
+		{
+			"courses_id": "549",
+			"courses_instructor": "grow, laura",
+			"courses_title": "sem in autism",
+			"overallAvg": 97.69
+		},
+		{
+			"courses_id": "509",
+			"courses_instructor": "harding, jillian",
+			"courses_title": "cl pro prim care",
+			"overallAvg": 95.13
+		},
+		{
+			"courses_id": "501",
+			"courses_instructor": "hodgson, antony",
+			"courses_title": "med tech project",
+			"overallAvg": 95.15
+		},
+		{
+			"courses_id": "120",
+			"courses_instructor": "jackson, howard",
+			"courses_title": "log & crit think",
+			"overallAvg": 96
+		},
+		{
+			"courses_id": "532",
+			"courses_instructor": "karu, kalle",
+			"courses_title": "algb geometry i",
+			"overallAvg": 97.48
+		},
+		{
+			"courses_id": "502",
+			"courses_instructor": "karu, kalle",
+			"courses_title": "algebra ii",
+			"overallAvg": 96.44
+		},
+		{
+			"courses_id": "515",
+			"courses_instructor": "kishchenko, svetlana",
+			"courses_title": "survlnc&monitrng",
+			"overallAvg": 96.8
+		},
+		{
+			"courses_id": "528",
+			"courses_instructor": "kishor, nand",
+			"courses_title": "basic princ meas",
+			"overallAvg": 95.57
+		},
+		{
+			"courses_id": "596",
+			"courses_instructor": "kishor, nand",
+			"courses_title": "cor des ed res",
+			"overallAvg": 96.21
+		},
+		{
+			"courses_id": "592",
+			"courses_instructor": "kishor, nand",
+			"courses_title": "exp des anl ed",
+			"overallAvg": 95.13
+		},
+		{
+			"courses_id": "482",
+			"courses_instructor": "kishor, nand",
+			"courses_title": "intr stat rs edu",
+			"overallAvg": 95.11
+		},
+		{
+			"courses_id": "509",
+			"courses_instructor": "krist, jennifer",
+			"courses_title": "cl pro prim care",
+			"overallAvg": 98.21
+		},
+		{
+			"courses_id": "578",
+			"courses_instructor": "krist, jennifer",
+			"courses_title": "fam nrs pract",
+			"overallAvg": 96.64
+		},
+		{
+			"courses_id": "509",
+			"courses_instructor": "krist, jennifer;mccuaig, fairleth",
+			"courses_title": "cl pro prim care",
+			"overallAvg": 95.29
+		},
+		{
+			"courses_id": "541",
+			"courses_instructor": "laba, izabella",
+			"courses_title": "harmonic anal i",
+			"overallAvg": 97.09
+		},
+		{
+			"courses_id": "403",
+			"courses_instructor": "lalji, fawziah;seto, katherine",
+			"courses_title": "admn of injectns",
+			"overallAvg": 95.07
+		},
+		{
+			"courses_id": "415",
+			"courses_instructor": "levinson, tami",
+			"courses_title": "tech for vis imp",
+			"overallAvg": 95.67
+		},
+		{
+			"courses_id": "377",
+			"courses_instructor": "magee, theresa",
+			"courses_title": "ds tec ii sc c&p",
+			"overallAvg": 95.58
+		},
+		{
+			"courses_id": "599",
+			"courses_instructor": "maillard, keith",
+			"courses_title": "thesis",
+			"overallAvg": 96.67
+		},
+		{
+			"courses_id": "505",
+			"courses_instructor": "marker, michael",
+			"courses_title": "fn & educ change",
+			"overallAvg": 95.78
+		},
+		{
+			"courses_id": "521",
+			"courses_instructor": "marker, michael",
+			"courses_title": "indig, tech&ed",
+			"overallAvg": 95.63
+		},
+		{
+			"courses_id": "411",
+			"courses_instructor": "mceachern hughes, tammy",
+			"courses_title": "augmt&alt comm",
+			"overallAvg": 95.5
+		},
+		{
+			"courses_id": "350",
+			"courses_instructor": "mclean, jayson",
+			"courses_title": "scenery prod i",
+			"overallAvg": 95.2
+		},
+		{
+			"courses_id": "526",
+			"courses_instructor": "mcquarrie, maureen",
+			"courses_title": "specific lrn dis",
+			"overallAvg": 96.33
+		},
+		{
+			"courses_id": "101",
+			"courses_instructor": "mcrae, lorna",
+			"courses_title": "cnsl mat cr prov",
+			"overallAvg": 96.5
+		},
+		{
+			"courses_id": "599",
+			"courses_instructor": "medved, maureen",
+			"courses_title": "thesis",
+			"overallAvg": 96
+		},
+		{
+			"courses_id": "533",
+			"courses_instructor": "milner-bolotin, marina",
+			"courses_title": "tech math sci",
+			"overallAvg": 95.58
+		},
+		{
+			"courses_id": "500",
+			"courses_instructor": "morgan, tannis",
+			"courses_title": "res mthd in educ",
+			"overallAvg": 97.5
+		},
+		{
+			"courses_id": "586",
+			"courses_instructor": "munteanu, mircea",
+			"courses_title": "",
+			"overallAvg": 95.36
+		},
+		{
+			"courses_id": "510",
+			"courses_instructor": "murugan, mathav",
+			"courses_title": "functional analy",
+			"overallAvg": 95.67
+		},
+		{
+			"courses_id": "545",
+			"courses_instructor": "nachmias, asaf",
+			"courses_title": "probability ii",
+			"overallAvg": 96.83
+		},
+		{
+			"courses_id": "574",
+			"courses_instructor": "neault, roberta a",
+			"courses_title": "career planning",
+			"overallAvg": 97.47
+		},
+		{
+			"courses_id": "504",
+			"courses_instructor": "owens, rhea",
+			"courses_title": "schl counselling",
+			"overallAvg": 95.78
+		},
+		{
+			"courses_id": "531",
+			"courses_instructor": "petrina, stephen",
+			"courses_title": "curric issu",
+			"overallAvg": 95.63
+		},
+		{
+			"courses_id": "516",
+			"courses_instructor": "porath, marion",
+			"courses_title": "able&creatv lrnr",
+			"overallAvg": 95.41
+		},
+		{
+			"courses_id": "606",
+			"courses_instructor": "porath, marion",
+			"courses_title": "coll&uni teachng",
+			"overallAvg": 97.67
+		},
+		{
+			"courses_id": "408",
+			"courses_instructor": "porath, marion",
+			"courses_title": "ed prg hghly abl",
+			"overallAvg": 95.22
+		},
+		{
+			"courses_id": "505",
+			"courses_instructor": "porath, marion",
+			"courses_title": "hn dev: inf-adlt",
+			"overallAvg": 96.23
+		},
+		{
+			"courses_id": "303",
+			"courses_instructor": "porath, marion",
+			"courses_title": "tch'g hghly able",
+			"overallAvg": 96
+		},
+		{
+			"courses_id": "518",
+			"courses_instructor": "pourbohloul, babak",
+			"courses_title": "math mdl com dis",
+			"overallAvg": 95.75
+		},
+		{
+			"courses_id": "312",
+			"courses_instructor": "romero, amber",
+			"courses_title": "intro excp child",
+			"overallAvg": 95.15
+		},
+		{
+			"courses_id": "432",
+			"courses_instructor": "smith, gillian",
+			"courses_title": "classroom mgmt",
+			"overallAvg": 95.13
+		},
+		{
+			"courses_id": "500",
+			"courses_instructor": "sobolev, boris",
+			"courses_title": "an meth epid res",
+			"overallAvg": 95.11
+		},
+		{
+			"courses_id": "537",
+			"courses_instructor": "sochting, ingrid",
+			"courses_title": "eth & prof clin",
+			"overallAvg": 95.75
+		},
+		{
+			"courses_id": "508",
+			"courses_instructor": "stamp, philip c",
+			"courses_title": "quant fld theory",
+			"overallAvg": 95.43
+		},
+		{
+			"courses_id": "312",
+			"courses_instructor": "stockman, james",
+			"courses_title": "intro excp child",
+			"overallAvg": 96.03
+		},
+		{
+			"courses_id": "599",
+			"courses_instructor": "taylor, timothy",
+			"courses_title": "thesis",
+			"overallAvg": 96
+		},
+		{
+			"courses_id": "562",
+			"courses_instructor": "timko, joleen",
+			"courses_title": "ds intl forstry",
+			"overallAvg": 96.36
+		},
+		{
+			"courses_id": "520",
+			"courses_instructor": "vanwynsberghe, robert",
+			"courses_title": "adlt edu pract",
+			"overallAvg": 96.46
+		},
+		{
+			"courses_id": "393",
+			"courses_instructor": "veiga, marcello",
+			"courses_title": "seminar",
+			"overallAvg": 96.59
+		},
+		{
+			"courses_id": "508",
+			"courses_instructor": "ventura, carlos estuardo",
+			"courses_title": "dynam struct 2",
+			"overallAvg": 96.27
+		},
+		{
+			"courses_id": "541",
+			"courses_instructor": "wagner, john",
+			"courses_title": "intro psychthrpy",
+			"overallAvg": 95.25
+		},
+		{
+			"courses_id": "279",
+			"courses_instructor": "wassink, berend",
+			"courses_title": "eng mtls lab",
+			"overallAvg": 95.73
+		},
+		{
+			"courses_id": "568",
+			"courses_instructor": "weber, rachel",
+			"courses_title": "dev neuropsych",
+			"overallAvg": 95.17
+		},
+		{
+			"courses_id": "516",
+			"courses_instructor": "wei, juncheng",
+			"courses_title": "prt diff equa i",
+			"overallAvg": 96.25
+		},
+		{
+			"courses_id": "514",
+			"courses_instructor": "weinberg, mark",
+			"courses_title": "counsl adolescnt",
+			"overallAvg": 95.36
+		},
+		{
+			"courses_id": "333",
+			"courses_instructor": "wenzek, rob",
+			"courses_title": "mo pict prod i",
+			"overallAvg": 96.4
+		},
+		{
+			"courses_id": "449",
+			"courses_instructor": "wilk, diana",
+			"courses_title": "educ stds autism",
+			"overallAvg": 97.41
+		},
+		{
+			"courses_id": "592",
+			"courses_instructor": "wu, amery",
+			"courses_title": "exp des anl ed",
+			"overallAvg": 95.67
+		}
+	]
+}

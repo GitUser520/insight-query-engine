@@ -1,0 +1,33 @@
+{
+	"title": "performQuery: Transformation invalid apply key value",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"courses_avg": 95
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"courses_avg",
+				"courses_dept",
+				"overallAvg"
+			],
+			"ORDER": {
+				"dir": "UP",
+				"keys": [
+					"courses_avg",
+					"courses_dept"
+				]
+			}
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": [
+				"courses_avg",
+				"courses_dept"
+			],
+			"APPLY": 100
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}
