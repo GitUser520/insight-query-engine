@@ -65,7 +65,7 @@ export type Group = Key[];
 export type ApplyKey = string;	// format: [^_]+
 
 export interface ApplyRule {
-	[applyKey: string]: ApplyRuleApplyKey
+	[applyKey: ApplyKey]: ApplyRuleApplyKey
 }
 
 // APPLYTOKEN = 'MAX' | 'MIN' | 'AVG' | 'COUNT' | 'SUM'

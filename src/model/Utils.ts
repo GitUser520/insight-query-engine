@@ -2,7 +2,6 @@ import {Key, MKey, MKeyPair, SKey, SKeyPair} from "./QueryInterfaces";
 import {InsightError, InsightResult} from "../controller/IInsightFacade";
 import Section from "../model/Section";
 import Dataset from "./Dataset";
-import {EBNF} from "./EBNF";
 import {EBNFHelper} from "./EBNFHelper";
 import Room from "./Room";
 import {SectionRoom} from "./QueryBody";
@@ -22,13 +21,13 @@ export class Utils {
 			}
 			result.push(tempJSON as InsightResult);
 		});
-		resultSection.rooms.forEach((section: any) => {
+		resultSection.rooms.forEach((room: any) => {
 			let tempJSON: any = {};
 			let keys = Object.keys(jsonFieldTracker);
 			for (const key of keys) {
 				let currentField: string = jsonFieldTracker[key].field;
-				if (section[currentField] !== undefined) {
-					tempJSON[key] = (section as any)[currentField];
+				if (room[currentField] !== undefined) {
+					tempJSON[key] = (room as any)[currentField];
 				}
 			}
 			result.push(tempJSON as InsightResult);

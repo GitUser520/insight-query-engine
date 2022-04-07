@@ -9,8 +9,8 @@ import Room from "./Room";
 
 
 export interface SectionRoom {
-	sections: Section[],
-	rooms: Room[]
+	sections: any[],
+	rooms: any[]
 }
 
 export class QueryBody {

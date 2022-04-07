@@ -1,0 +1,144 @@
+{
+	"title": "performQuery: Transformation valid another count",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"courses_avg": 95
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"allDept"
+			],
+			"ORDER": {
+				"dir": "DOWN",
+				"keys": [
+					"allDept"
+				]
+			}
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": [
+				"courses_dept"
+			],
+			"APPLY": [
+				{
+					"allDept": {
+						"COUNT": "courses_id"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"allDept": 24
+		},
+		{
+			"allDept": 10
+		},
+		{
+			"allDept": 6
+		},
+		{
+			"allDept": 5
+		},
+		{
+			"allDept": 4
+		},
+		{
+			"allDept": 3
+		},
+		{
+			"allDept": 3
+		},
+		{
+			"allDept": 2
+		},
+		{
+			"allDept": 2
+		},
+		{
+			"allDept": 2
+		},
+		{
+			"allDept": 2
+		},
+		{
+			"allDept": 2
+		},
+		{
+			"allDept": 2
+		},
+		{
+			"allDept": 2
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		},
+		{
+			"allDept": 1
+		}
+	]
+}

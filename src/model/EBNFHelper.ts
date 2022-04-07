@@ -8,7 +8,7 @@ import {
 	Negation,
 	OrderValue,
 	SComparison,
-	SKey
+	SKey, Transformation
 } from "./QueryInterfaces";
 import {EBNF} from "./EBNF";
 import Dataset from "./Dataset";
@@ -72,6 +72,10 @@ export class EBNFHelper {
 		return valid;
 	}
 
+	public static isInstanceOfApplyKey(object: any): object is ApplyKey {
+		return typeof object === "string" && object.split("_").length === 1;
+	}
+
 	public static isInstanceOfLComparison(object: any): object is LComparison {
 		return typeof object === "object" && (object.AND !== undefined || object.OR !== undefined);
 	}
@@ -91,6 +95,10 @@ export class EBNFHelper {
 
 	public static isInstanceOfOrderValue(object: any): object is OrderValue {
 		return typeof object === "object" && (object.dir !== undefined && object.keys !== undefined);
+	}
+
+	public static isInstanceOfTransformation(object: any): object is Transformation {
+		return typeof object === "object" && (object.GROUP !== undefined && object.APPLY !== undefined);
 	}
 
 	public static checkIsValidAsteriskString(inputString: string): boolean {

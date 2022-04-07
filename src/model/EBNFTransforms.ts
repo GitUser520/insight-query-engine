@@ -1,4 +1,4 @@
-import {ApplyRule, Group, Transformation, Key} from "./QueryInterfaces";
+import {ApplyRule, Group, Transformation, Key, AnyKey} from "./QueryInterfaces";
 import Dataset from "./Dataset";
 import {EBNFHelper} from "./EBNFHelper";
 import {EBNF} from "./EBNF";
@@ -13,10 +13,21 @@ export class EBNFTransforms {
 	- MAX/MIN/AVG/SUM should only be requested for numeric keys. COUNT can be requested for all keys.
 	 */
 
-	public static checkQueryTransformations(transform: Transformation, datasets: Dataset[]): boolean {
+	public static checkQueryTransformations(transform: Transformation, datasets: Dataset[],
+		additionalColumns: AnyKey[]): boolean {
+		if (transform === undefined || !(typeof transform === "object")) {
+			return false;
+		}
 		let group = transform.GROUP;
 		let apply = transform.APPLY;
-		return this.checkValidGroup(group, datasets) && this.checkValidApply(apply, datasets);
+		if (group === null || group === undefined) {
+			return false;
+		}
+		if (apply === null || apply === undefined) {
+			return false;
+		}
+
+		return this.checkValidGroup(group, datasets) && this.checkValidApply(apply, datasets, additionalColumns);
 	}
 
 	private static checkValidGroup(group: Group, datasets: Dataset[]): boolean {
@@ -30,18 +41,19 @@ export class EBNFTransforms {
 		return valid;
 	}
 
-	private static checkValidApply(apply: ApplyRule[], datasets: Dataset[]): boolean {
+	private static checkValidApply(apply: ApplyRule[], datasets: Dataset[], additionalColumns: AnyKey[]): boolean {
 		if (!Array.isArray(apply) || apply.length === 0) {
 			return false;
 		}
 		let valid = true;
 		apply.forEach((applyRule) => {
-			valid = valid && this.checkValidApplyRule(applyRule, datasets);
+			valid = valid && this.checkValidApplyRule(applyRule, datasets, additionalColumns);
 		});
 		return valid;
 	}
 
-	private static checkValidApplyRule(applyRule: ApplyRule, datasets: Dataset[]): boolean {
+	private static checkValidApplyRule(applyRule: ApplyRule, datasets: Dataset[],
+		additionalColumns: AnyKey[]): boolean {
 		let objectKeys = Object.keys(applyRule);
 		// should only be one key
 		if (objectKeys.length !== 1) {
@@ -49,7 +61,9 @@ export class EBNFTransforms {
 		}
 		let applyKey = objectKeys[0];
 		let validApplyKey = EBNFHelper.checkValidApplyKey(applyKey);
-
+		if (validApplyKey) {
+			additionalColumns.push(applyKey);
+		}
 		let applyRuleApplyKey = applyRule[applyKey];
 		let applyRuleKeys = Object.keys(applyRuleApplyKey);
 		if (applyRuleKeys.length !== 1) {
