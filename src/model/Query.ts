@@ -44,7 +44,6 @@ export class Query {
 		let queryResults = Utils.filterByOptions(querySectionResults, jsonFieldTracker);
 		if (queryOrder !== null && queryOrder !== undefined) {
 			if (EBNFHelper.isInstanceOfOrderValue(queryOrder)) {
-				console.log("should not be here");
 				let dir = queryOrder.dir;
 				let keys = queryOrder.keys;
 				QuerySort.querySortArray(queryResults, keys, dir);

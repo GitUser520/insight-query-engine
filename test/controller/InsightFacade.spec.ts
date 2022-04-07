@@ -531,7 +531,40 @@ function checkOrder(array: InsightResult[], input: unknown): boolean {
 	let valid = true;
 	console.log(order);
 	if (EBNFHelper.isInstanceOfOrderValue(order)) {
-		return false;
+		let dir = order.dir;
+		let keys = order.keys;
+		if (dir === "UP") {
+			for (let i = 1; i < array.length; i++) {
+				for (const key of keys) {
+					let currentOrderValid = (array[i - 1] as any)[key] <= (array[i] as any)[key];
+					if (!currentOrderValid) {
+						console.log("These are in wrong order: \n" +
+							JSON.stringify(array[i - 1]) + "\n" + JSON.stringify(array[i]));
+						break;
+					}
+					if ((array[i - 1] as any)[key] < (array[i] as any)[key]) {
+						break;
+					}
+					valid = valid && currentOrderValid;
+				}
+			}
+		} else {
+			for (let i = 1; i < array.length; i++) {
+				for (const key of keys) {
+					let currentOrderValid = (array[i - 1] as any)[key] >= (array[i] as any)[key];
+					if (!currentOrderValid) {
+						console.log("These are in wrong order: \n" +
+							JSON.stringify(array[i - 1]) + "\n" + JSON.stringify(array[i]));
+						break;
+					}
+					if ((array[i - 1] as any)[key] > (array[i] as any)[key]) {
+						break;
+					}
+					valid = valid && currentOrderValid;
+				}
+			}
+		}
+
 	} else {
 		for (let i = 1; i < array.length; i++) {
 			let currentOrderValid = (array[i - 1] as any)[order] <= (array[i] as any)[order];
