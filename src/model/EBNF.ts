@@ -63,13 +63,16 @@ export class EBNF {
 		}
 		// check the body
 		let validBody = EBNFBody.checkQueryBody(queryBody, this.datasets, this);
-		// check the options
-		let validOptions = EBNFOptions.checkQueryOptions(queryOptions, this.datasets);
 		// check optional field TRANSFORMATIONS
 		let validTransformation = true;
+		let additionalColumns: AnyKey[] = [];
 		if (queryTransformations !== undefined) {
-			validTransformation = EBNFTransforms.checkQueryTransformations(queryTransformations, this.datasets);
+			validTransformation = EBNFTransforms.checkQueryTransformations(queryTransformations,
+				this.datasets, additionalColumns);
 		}
+		// check the options
+		let validOptions = EBNFOptions.checkQueryOptions(queryOptions, this.datasets, additionalColumns);
+
 
 		return validBody && validOptions && validTransformation;
 	}
