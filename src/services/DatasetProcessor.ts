@@ -119,7 +119,7 @@ export function zipRoomsProcessor(content: string): Promise<any[]> {
 				if (rooms.length === 0) {
 					return Promise.reject(new InsightError("no valid room found"));
 				}
-				console.log(rooms);
+				// console.log(rooms);
 				return Promise.resolve(rooms);
 			}).catch((err) => {
 				return Promise.reject(new InsightError("error in getting rooms " + err));
@@ -200,8 +200,11 @@ function parseBuilding(address: string, href: string, code: string, fullname: st
 			return getNodeHelper(tree, "tbody");
 		});
 		Promise.all([geoLocation, roomsData]).then(([resultGeoLocation, resultRoomsData]) => {
-			// console.log("there0");
-			if (resultGeoLocation && resultRoomsData !== null) {
+			// console.log(resultGeoLocation);
+			if (Object.prototype.hasOwnProperty.call(resultGeoLocation, "error")) {
+				return resolve(rooms);
+			}
+			if (resultRoomsData !== null) {
 				for (let roomNode of resultRoomsData.childNodes) {
 					if (roomNode.nodeName === "tr") {
 						const fullHref = "http://students.ubc.ca/" + href.slice(2);
@@ -262,6 +265,7 @@ function getGeoLocation(address: string): Promise<any> {
 			res.on("end", () => {
 				try {
 					const parsedData = JSON.parse(rawData);
+					// console.log(parsedData);
 					resolve(parsedData);
 				} catch (e: any) {
 					reject(new InsightError(e));
