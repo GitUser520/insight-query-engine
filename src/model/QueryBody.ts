@@ -42,10 +42,6 @@ export class QueryBody {
 			rooms: []
 		};
 
-		// datasets.forEach((dataset) => {
-		// 	allSections = allSections.concat(dataset.data);
-		// });
-
 		datasets.forEach((dataset) => {
 			if (dataset.kind === InsightDatasetKind.Courses) {
 				allSections.sections = allSections.sections.concat(dataset.data);
