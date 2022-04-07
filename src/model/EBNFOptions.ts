@@ -4,16 +4,16 @@ import {EBNF} from "./EBNF";
 import {EBNFHelper} from "./EBNFHelper";
 
 export class EBNFOptions {
-	public static checkQueryOptions(options: object, datasets: Dataset[]): boolean {
+	public static checkQueryOptions(options: object, datasets: Dataset[], additionalColumns: AnyKey[]): boolean {
 		let queryColumns = (options as Options).COLUMNS;
 		let queryOrder = (options as Options).ORDER;
 
 		if (queryColumns === null || queryColumns === undefined) {
 			return false;
 		}
-
+		// queryColumns = queryColumns.concat(additionalColumns);
 		// check that the columns are valid
-		let validColumns = EBNFOptions.checkQueryColumns(queryColumns, datasets);
+		let validColumns = EBNFOptions.checkQueryColumns(queryColumns, datasets, additionalColumns);
 		let validOrder = true;
 
 		if (queryOrder !== undefined) {
@@ -24,13 +24,13 @@ export class EBNFOptions {
 	}
 
 	// returns true if all elements in the array are valid keys
-	public static checkQueryColumns(column: Key[], datasets: Dataset[]): boolean {
+	public static checkQueryColumns(column: AnyKey[], datasets: Dataset[], additionalColumns: AnyKey[]): boolean {
 		if (!Array.isArray(column) || column.length === 0) {
 			return false;
 		}
 		let result = true;
 		column.forEach((key) => {
-			result = result && EBNFHelper.checkValidKey(key, datasets);
+			result = result && (additionalColumns.includes(key) || EBNFHelper.checkValidKey(key, datasets));
 		});
 
 		return result;

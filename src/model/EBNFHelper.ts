@@ -8,7 +8,7 @@ import {
 	Negation,
 	OrderValue,
 	SComparison,
-	SKey
+	SKey, Transformation
 } from "./QueryInterfaces";
 import {EBNF} from "./EBNF";
 import Dataset from "./Dataset";
@@ -19,6 +19,9 @@ URL: https://stackoverflow.com/questions/14425568/interface-type-check-with-type
 */
 export class EBNFHelper {
 	public static checkMKeyUnknownID(mkey: MKey): boolean {
+		if (typeof mkey !== "string") {
+			return false;
+		}
 		let mKeyParts = mkey.split("_");
 		if (!EBNF.coursesMField.includes(mKeyParts[1])) {
 			return false;
@@ -27,16 +30,20 @@ export class EBNFHelper {
 	}
 
 	public static checkSKeyUnknownID(skey: SKey): boolean {
+		if (typeof skey !== "string") {
+			return false;
+		}
 		let sKeyParts = skey.split("_");
-
 		if (!EBNF.coursesSField.includes(sKeyParts[1])) {
 			return false;
 		}
-
 		return true;
 	}
 
 	public static checkMKey(mkey: MKey, datasets: Dataset[]): boolean {
+		if (typeof mkey !== "string") {
+			return false;
+		}
 		let mKeyParts = mkey.split("_");
 		if (!EBNF.coursesMField.includes(mKeyParts[1])) {
 			return false;
@@ -50,18 +57,23 @@ export class EBNFHelper {
 	}
 
 	public static checkSKey(skey: SKey, datasets: Dataset[]): boolean {
+		if (typeof skey !== "string") {
+			return false;
+		}
 		let sKeyParts = skey.split("_");
-
 		if (!EBNF.coursesSField.includes(sKeyParts[1])) {
 			return false;
 		}
-
 		let valid = false;
 		datasets.forEach((dataset) => {
 			valid = valid || (dataset.id === sKeyParts[0]);
 		});
 
 		return valid;
+	}
+
+	public static isInstanceOfApplyKey(object: any): object is ApplyKey {
+		return typeof object === "string" && object.split("_").length === 1;
 	}
 
 	public static isInstanceOfLComparison(object: any): object is LComparison {
@@ -82,10 +94,17 @@ export class EBNFHelper {
 	}
 
 	public static isInstanceOfOrderValue(object: any): object is OrderValue {
-		return typeof object === "object" && (object.dirs !== undefined && object.keys !== undefined);
+		return typeof object === "object" && (object.dir !== undefined && object.keys !== undefined);
+	}
+
+	public static isInstanceOfTransformation(object: any): object is Transformation {
+		return typeof object === "object" && (object.GROUP !== undefined && object.APPLY !== undefined);
 	}
 
 	public static checkIsValidAsteriskString(inputString: string): boolean {
+		if (typeof inputString !== "string") {
+			return false;
+		}
 		let stringArray = inputString.split("*");
 		if (stringArray.length === 1) {
 			return true;
@@ -110,7 +129,10 @@ export class EBNFHelper {
 
 	// check valid apply key
 	public static checkValidApplyKey(applyKey: ApplyKey) {
-		if (applyKey === null || applyKey === undefined) {
+		// if (applyKey === null || applyKey === undefined) {
+		// 	return false;
+		// }
+		if (typeof applyKey !== "string") {
 			return false;
 		}
 		let applyKeyArray = applyKey.split("_");

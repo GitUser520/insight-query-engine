@@ -9,8 +9,8 @@ import Room from "./Room";
 
 
 export interface SectionRoom {
-	sections: Section[],
-	rooms: Room[]
+	sections: any[],
+	rooms: any[]
 }
 
 export class QueryBody {
@@ -41,10 +41,6 @@ export class QueryBody {
 			sections: [],
 			rooms: []
 		};
-
-		// datasets.forEach((dataset) => {
-		// 	allSections = allSections.concat(dataset.data);
-		// });
 
 		datasets.forEach((dataset) => {
 			if (dataset.kind === InsightDatasetKind.Courses) {
