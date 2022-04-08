@@ -5,7 +5,7 @@ import {
 	LComparison,
 	MComparison,
 	MKey,
-	Negation,
+	Negation, Options,
 	OrderValue,
 	SComparison,
 	SKey, Transformation
@@ -98,7 +98,35 @@ export class EBNFHelper {
 	}
 
 	public static isInstanceOfTransformation(object: any): object is Transformation {
-		return typeof object === "object" && (object.GROUP !== undefined && object.APPLY !== undefined);
+		let validType = typeof object === "object";
+		let keys = ["GROUP", "APPLY"];
+		let objectKeys = Object.keys(object);
+		let validKeys = true;
+		objectKeys.forEach((key) => {
+			validKeys = validKeys && keys.includes(key);
+		});
+		return validType && validKeys;
+	}
+
+	public static isInstanceOfOptions(object: any): object is Options {
+		let validType = typeof object === "object";
+		let objectKeys = Object.keys(object);
+		if (objectKeys.length === 1) {
+			let keys = ["COLUMNS"];
+			let validKeys = true;
+			objectKeys.forEach((key) => {
+				validKeys = validKeys && keys.includes(key);
+			});
+			return validType && validKeys;
+		} else if (objectKeys.length === 2) {
+			let keys = ["COLUMNS", "ORDER"];
+			let validKeys = true;
+			objectKeys.forEach((key) => {
+				validKeys = validKeys && keys.includes(key);
+			});
+			return validType && validKeys;
+		}
+		return false;
 	}
 
 	public static checkIsValidAsteriskString(inputString: string): boolean {

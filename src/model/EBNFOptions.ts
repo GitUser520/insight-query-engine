@@ -11,7 +11,7 @@ export class EBNFOptions {
 		if (queryColumns === null || queryColumns === undefined) {
 			return false;
 		}
-		// queryColumns = queryColumns.concat(additionalColumns);
+		let isValidOptions = EBNFHelper.isInstanceOfOptions(options);
 		// check that the columns are valid
 		let validColumns = EBNFOptions.checkQueryColumns(queryColumns, datasets, additionalColumns);
 		let validOrder = true;
@@ -20,7 +20,7 @@ export class EBNFOptions {
 			validOrder = EBNFOptions.checkQueryOrder(queryOrder, queryColumns, datasets);
 		}
 
-		return validColumns && validOrder;
+		return isValidOptions && validColumns && validOrder;
 	}
 
 	// returns true if all elements in the array are valid keys

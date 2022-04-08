@@ -1,20 +1,24 @@
 import {SectionRoom} from "./QueryBody";
 import {AnyKey, ApplyKey, ApplyRule, ApplyRuleApplyKey, Key, Transformation} from "./QueryInterfaces";
 import {InsightError} from "../controller/IInsightFacade";
+import {Utils} from "./Utils";
 
 export class QueryTransform {
 	public static applyTransform(transform: Transformation, sectionRooms: SectionRoom): SectionRoom {
 		let group = transform.GROUP;
 		let applyRules = transform.APPLY;
+		if (applyRules.length === 0) {
+			return sectionRooms;
+		}
 		let applyRuleOne = applyRules[0];
-		sectionRooms = QueryTransform.applyApplyRule(applyRuleOne, sectionRooms, group);
+		let newSectionRooms = QueryTransform.applyApplyRule(applyRuleOne, sectionRooms, group);
 
 		for (let i = 1; i < applyRules.length; i++) {
-			let tempSectionRooms = QueryTransform.applyApplyRule(applyRules[i], sectionRooms, group);
-			sectionRooms = tempSectionRooms;
+			let tempSectionRooms = QueryTransform.applyApplyRule(applyRules[i], newSectionRooms, group);
+			newSectionRooms = tempSectionRooms;
 		}
 
-		return sectionRooms;
+		return newSectionRooms;
 	}
 
 	public static applyApplyRule(applyRule: ApplyRule, sectionRooms: SectionRoom, group: Key[]): SectionRoom {
@@ -29,7 +33,7 @@ export class QueryTransform {
 			throw new InsightError("ApplyRuleApplyKey has more or less than 1 key.");
 		}
 		let applyToken = applyObjectKeys[0];
-		let referencingKey = (applyToken as any)[applyToken];
+		let referencingKey = (applyObject as any)[applyToken];
 		let newSectionRoom: SectionRoom;
 
 		if (applyToken === "MAX") {
@@ -83,13 +87,16 @@ export class QueryTransform {
 			if (equivSection === null) {
 				let object: any = {};
 				for (const keyVal of group) {
-					object[keyVal] = section[keyVal];
+					let parsedKey = Utils.parseKey(keyVal);
+					object[parsedKey.field] = section[parsedKey.field];
 				}
-				object[applyKey] = section[referencingKey];
+				let parsedRefKey = Utils.parseKey(referencingKey);
+				object[applyKey] = section[parsedRefKey.field];
 				newSectionRoom.sections.push(object);
 			} else {
-				if (section[referencingKey] >= equivSection[applyKey]) {
-					equivSection[applyKey] = section[referencingKey];
+				let parsedRefKey = Utils.parseKey(referencingKey);
+				if (section[parsedRefKey.field] >= equivSection[applyKey]) {
+					equivSection[applyKey] = section[parsedRefKey.field];
 				}
 			}
 		});
@@ -99,13 +106,16 @@ export class QueryTransform {
 			if (equivSection === null) {
 				let object: any = {};
 				for (const keyVal of group) {
-					object[keyVal] = room[keyVal];
+					let parsedKey = Utils.parseKey(keyVal);
+					object[parsedKey.field] = room[parsedKey.field];
 				}
-				object[applyKey] = room[referencingKey];
+				let parsedRefKey = Utils.parseKey(referencingKey);
+				object[applyKey] = room[parsedRefKey.field];
 				newSectionRoom.rooms.push(object);
 			} else {
-				if (room[referencingKey] >= equivSection[applyKey]) {
-					equivSection[applyKey] = room[referencingKey];
+				let parsedRefKey = Utils.parseKey(referencingKey);
+				if (room[parsedRefKey.field] >= equivSection[applyKey]) {
+					equivSection[applyKey] = room[parsedRefKey.field];
 				}
 			}
 		});
@@ -121,13 +131,16 @@ export class QueryTransform {
 			if (equivSection === null) {
 				let object: any = {};
 				for (const keyVal of group) {
-					object[keyVal] = section[keyVal];
+					let parsedKey = Utils.parseKey(keyVal);
+					object[parsedKey.field] = section[parsedKey.field];
 				}
-				object[applyKey] = section[referencingKey];
+				let parsedRefKey = Utils.parseKey(referencingKey);
+				object[applyKey] = section[parsedRefKey.field];
 				newSectionRoom.sections.push(object);
 			} else {
-				if (section[referencingKey] <= equivSection[applyKey]) {
-					equivSection[applyKey] = section[referencingKey];
+				let parsedRefKey = Utils.parseKey(referencingKey);
+				if (section[parsedRefKey.field] <= equivSection[applyKey]) {
+					equivSection[applyKey] = section[parsedRefKey.field];
 				}
 			}
 		});
@@ -137,13 +150,16 @@ export class QueryTransform {
 			if (equivSection === null) {
 				let object: any = {};
 				for (const keyVal of group) {
-					object[keyVal] = room[keyVal];
+					let parsedKey = Utils.parseKey(keyVal);
+					object[parsedKey.field] = room[parsedKey.field];
 				}
-				object[applyKey] = room[referencingKey];
+				let parsedRefKey = Utils.parseKey(referencingKey);
+				object[applyKey] = room[parsedRefKey.field];
 				newSectionRoom.rooms.push(object);
 			} else {
-				if (room[referencingKey] <= equivSection[applyKey]) {
-					equivSection[applyKey] = room[referencingKey];
+				let parsedRefKey = Utils.parseKey(referencingKey);
+				if (room[parsedRefKey.field] <= equivSection[applyKey]) {
+					equivSection[applyKey] = room[parsedRefKey.field];
 				}
 			}
 		});
@@ -153,19 +169,21 @@ export class QueryTransform {
 	public static applyAvg(applyKey: ApplyKey, referencingKey: Key, sectionRooms: SectionRoom,
 		group: Key[]): SectionRoom {
 		let newSectionRoom: SectionRoom = {sections: [], rooms: []};
+		let parsedRefKey = Utils.parseKey(referencingKey);
 		sectionRooms.sections.forEach((section) => {
 			let equivSection = QueryTransform.getEquivalentSection(newSectionRoom.sections, section, group);
 			if (equivSection === null) {
 				let object: any = {};
 				for (const keyVal of group) {
-					object[keyVal] = section[keyVal];
+					let parsedKey = Utils.parseKey(keyVal);
+					object[parsedKey.field] = section[parsedKey.field];
 				}
-				object["SUM_VALUE"] = section[referencingKey];
+				object["SUM_VALUE"] = section[parsedRefKey.field];
 				object["COUNT_VALUE"] = 1;
 				object[applyKey] = object["SUM_VALUE"] / object["COUNT_VALUE"];
 				newSectionRoom.sections.push(object);
 			} else {
-				equivSection["SUM_VALUE"] += section[referencingKey];
+				equivSection["SUM_VALUE"] += section[parsedRefKey.field];
 				equivSection["COUNT_VALUE"] = equivSection["COUNT_VALUE"] + 1;
 				equivSection[applyKey] = equivSection["SUM_VALUE"] / equivSection["COUNT_VALUE"];
 			}
@@ -179,14 +197,15 @@ export class QueryTransform {
 			if (equivSection === null) {
 				let object: any = {};
 				for (const keyVal of group) {
-					object[keyVal] = room[keyVal];
+					let parsedKey = Utils.parseKey(keyVal);
+					object[parsedKey.field] = room[parsedKey.field];
 				}
-				object["SUM_VALUE"] = room[referencingKey];
+				object["SUM_VALUE"] = room[parsedRefKey.field];
 				object["COUNT_VALUE"] = 1;
 				object[applyKey] = object["SUM_VALUE"] / object["COUNT_VALUE"];
 				newSectionRoom.rooms.push(object);
 			} else {
-				equivSection["SUM_VALUE"] += room[referencingKey];
+				equivSection["SUM_VALUE"] += room[parsedRefKey.field];
 				equivSection["COUNT_VALUE"] = equivSection["COUNT_VALUE"] + 1;
 				equivSection[applyKey] = equivSection["SUM_VALUE"] / equivSection["COUNT_VALUE"];
 			}
@@ -207,7 +226,8 @@ export class QueryTransform {
 			if (equivSection === null) {
 				let object: any = {};
 				for (const keyVal of group) {
-					object[keyVal] = section[keyVal];
+					let parsedKey = Utils.parseKey(keyVal);
+					object[parsedKey.field] = section[parsedKey.field];
 				}
 				object[applyKey] = 1;
 				newSectionRoom.sections.push(object);
@@ -221,7 +241,8 @@ export class QueryTransform {
 			if (equivSection === null) {
 				let object: any = {};
 				for (const keyVal of group) {
-					object[keyVal] = room[keyVal];
+					let parsedKey = Utils.parseKey(keyVal);
+					object[parsedKey.field] = room[parsedKey.field];
 				}
 				object[applyKey] = 1;
 				newSectionRoom.rooms.push(object);
@@ -241,12 +262,15 @@ export class QueryTransform {
 			if (equivSection === null) {
 				let object: any = {};
 				for (const keyVal of group) {
-					object[keyVal] = section[keyVal];
+					let parsedKey = Utils.parseKey(keyVal);
+					object[parsedKey.field] = section[parsedKey.field];
 				}
-				object[applyKey] = section[referencingKey];
+				let parsedRefKey = Utils.parseKey(referencingKey);
+				object[applyKey] = section[parsedRefKey.field];
 				newSectionRoom.sections.push(object);
 			} else {
-				equivSection[applyKey] += section[referencingKey];
+				let parsedRefKey = Utils.parseKey(referencingKey);
+				equivSection[applyKey] += section[parsedRefKey.field];
 			}
 		});
 
@@ -255,12 +279,15 @@ export class QueryTransform {
 			if (equivSection === null) {
 				let object: any = {};
 				for (const keyVal of group) {
-					object[keyVal] = room[keyVal];
+					let parsedKey = Utils.parseKey(keyVal);
+					object[parsedKey.field] = room[parsedKey.field];
 				}
-				object[applyKey] = room[referencingKey];
+				let parsedRefKey = Utils.parseKey(referencingKey);
+				object[applyKey] = room[parsedRefKey.field];
 				newSectionRoom.rooms.push(object);
 			} else {
-				equivSection[applyKey] += room[referencingKey];
+				let parsedRefKey = Utils.parseKey(referencingKey);
+				equivSection[applyKey] += room[parsedRefKey.field];
 			}
 		});
 		return newSectionRoom;

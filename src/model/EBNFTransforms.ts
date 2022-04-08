@@ -15,7 +15,7 @@ export class EBNFTransforms {
 
 	public static checkQueryTransformations(transform: Transformation, datasets: Dataset[],
 		additionalColumns: AnyKey[]): boolean {
-		if (transform === undefined || !(typeof transform === "object")) {
+		if (transform === undefined || !EBNFHelper.isInstanceOfTransformation(transform)) {
 			return false;
 		}
 		let group = transform.GROUP;
@@ -42,7 +42,7 @@ export class EBNFTransforms {
 	}
 
 	private static checkValidApply(apply: ApplyRule[], datasets: Dataset[], additionalColumns: AnyKey[]): boolean {
-		if (!Array.isArray(apply) || apply.length === 0) {
+		if (!Array.isArray(apply)) {
 			return false;
 		}
 		let valid = true;
