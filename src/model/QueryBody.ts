@@ -133,7 +133,7 @@ export class QueryBody {
 			throw new InsightError("Invalid query.");
 		}
 		let keys = Utils.parseMKeyPair(comparator);
-		if (!EBNF.coursesMField.includes(keys.field)) {
+		if (!EBNF.allMField.includes(keys.field)) {
 			throw new InsightError("Invalid query.");
 		}
 		let resultDataset = Utils.filterByID(datasets, keys.id);

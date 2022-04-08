@@ -14,17 +14,19 @@ import {EBNFTransforms} from "./EBNFTransforms";
 export class EBNF {
 
 	public datasets: Dataset[];
-	public static coursesMField = [
+	public static allMField = [
 		"avg", "pass", "fail", "audit","year", "lat", "lon", "seats"
 	];
 
-	public static coursesSField = [
+	public static allSField = [
 		"dept", "id", "instructor", "title", "uuid", "fullname", "shortname",
 		"number", "name", "address", "type", "furniture", "href"
 	];
 
-	// public static roomsMField = ["lat", "lon", "seats"];
-	// public static roomsSField = ["fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
+	public static coursesMField = ["avg", "pass", "fail", "audit","year"];
+	public static coursesSField = ["dept", "id", "instructor", "title", "uuid"];
+	public static roomsMField = ["lat", "lon", "seats"];
+	public static roomsSField = ["fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
 	public static validDir = ["UP", "DOWN"];
 	public datasetID: string;
 	public idChanged: boolean;

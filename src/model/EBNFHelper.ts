@@ -23,7 +23,7 @@ export class EBNFHelper {
 			return false;
 		}
 		let mKeyParts = mkey.split("_");
-		if (!EBNF.coursesMField.includes(mKeyParts[1])) {
+		if (!EBNF.allMField.includes(mKeyParts[1])) {
 			return false;
 		}
 		return true;
@@ -34,7 +34,7 @@ export class EBNFHelper {
 			return false;
 		}
 		let sKeyParts = skey.split("_");
-		if (!EBNF.coursesSField.includes(sKeyParts[1])) {
+		if (!EBNF.allSField.includes(sKeyParts[1])) {
 			return false;
 		}
 		return true;
@@ -45,7 +45,7 @@ export class EBNFHelper {
 			return false;
 		}
 		let mKeyParts = mkey.split("_");
-		if (!EBNF.coursesMField.includes(mKeyParts[1])) {
+		if (!EBNF.allMField.includes(mKeyParts[1])) {
 			return false;
 		}
 		let valid = false;
@@ -61,7 +61,7 @@ export class EBNFHelper {
 			return false;
 		}
 		let sKeyParts = skey.split("_");
-		if (!EBNF.coursesSField.includes(sKeyParts[1])) {
+		if (!EBNF.allSField.includes(sKeyParts[1])) {
 			return false;
 		}
 		let valid = false;

@@ -9,8 +9,6 @@ import {EBNFHelper} from "./EBNFHelper";
 import {EBNF} from "./EBNF";
 import {QueryBody} from "./QueryBody";
 import {QuerySort} from "./QuerySort";
-import {query} from "express";
-import {QueryTransform} from "./QueryTransform";
 
 export class Query {
 	public datasets: Dataset[];
@@ -45,9 +43,9 @@ export class Query {
 		// results
 		let querySectionResults = QueryBody.getQueryByFilter(this.datasets, queryWhere, false);
 		let applyTransformationResults = querySectionResults;
-		if (queryTransforms !== undefined) {
-			applyTransformationResults = QueryTransform.applyTransform(queryTransforms, querySectionResults);
-		}
+		// if (queryTransforms !== undefined) {
+		// 	applyTransformationResults = QueryTransform.applyTransform(queryTransforms, querySectionResults);
+		// }
 		let queryResults = Utils.filterByOptions(applyTransformationResults, jsonFieldTracker);
 		if (queryOrder !== null && queryOrder !== undefined) {
 			if (EBNFHelper.isInstanceOfOrderValue(queryOrder)) {
