@@ -31,7 +31,7 @@ Table of Contents:
         - [COUNT](#count)
 - [REST API Service Example](#rest-api-service-example)
 
-See [here](<https://github.com/GitUser520/search-engine>) for the Github page. Based on the Insight UBC class project.
+See [here](<https://github.com/GitUser520/insight-query-engine>) for the Github page. Based on the Insight UBC class project.
 
 -------------
 ## How to Use
