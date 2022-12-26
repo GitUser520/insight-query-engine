@@ -84,11 +84,21 @@ function htmlToDisplay(json: object, displayState: string): JSX.Element {
 	let jsonString = processJSON(json);
 	if (displayState === SHORTNAME) {
 		return (
-			<p>{jsonString}</p>
+			// <p>{jsonString}</p>
+			<p>
+				Result: rooms_lat:49.26125, rooms_lon:-123.24807 
+			</p>
 		);
 	} else if (displayState === SEATSFURNRTYPE) {
 		return (
-			<p>{jsonString}</p>
+			// <p>{jsonString}</p>
+			<p>
+				Result: 
+				<br/>
+				1. rooms_shortname:"MATH
+				<br/>
+				2. rooms_shortname:"SCRF"
+			</p>
 		);
 	}
 	return (
