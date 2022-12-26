@@ -1,6 +1,6 @@
 # Insight Query Engine
 
-Insight is a typescript-based query processor and execution engine that performs analytics using a custom query language.
+Insight is a Typescript-based query processor and execution engine that performs analytics using a custom query language.
 
 It supports many basic analytics commands, including:
 - column selection
