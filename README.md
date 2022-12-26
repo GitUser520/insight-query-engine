@@ -72,9 +72,9 @@ More complex queries can be formed by nesting together queries with `AND` or `OR
     },
     "OPTIONS": {
         "COLUMNS": [
-        "courses_dept",
-        "courses_avg",
-        "courses_title"
+            "courses_dept",
+            "courses_avg",
+            "courses_title"
         ]
     }
 }
